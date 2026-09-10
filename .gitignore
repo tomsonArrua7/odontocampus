@@ -1,0 +1,60 @@
+# ==========================================================================
+# OdontoCampus — archivos que NUNCA se versionan
+#
+# Lo primero de la lista son los secretos. Un .env con la SERVICE_ROLE_KEY
+# subido a un repositorio queda en el historial de git para siempre: borrarlo
+# en un commit posterior NO lo elimina, sigue recuperable. Si alguna vez pasa,
+# la única salida real es rotar todas las claves.
+# ==========================================================================
+
+# --- Secretos ---------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.env
+!*.env.example
+backup.env
+secrets/
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+*.gpg
+!*.gpg.example
+
+# --- Backups y volcados -----------------------------------------------------
+# Contienen notas de estudiantes: datos personales.
+*.sql.gz
+*.dump
+*.tar.gz
+volumes/
+backups/
+
+# --- Dependencias y compilados ----------------------------------------------
+node_modules/
+dist/
+build/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# --- Herramientas y sistema -------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+.idea/
+.vscode/
+*.log
+
+# --- Claude Code ------------------------------------------------------------
+# La configuración compartida del proyecto sí se versiona (.claude/settings.json
+# y launch.json); la local de cada persona, no.
+.claude/settings.local.json
+
+# --- Excepción --------------------------------------------------------------
+# El esquema SQL sí se versiona: es código, no datos.
+!infra/supabase/sql/*.sql

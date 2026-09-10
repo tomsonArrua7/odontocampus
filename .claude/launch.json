@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "odontocampus",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["run_server.py", "8081"],
+      "port": 8081
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+# ==========================================================================
+# OdontoCampus — Ajustes sobre el docker-compose oficial de Supabase
+#
+# Copiar este archivo a /opt/supabase/docker-compose.override.yml
+# Docker Compose lo aplica solo, sin tocar el docker-compose.yml original
+# (así se puede actualizar Supabase sin perder estos cambios).
+#
+# QUÉ HACE
+#   1. Ata todos los puertos a 127.0.0.1. El compose oficial publica en
+#      0.0.0.0: sin esto, http://TU_IP:8000 responde sin TLS y salteando
+#      por completo el proxy de CloudPanel, sus reglas y sus certificados.
+#   2. Quita el puerto publicado de PostgreSQL. La base no se expone jamás.
+#      Hay bots escaneando el 5432 de todo internet las 24 horas.
+#
+# ANTES DE USARLO — importante
+#   Los servicios cambian entre versiones de Supabase. Verificá cuáles trae
+#   la tuya:
+#
+#       cd /opt/supabase && docker compose config --services
+#
+#   Comentá acá abajo los bloques de servicios que NO aparezcan en esa lista.
+#   Si definís un servicio que no existe en el compose base, Compose intenta
+#   crearlo sin imagen y falla.
+#
+# REQUISITO
+#   La etiqueta !override necesita Docker Compose v2.20 o superior
+#   (docker compose version). En versiones anteriores no se pueden quitar
+#   entradas de una lista: hay que editar el docker-compose.yml a mano.
+# ==========================================================================
+
+services:
+
+  # ------------------------------------------------------------------
+  # Kong — la puerta de entrada. Es lo único que el proxy de CloudPanel
+  # necesita alcanzar (api.odontocampus.com.ar → http://127.0.0.1:8000).
+  #
+  # El compose oficial publica también el 8443, que es EL PUERTO DEL PANEL
+  # DE CLOUDPANEL. Conflicto real: no lo publicamos. El TLS lo termina
+  # Nginx, así que Kong en HTTP plano sobre loopback alcanza y sobra.
+  # ------------------------------------------------------------------
+  kong:
+    ports: !override
+      - "127.0.0.1:8000:8000/tcp"
+
+  # ------------------------------------------------------------------
+  # PostgreSQL — sin puerto publicado. Ni siquiera en loopback.
+  # Para administrarla se usa un túnel SSH:
+  #     ssh -L 5432:127.0.0.1:5432 usuario@servidor
+  # ------------------------------------------------------------------
+  db:
+    ports: !override []
+
+  # ------------------------------------------------------------------
+  # Supavisor (pooler de conexiones). En algunas versiones se llama
+  # "pooler". Si no aparece en `docker compose config --services`,
+  # comentá este bloque entero.
+  # ------------------------------------------------------------------
+  supavisor:
+    ports: !override
+      - "127.0.0.1:5432:5432"
+      - "127.0.0.1:6543:6543"
+
+  # ------------------------------------------------------------------
+  # Analytics (Logflare). Es el contenedor que más memoria consume y la
+  # causa más común de caídas en servidores de 4 GB.
+  #
+  # Si necesitás desactivarlo, NO alcanza con apagarlo: varios servicios
+  # lo declaran en su depends_on y el arranque queda trabado. Hay que
+  # quitar esas referencias del docker-compose.yml original.
+  # ------------------------------------------------------------------
+  analytics:
+    ports: !override
+      - "127.0.0.1:4000:4000"
+
+  # ------------------------------------------------------------------
+  # Studio (el panel). No se publica: se llega por el túnel SSH a Kong.
+  # En una instalación autoalojada, Studio está protegido apenas por la
+  # contraseña básica de Kong. Exponerlo a internet es regalar la base.
+  # ------------------------------------------------------------------
+  studio:
+    ports: !override []

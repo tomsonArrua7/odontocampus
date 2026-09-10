@@ -1,0 +1,114 @@
+/* ==========================================================================
+   ODONTOCAMPUS — 05 · RESPONSIVE
+   Enfoque: la mayoría de las consultas ocurren en el celular, en el pasillo,
+   minutos antes de una mesa. El móvil no es una versión reducida: es el caso
+   de uso principal.
+   ========================================================================== */
+
+/* ---- Escritorio angosto / tablet grande --------------------------------- */
+@media (max-width: 1180px) {
+  .nav-link { padding: var(--sp-2) var(--sp-3); font-size: var(--fs-sm); }
+  .btn-search-trigger span:not(.kbd-shortcut) { display: none; }
+  .btn-search-trigger .kbd-shortcut { display: none; }
+  .btn-search-trigger { width: 40px; justify-content: center; padding: 0; }
+}
+
+/* ---- Tablet -------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  :root { --page-pad: 1rem; }
+
+  .navbar { min-height: 64px; }
+  .nav-menu { display: none; }
+  .mobile-toggle { display: flex; }
+
+  .hero-grid { grid-template-columns: 1fr; gap: var(--sp-8); }
+  .hero-title { max-width: none; }
+  .home-panel { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: var(--sp-6); }
+}
+
+/* ---- Móvil --------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .hero-banner { padding: var(--sp-8) 0; }
+  .hero-cta-group .btn { flex: 1 1 100%; }
+
+  .quick-hub-grid { grid-template-columns: 1fr; }
+
+  .section-header { margin: var(--sp-8) 0 var(--sp-5); }
+
+  .calc-stats-grid { grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+  .stat-value { font-size: var(--fs-2xl); }
+
+  .calculator-year-header { flex-direction: column; align-items: flex-start; }
+
+  /* Los filtros pasan a una columna: en 375px de ancho, dos selects lado a
+     lado dejan etiquetas cortadas. */
+  .filter-bar { flex-direction: column; align-items: stretch; }
+  .filter-group { flex-direction: column; align-items: stretch; }
+  .filter-group .field { min-width: 0; }
+
+  .news-grid, .hc-grid, .biblio-grid, .bolsa-grid,
+  .permutas-grid, .guia-grid, .mesas-grid, .revalidas-grid,
+  .grid-cards, .skeleton-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fecha-item { flex-direction: column; align-items: stretch; gap: var(--sp-3); }
+  .fecha-date-badge { width: 100%; min-width: 0; justify-content: center; }
+
+  .hc-actions, .biblio-actions { flex-direction: column; }
+  .hc-actions .btn, .biblio-actions .btn { width: 100%; }
+
+  /* Chat a pantalla casi completa: la ventana de 380px flotante en un
+     celular tapaba el contenido y dejaba el input bajo el teclado. */
+  .odontobot-window {
+    width: auto;
+    inset: var(--sp-4) var(--sp-3) var(--sp-3);
+    height: auto;
+  }
+  .odontobot-fab { bottom: var(--sp-4); right: var(--sp-4); }
+
+  .toast-container {
+    left: var(--sp-3);
+    right: var(--sp-3);
+    bottom: calc(var(--sp-4) + 66px); /* no tapar el botón del asistente */
+    max-width: none;
+  }
+
+  .modal-overlay { padding: var(--sp-2); align-items: flex-end; }
+  .modal-card { max-height: 92dvh; }
+
+  .footer-grid { grid-template-columns: 1fr; gap: var(--sp-6); }
+}
+
+/* ---- Móvil chico --------------------------------------------------------- */
+@media (max-width: 480px) {
+  .brand-title { font-size: var(--fs-md); }
+  .brand-subtitle { font-size: 0.7rem; }
+  .brand-logo-img { width: 38px; height: 38px; }
+
+  .calc-stats-grid { grid-template-columns: 1fr; }
+  .news-footer { flex-direction: column; align-items: stretch; }
+  .news-footer .btn { width: 100%; }
+
+  .day-group-header { gap: var(--sp-2); }
+  .mesa-card, .revalida-card, .card,
+  .news-card, .hc-card, .biblio-card, .bolsa-card,
+  .permuta-card, .guia-card { padding: var(--sp-4); }
+}
+
+/* ---- Pantallas anchas ---------------------------------------------------- */
+@media (min-width: 1440px) {
+  :root { --page-pad: 2rem; }
+}
+
+/* ---- Preferencia de más contraste ---------------------------------------- */
+@media (prefers-contrast: more) {
+  :root {
+    --border: var(--gray-400);
+    --border-strong: var(--gray-600);
+    --text-muted: var(--gray-700);
+  }
+  .card, .news-card, .hc-card, .biblio-card, .bolsa-card,
+  .permuta-card, .guia-card, .mesa-card, .revalida-card { border-width: 2px; }
+}

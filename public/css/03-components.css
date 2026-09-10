@@ -1,0 +1,757 @@
+/* ==========================================================================
+   ODONTOCAMPUS — 03 · COMPONENTES
+   Piezas reutilizables: botones, formularios, insignias, tarjetas, pestañas,
+   modales, avisos, estados vacíos y esqueletos de carga.
+   ========================================================================== */
+
+/* ==========================================================================
+   BOTONES
+   Altura mínima táctil de 44px en todas las variantes salvo las "sm", que
+   sólo se usan dentro de tarjetas ya densas y nunca como acción principal.
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: var(--tap-target);
+  padding: var(--sp-3) var(--sp-5);
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-semi);
+  line-height: 1.2;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: var(--transition);
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:hover { text-decoration: none; }
+.btn:active { transform: translateY(1px); }
+.btn[disabled], .btn[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-sm {
+  min-height: 36px;
+  padding: var(--sp-2) var(--sp-3);
+  font-size: var(--fs-sm);
+}
+.btn-lg {
+  min-height: 52px;
+  padding: var(--sp-4) var(--sp-6);
+  font-size: var(--fs-lg);
+}
+.btn-block { width: 100%; }
+
+.btn-magenta {
+  background-color: var(--accent);
+  color: var(--accent-on);
+  box-shadow: var(--shadow-accent);
+}
+.btn-magenta:hover {
+  background-color: var(--accent-hover);
+  color: var(--accent-on);
+  transform: translateY(-2px);
+}
+
+.btn-navy {
+  background-color: var(--brand-surface);
+  color: var(--on-brand);
+  border-color: var(--brand-surface);
+}
+.btn-navy:hover { background-color: var(--brand-navy-600); color: var(--on-brand); }
+
+.btn-outline-magenta {
+  background: transparent;
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+.btn-outline-magenta:hover {
+  background: var(--accent);
+  color: var(--accent-on);
+}
+
+/* Variante para usar sobre el hero / superficies oscuras */
+.btn-on-brand {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.45);
+  color: var(--on-brand);
+}
+.btn-on-brand:hover {
+  background: rgba(255, 255, 255, 0.20);
+  border-color: #fff;
+  color: var(--on-brand);
+}
+
+.btn-secondary {
+  background-color: var(--surface-3);
+  color: var(--text);
+  border-color: var(--border);
+}
+.btn-secondary:hover { background-color: var(--surface-hover); border-color: var(--border-strong); }
+
+.btn-whatsapp {
+  background-color: var(--whatsapp);
+  color: #fff;
+}
+.btn-whatsapp:hover { background-color: var(--whatsapp-hover); color: #fff; }
+
+.btn-danger-soft {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+.btn-danger-soft:hover { background: var(--danger); color: #fff; }
+
+.btn-icon {
+  width: var(--tap-target);
+  height: var(--tap-target);
+  min-height: var(--tap-target);
+  padding: 0;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: transparent;
+}
+.btn-ghost:hover { background: var(--surface-hover); color: var(--text); }
+
+/* ==========================================================================
+   FORMULARIOS
+   Toda entrada lleva etiqueta real (visible o .visually-hidden). Los
+   placeholders no son etiquetas: desaparecen al escribir y dejan al usuario
+   sin contexto — problema serio en formularios largos y con ansiedad.
+   ========================================================================== */
+.field { display: flex; flex-direction: column; gap: var(--sp-2); }
+
+.field-label {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semi);
+  color: var(--text-strong);
+}
+
+.field-hint {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+.form-select,
+.form-control {
+  width: 100%;
+  min-height: var(--tap-target);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  color: var(--text);
+  background-color: var(--surface);
+  transition: var(--transition);
+}
+.form-control::placeholder { color: var(--text-soft); }
+
+.form-select:hover,
+.form-control:hover { border-color: var(--text-soft); }
+
+.form-select:focus-visible,
+.form-control:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+
+.form-select {
+  appearance: none;
+  padding-right: var(--sp-8);
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+                    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: right 18px center, right 13px center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
+/* Campo de búsqueda con icono a la izquierda.
+   El icono se ancla al fondo del campo, no a su centro: así queda alineado
+   con el input tanto si el campo lleva etiqueta visible arriba como si no. */
+.search-field { position: relative; flex: 1; min-width: 220px; }
+.search-field > i {
+  position: absolute;
+  left: var(--sp-4);
+  bottom: 22px;
+  transform: translateY(50%);
+  color: var(--text-soft);
+  pointer-events: none;
+}
+.search-field .form-control { padding-left: 2.75rem; }
+
+.nota-input {
+  max-width: 92px;
+  text-align: center;
+  font-weight: var(--fw-bold);
+}
+.nota-input.active {
+  border-color: var(--success);
+  background-color: var(--success-bg);
+  color: var(--success);
+}
+.aplazos-input { max-width: 76px; text-align: center; }
+
+/* ==========================================================================
+   BARRA DE FILTROS
+   ========================================================================== */
+.filter-bar {
+  background: var(--surface);
+  padding: var(--sp-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--sp-6);
+  display: flex;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.filter-group {
+  display: flex;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  align-items: flex-end;
+  flex: 1;
+}
+.filter-group .field { min-width: 170px; }
+.filter-note {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+/* Resumen de resultados: región viva, se anuncia al filtrar */
+.results-summary {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semi);
+  color: var(--text-muted);
+  margin-bottom: var(--sp-4);
+}
+.results-summary b { color: var(--text-strong); }
+
+/* ==========================================================================
+   INSIGNIAS Y ETIQUETAS
+   ========================================================================== */
+.badge-materia-anio,
+.badge-status,
+.badge-modalidad,
+.badge-tipo-tramite,
+.news-tag,
+.bolsa-badge,
+.hc-tag,
+.mesa-day-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  font-weight: var(--fw-bold);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.badge-materia-anio {
+  background: var(--info-bg);
+  color: var(--info);
+  font-size: var(--fs-xs);
+  padding: 4px 10px;
+}
+
+.badge-status { font-size: var(--fs-xs); padding: 4px 10px; }
+.status-disponible { background: var(--success-bg); color: var(--success); }
+.status-dot { width: 7px; height: 7px; background: currentColor; border-radius: 50%; }
+
+.badge-modalidad { font-size: var(--fs-xs); padding: 4px 10px; }
+.mod-zoom { background: var(--info-bg); color: var(--info); }
+.mod-presencial { background: var(--success-bg); color: var(--success); }
+
+.badge-tipo-tramite {
+  font-size: var(--fs-xs);
+  padding: 3px 9px;
+  border-radius: var(--radius-xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+.tipo-revalida { background: var(--accent-soft); color: var(--accent-soft-text); }
+.tipo-actualizacion { background: var(--warning-bg); color: var(--warning); }
+
+.news-tag {
+  background: var(--accent-soft);
+  color: var(--accent-soft-text);
+  padding: 4px 11px;
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.hc-tag {
+  background: var(--neutral-bg);
+  color: var(--neutral-text);
+  font-size: var(--fs-xs);
+  padding: 3px 9px;
+  border-radius: var(--radius-xs);
+  font-weight: var(--fw-semi);
+}
+
+.mesa-day-badge {
+  background: var(--surface-3);
+  color: var(--text-strong);
+  font-size: var(--fs-xs);
+  padding: 4px 11px;
+}
+
+.bolsa-badge {
+  background: var(--accent-soft);
+  color: var(--accent-soft-text);
+  font-size: var(--fs-xs);
+  padding: 3px 10px;
+  margin-bottom: var(--sp-2);
+}
+
+.code-tag {
+  background: var(--neutral-bg);
+  color: var(--text-strong);
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-xs);
+}
+
+.kbd-shortcut {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 2px 7px;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--on-brand-muted);
+}
+
+/* ==========================================================================
+   TARJETA GENÉRICA
+   Toda tarjeta del sitio usa la misma base: mismo radio, mismo borde, misma
+   elevación y el mismo gesto al pasar el mouse. Antes había cinco variantes
+   ligeramente distintas y el conjunto se leía desprolijo.
+   ========================================================================== */
+.card,
+.news-card, .hc-card, .biblio-card, .bolsa-card,
+.permuta-card, .guia-card, .mesa-card, .revalida-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition);
+  position: relative;
+}
+
+.card:hover,
+.news-card:hover, .hc-card:hover, .biblio-card:hover, .bolsa-card:hover,
+.permuta-card:hover, .guia-card:hover, .mesa-card:hover, .revalida-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent);
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding-top: var(--sp-4);
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+/* Rejillas: una sola definición para todo el sitio */
+.grid-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--gap-grid);
+}
+.news-grid, .hc-grid, .biblio-grid, .bolsa-grid,
+.permutas-grid, .guia-grid, .mesas-grid, .revalidas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--gap-grid);
+}
+
+/* ==========================================================================
+   PESTAÑAS (navegación interna de sección)
+   Patrón ARIA completo: tablist / tab / tabpanel + flechas del teclado.
+   ========================================================================== */
+.tabs {
+  display: flex;
+  gap: var(--sp-1);
+  border-bottom: 2px solid var(--border);
+  margin-bottom: var(--sp-6);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: var(--tap-target);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-semi);
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.tab:hover { color: var(--text-strong); background: var(--surface-hover); }
+.tab[aria-selected="true"] {
+  color: var(--accent-text);
+  border-bottom-color: var(--accent);
+}
+.tab .tab-count {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  background: var(--surface-3);
+  color: var(--text-muted);
+  padding: 1px 8px;
+  border-radius: var(--radius-full);
+}
+.tab[aria-selected="true"] .tab-count {
+  background: var(--accent-soft);
+  color: var(--accent-soft-text);
+}
+
+.tab-panel:focus { outline: none; }
+
+/* ==========================================================================
+   AVISOS / BANNERS INFORMATIVOS
+   ========================================================================== */
+.callout {
+  display: flex;
+  gap: var(--sp-4);
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--sp-6);
+}
+.callout > i { font-size: var(--fs-xl); color: var(--accent-text); flex-shrink: 0; margin-top: 2px; }
+.callout h3 { font-size: var(--fs-lg); margin-bottom: var(--sp-2); }
+.callout p { font-size: var(--fs-base); color: var(--text-muted); }
+.callout-info { border-left-color: var(--info); }
+.callout-info > i { color: var(--info); }
+.callout-warning { border-left-color: var(--warning); }
+.callout-warning > i { color: var(--warning); }
+
+/* Lista de definiciones dentro de un aviso ("¿qué es una reválida?") */
+.def-list { display: grid; gap: var(--sp-3); margin-top: var(--sp-3); }
+.def-list > div { font-size: var(--fs-base); }
+.def-list dt { font-weight: var(--fw-bold); color: var(--text-strong); }
+.def-list dd { color: var(--text-muted); }
+
+.info-banner-foe {
+  background: linear-gradient(135deg, var(--brand-navy-800) 0%, var(--brand-navy-600) 100%);
+  color: var(--on-brand);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-6);
+  margin-bottom: var(--sp-6);
+  box-shadow: var(--shadow-md);
+  border-left: 5px solid var(--accent);
+}
+.info-banner-foe h3 {
+  color: var(--on-brand);
+  font-size: var(--fs-lg);
+  margin-bottom: var(--sp-3);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.info-banner-foe p, .info-banner-foe dd { color: var(--on-brand-muted); font-size: var(--fs-base); }
+.info-banner-foe dt { color: var(--on-brand); }
+
+/* ==========================================================================
+   ESTADOS: VACÍO, ERROR Y CARGA
+   Cada estado dice tres cosas: qué pasó, por qué, y qué puede hacer la
+   persona ahora. Nunca se deja una pantalla en blanco sin explicación.
+   ========================================================================== */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--sp-12) var(--sp-6);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--border-strong);
+}
+.empty-icon { font-size: 2.75rem; color: var(--text-soft); margin-bottom: var(--sp-4); }
+.empty-state h3 { font-size: var(--fs-xl); margin-bottom: var(--sp-2); }
+.empty-state p {
+  color: var(--text-muted);
+  margin-inline: auto;
+  max-width: 46ch;
+  margin-bottom: var(--sp-5);
+}
+.empty-state .btn { margin-inline: auto; }
+
+/* Esqueletos de carga: sustituyen al texto "Cargando..." porque muestran la
+   forma de lo que viene y reducen la sensación de espera. */
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--gap-grid);
+}
+.skeleton-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5);
+}
+.skeleton-line {
+  height: 12px;
+  border-radius: var(--radius-full);
+  background: var(--surface-3);
+  background-image: linear-gradient(90deg, var(--surface-3) 0%, var(--surface-hover) 40%, var(--surface-3) 80%);
+  background-size: 600px 100%;
+  animation: shimmer 1.4s linear infinite;
+  margin-bottom: var(--sp-3);
+}
+.skeleton-line.w-40 { width: 40%; }
+.skeleton-line.w-60 { width: 60%; }
+.skeleton-line.w-80 { width: 80%; }
+.skeleton-line.tall { height: 22px; }
+
+/* ==========================================================================
+   MODALES
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 13, 23, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: var(--z-modal);
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--sp-4);
+  overflow-y: auto;
+}
+.modal-overlay.active { display: flex; animation: fadeIn var(--dur) var(--ease); }
+
+.modal-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  max-width: 640px;
+  width: 100%;
+  max-height: calc(100dvh - var(--sp-8));
+  margin-block: auto;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  animation: scaleUp var(--dur) var(--ease);
+}
+
+.modal-card-header {
+  padding: var(--sp-4) var(--sp-5);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+}
+.modal-card-header h3 { font-size: var(--fs-xl); }
+.modal-card-body { padding: var(--sp-5); overflow-y: auto; }
+.modal-card-body p { color: var(--text-muted); }
+.modal-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+  flex-wrap: wrap;
+}
+
+.modal-lead { font-size: var(--fs-lg); color: var(--text); line-height: var(--lh-base); }
+
+.check-list { display: flex; flex-direction: column; gap: var(--sp-2); }
+.check-list li { display: flex; gap: var(--sp-3); font-size: var(--fs-base); }
+.check-list li i { color: var(--accent-text); margin-top: 5px; flex-shrink: 0; }
+
+/* Resultados del buscador global */
+.search-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  max-height: 55vh;
+  overflow-y: auto;
+}
+.search-result-item {
+  width: 100%;
+  text-align: left;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.search-result-item:hover,
+.search-result-item:focus-visible,
+.search-result-item[aria-selected="true"] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.search-result-item i { color: var(--accent-text); font-size: var(--fs-lg); flex-shrink: 0; width: 22px; text-align: center; }
+.search-result-item strong { display: block; font-size: var(--fs-base); color: var(--text-strong); }
+.search-result-item small { display: block; color: var(--text-muted); }
+.search-hint { text-align: center; padding: var(--sp-6); color: var(--text-muted); font-size: var(--fs-sm); }
+
+/* ==========================================================================
+   AVISOS FLOTANTES (toasts)
+   role="status" en el contenedor: el lector de pantalla los anuncia sin robar
+   el foco. Antes eran invisibles para quien no mira la pantalla.
+   ========================================================================== */
+.toast-container {
+  position: fixed;
+  bottom: var(--sp-6);
+  left: var(--sp-6);
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  max-width: min(400px, calc(100vw - var(--sp-8)));
+  pointer-events: none;
+}
+.toast-message {
+  background: var(--brand-navy-800);
+  color: #fff;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-semi);
+  border-left: 4px solid var(--accent);
+  pointer-events: auto;
+}
+.toast-message i { flex-shrink: 0; }
+.toast-success { border-left-color: var(--success-dot); }
+.toast-warning { border-left-color: #F59E0B; }
+.toast-danger  { border-left-color: #EF4444; }
+.toast-message.fade-out { opacity: 0; transform: translateY(8px); transition: all var(--dur-slow) var(--ease); }
+
+/* ==========================================================================
+   TABLA
+   ========================================================================== */
+.table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+.odonto-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: var(--fs-base);
+  min-width: 640px;
+}
+.odonto-table caption {
+  text-align: left;
+  padding: var(--sp-3) var(--sp-5);
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+.odonto-table th {
+  background: var(--surface-2);
+  padding: var(--sp-3) var(--sp-4);
+  font-weight: var(--fw-bold);
+  color: var(--text-strong);
+  border-bottom: 1px solid var(--border);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.odonto-table td {
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.materia-row:hover { background-color: var(--surface-2); }
+.materia-row.row-aprobada { background-color: var(--success-bg); }
+.materia-title { font-weight: var(--fw-bold); color: var(--text-strong); }
+.correlativa-info { display: block; font-size: var(--fs-xs); color: var(--text-muted); margin-top: 2px; }
+.regimen-tag { font-size: var(--fs-sm); color: var(--text-muted); }
+
+/* ==========================================================================
+   BARRA DE PROGRESO
+   ========================================================================== */
+.progress-container {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-full);
+  height: 14px;
+  overflow: hidden;
+  margin-top: var(--sp-2);
+}
+.progress-bar {
+  background: linear-gradient(90deg, var(--brand-magenta-400) 0%, var(--accent) 100%);
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.6s var(--ease);
+}
+
+/* ==========================================================================
+   CHIPS DE SUGERENCIA
+   ========================================================================== */
+.sugg-chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-strong);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-full);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semi);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.sugg-chip:hover { background: var(--accent); color: var(--accent-on); border-color: var(--accent); }
