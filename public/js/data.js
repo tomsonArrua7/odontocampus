@@ -275,57 +275,6 @@ const ODONTO_DATA = {
     }
   ],
 
-  // Permutas de Comisiones (Datos precargados y dinámicos)
-  permutasIniciales: [
-    {
-      id: "perm-1",
-      estudiante: "Valentina Rossi",
-      materia: "Operatoria Dental I",
-      anio: "3° Año",
-      comisionActual: "Comisión 4 (Martes 8:00 a 12:00)",
-      comisionDeseada: "Comisión 1 o 2 (Jueves Mañana)",
-      motivo: "Superposición horaria laboral en consultorio.",
-      contactoWhatsapp: "2214987654",
-      fechaPublicacion: "Hace 1 día",
-      estado: "Disponible"
-    },
-    {
-      id: "perm-2",
-      estudiante: "Lucas Benítez",
-      materia: "Cirugía Bucomaxilofacial I",
-      anio: "4° Año",
-      comisionActual: "Comisión 6 (Viernes 14:00 a 18:00)",
-      comisionDeseada: "Comisión 3 (Miércoles 8:00 a 12:00)",
-      motivo: "Viajo desde el interior los viernes.",
-      contactoWhatsapp: "2215891234",
-      fechaPublicacion: "Hace 2 días",
-      estado: "Disponible"
-    },
-    {
-      id: "perm-3",
-      estudiante: "Camila Fernández",
-      materia: "Anatomía General e Histología",
-      anio: "1° Año",
-      comisionActual: "Comisión 12 (Lunes 18:00 a 22:00)",
-      comisionDeseada: "Comisión 2, 3 o 4 (Cualquier día Mañana)",
-      motivo: "Dificultad de transporte nocturno hacia Berisso.",
-      contactoWhatsapp: "2216123456",
-      fechaPublicacion: "Hace 3 días",
-      estado: "Disponible"
-    },
-    {
-      id: "perm-4",
-      estudiante: "Matías Gómez",
-      materia: "Periodoncia I",
-      anio: "3° Año",
-      comisionActual: "Comisión 2 (Lunes 8:00 a 12:00)",
-      comisionDeseada: "Comisión 5 (Jueves 14:00 a 18:00)",
-      motivo: "Coordinación con pareja de clínica.",
-      contactoWhatsapp: "2215443322",
-      fechaPublicacion: "Hace 4 días",
-      estado: "Disponible"
-    }
-  ],
 
   // Biblioteca de Apuntes y Recursos por Materia
   biblioteca: [

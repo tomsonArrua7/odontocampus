@@ -34,16 +34,17 @@ rindo?", "¿qué llevo a la clínica?", "¿cómo vengo?".
 | **Cuándo rindo** | Mesas de finales · Reválidas y actualizaciones | ¿Cuándo y dónde rindo? |
 | **Cursada y clínica** | Historias clínicas · Instrumental · Bolsa de compra y venta | ¿Qué necesito para atender? |
 | **Biblioteca** | — | ¿Con qué estudio? |
-| **Mi carrera** | Mi promedio · Permutas de comisión | ¿Cómo vengo? |
+| **Mi promedio** | — | ¿Cómo vengo? |
 
 ### Rutas
 
 El estado vive en el hash: `#seccion` o `#seccion/pestaña`.
-Ejemplos: `#fechas/revalidas`, `#cursada/instrumental`, `#carrera/promedio`.
+Ejemplos: `#fechas/revalidas`, `#cursada/instrumental`, `#carrera`.
 
-Los enlaces de la versión anterior (`#mesas`, `#calculadora`, `#historias`…)
-siguen funcionando: hay una tabla de alias en `js/app.js`. Si alguien guardó un
-enlace o lo compartió por WhatsApp, no se le rompe.
+Los enlaces de versiones anteriores (`#mesas`, `#calculadora`, `#historias`,
+`#carrera/permutas`…) siguen funcionando: hay una tabla de alias en `js/app.js`
+y la URL se normaliza sola. Si alguien guardó un enlace o lo compartió por
+WhatsApp, no se le rompe.
 
 ---
 
@@ -69,7 +70,6 @@ public/               EL SITIO. Es exactamente lo que se copia a htdocs/
     calculator.js     Promedio y avance de carrera
     sync.js           Sincronización de notas: consentimiento, cifrado, mezcla
     auth.js           Ingreso por código de email y panel de cuenta
-    permutas.js       Tablón de permutas de comisión
     chatbot.js        OdontoBot (buscador de preguntas frecuentes)
     app.js            Router, inicio, historias clínicas, biblioteca, buscador
 
@@ -171,7 +171,7 @@ saltea todas las políticas y vive sólo en el `.env` del servidor.
 ### 1. Nada entra al DOM sin escapar
 
 Los datos de mesas y reválidas los edita gente ajena a este repositorio, y las
-publicaciones de la bolsa y de permutas las escribe cualquier estudiante. Todo
+publicaciones de la bolsa las escribe cualquier estudiante. Todo
 eso se inserta con `innerHTML`.
 
 ```js
@@ -271,10 +271,6 @@ El filtro de días se arma solo con los días que la planilla realmente trae.
 
 ## Pendientes conocidos
 
-- **Permutas**: las publicaciones se guardan en `localStorage`, o sea que cada
-  persona ve solo las propias más las de ejemplo. Para que la permuta sirva de
-  verdad hace falta un backend compartido. La interfaz lo dice explícitamente en
-  vez de aparentar una red que no existe.
 - **Biblioteca**: las fichas de apuntes existen pero no hay archivos detrás. El
   botón avisa que el material todavía no está subido.
 - **Font Awesome** se carga completo desde un CDN (~300 KB). Cuando el conjunto

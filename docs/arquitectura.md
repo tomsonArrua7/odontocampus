@@ -24,7 +24,8 @@ construir y por qué.
 > |---|---|---|
 > | Caddy como proxy | **Nginx de CloudPanel** | CloudPanel ya gestiona Nginx y renueva Let's Encrypt solo. Agregar Caddy sería una segunda pieza compitiendo por los puertos 80 y 443. |
 > | API propia en Node + Fastify (§7) | **Supabase autoalojado** | Auth con enlace por email, Postgres, RLS, Storage y REST ya resueltos. Menos código propio que mantener con un equipo que rota. |
-> | Sesión en cookie `httpOnly` (§3) | **Token en `localStorage`** | `supabase-js` sobre un sitio estático no puede usar cookies `httpOnly`: requieren una capa de servidor que renderice. Es un compromiso real, detallado en §7 del documento de despliegue. |
+> | Sesión en cookie `httpOnly` (§3) | **Token en `localStorage`** | El sitio es estático y las cookies `httpOnly` requieren una capa de servidor que renderice. Es un compromiso real, detallado en §7 del documento de despliegue. |
+> | Permutas de comisión (§4, §10 fase 2) | **Dadas de baja** | Decisión del equipo: no van a la web. La tabla se quitó del esquema y el módulo del sitio. Queda en el historial de git por si alguna vez se retoma. |
 >
 > **Lo que NO cambió, y es lo más importante:** las notas se cifran en el
 > navegador y la base no tiene columna `nota`, `promedio` ni `materia`

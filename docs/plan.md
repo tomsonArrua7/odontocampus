@@ -24,6 +24,7 @@ supone que el anterior está cerrado.
 | Repositorio en `github.com/tomsonArrua7/odontocampus` | — |
 | Dominio `odontocampus.com.ar` | Apuntar el DNS |
 | Frontend de cuentas completo (acceso, cifrado, sincronización) | Enchufarlo al servidor |
+| Permutas dadas de baja | — |
 | — | Servidor, SMTP, aplicar el esquema |
 
 ---
@@ -33,7 +34,7 @@ supone que el anterior está cerrado.
 Lo que bloquea a todo lo demás, en orden:
 
 ```
-Dominio ✅ ──▶ DNS ──▶ Sitios en CloudPanel ──▶ Certificados
+Dominio ✅ ──▶ DNS ✅ ──▶ Sitios en CloudPanel ──▶ Certificados
                                                     │
                                                     ▼
                           Supabase ──▶ Esquema ──▶ ANON_KEY en config.js
@@ -88,9 +89,9 @@ por acá.
 
 Guía completa: [`despliegue-cloudpanel.md`](despliegue-cloudpanel.md).
 
-- [ ] Swap de 4 GB (el servidor tiene 2 GB de RAM)
-- [ ] DNS: `@`, `www` y `api` apuntando a la IP
-- [ ] CloudPanel → **Create a Static HTML Site** para `odontocampus.com.ar`
+- [x] DNS: `@`, `www` y `api` apuntando a `179.43.126.185`, en **DNS only**
+- [ ] CloudPanel → **Create a Static HTML Site** para `odontocampus.com.ar`,
+      y después agregarle `www.odontocampus.com.ar` en *Domains*
 - [ ] CloudPanel → **Create a Reverse Proxy** para `api.odontocampus.com.ar`
       → `http://127.0.0.1:8000`
 - [ ] Certificados Let's Encrypt en ambos (después de que el DNS resuelva)
@@ -141,17 +142,6 @@ alguien no inicia sesión nunca, el sitio le funciona igual que hoy.
 
 ---
 
-## Bloque F — Permutas reales 💻
-
-- [ ] Migrar `permutas.js` de `localStorage` a Supabase
-- [ ] Botón de reportar
-- [ ] Vencimiento a 60 días con opción de renovar
-
-Es la primera función que **necesita** un servidor para existir: hoy cada
-persona ve solamente sus propias publicaciones.
-
----
-
 ## Bloque G — Legal y moderación 👥
 
 Esto no se puede saltear ni dejar para después: condiciona lo que se puede
@@ -197,15 +187,14 @@ Menores, pero anotados para que no se pierdan:
 
 Con el dominio y el repositorio listos, quedan tres pasos tuyos:
 
-1. **DNS**: apuntar `@`, `www` y `api` a la IP del servidor. Todo lo demás
-   espera por esto.
-2. **Resend → Add domain** `odontocampus.com.ar` y cargar SPF y DKIM. Los
+1. **Resend → Add domain** `odontocampus.com.ar` y cargar SPF y DKIM. Los
    registros tardan en propagar: conviene largarlo ya aunque falte el resto.
-3. **Swap de 4 GB** antes de instalar Supabase. Son 2 GB de RAM y el margen es
-   chico.
+2. **Los dos sitios en CloudPanel** (Static HTML Site + Reverse Proxy) y sus
+   certificados.
+3. **Supabase** en `/opt/supabase`, con el override de puertos.
 
-Después, los dos sitios en CloudPanel y Supabase. La guía completa está en
+La guía completa está en
 [`despliegue-cloudpanel.md`](despliegue-cloudpanel.md).
 
-Mientras tanto, el próximo bloque de código es **F — permutas al servidor**,
-que ya puede apoyarse en la sesión que construimos.
+Del lado del código, lo que queda depende de que exista el servidor: pegar la
+`ANON_KEY` en `config.js`, la CSP en el vhost y el borrado de cuenta.

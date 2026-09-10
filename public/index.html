@@ -69,7 +69,7 @@
         <li><a href="#fechas" class="nav-link" data-nav="fechas"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i> Cuándo rindo</a></li>
         <li><a href="#cursada" class="nav-link" data-nav="cursada"><i class="fa-solid fa-tooth" aria-hidden="true"></i> Cursada y clínica</a></li>
         <li><a href="#biblioteca" class="nav-link" data-nav="biblioteca"><i class="fa-solid fa-book-bookmark" aria-hidden="true"></i> Biblioteca</a></li>
-        <li><a href="#carrera" class="nav-link" data-nav="carrera"><i class="fa-solid fa-chart-line" aria-hidden="true"></i> Mi carrera</a></li>
+        <li><a href="#carrera" class="nav-link" data-nav="carrera"><i class="fa-solid fa-calculator" aria-hidden="true"></i> Mi promedio</a></li>
       </ul>
 
       <div class="nav-utils">
@@ -109,8 +109,7 @@
         <li><a href="#cursada/instrumental" class="nav-link" data-nav="cursada/instrumental"><i class="fa-solid fa-toolbox" aria-hidden="true"></i> Instrumental por cátedra</a></li>
         <li><a href="#cursada/bolsa" class="nav-link" data-nav="cursada/bolsa"><i class="fa-solid fa-tags" aria-hidden="true"></i> Bolsa de compra y venta</a></li>
         <li><a href="#biblioteca" class="nav-link" data-nav="biblioteca"><i class="fa-solid fa-book-bookmark" aria-hidden="true"></i> Biblioteca de apuntes</a></li>
-        <li><a href="#carrera/promedio" class="nav-link" data-nav="carrera/promedio"><i class="fa-solid fa-calculator" aria-hidden="true"></i> Mi promedio</a></li>
-        <li><a href="#carrera/permutas" class="nav-link" data-nav="carrera/permutas"><i class="fa-solid fa-right-left" aria-hidden="true"></i> Permutas de comisión</a></li>
+        <li><a href="#carrera" class="nav-link" data-nav="carrera"><i class="fa-solid fa-calculator" aria-hidden="true"></i> Mi promedio</a></li>
       </ul>
       </nav>
       <p class="mobile-nav-note">¿Necesitás algo puntual? Usá el buscador: encuentra mesas, materias, apuntes e historias clínicas a la vez.</p>
@@ -161,7 +160,7 @@
                 <i class="fa-solid fa-file-medical" aria-hidden="true"></i>
                 <span>Historias clínicas<small>Listas para imprimir</small></span>
               </button>
-              <button type="button" class="quick-btn" data-action="ir" data-destino="carrera/promedio">
+              <button type="button" class="quick-btn" data-action="ir" data-destino="carrera">
                 <i class="fa-solid fa-calculator" aria-hidden="true"></i>
                 <span>Mi promedio<small>Con y sin aplazos</small></span>
               </button>
@@ -458,31 +457,19 @@
   </section>
 
   <!-- ======================================================================
-       MI CARRERA — promedio + permutas
-       El módulo de permutas ya existía en el código pero nunca se había
-       enlazado a la página: no había forma de llegar a él.
+       MI PROMEDIO
        ====================================================================== -->
   <section id="seccion-carrera" class="app-section" aria-labelledby="titulo-carrera">
     <div class="container">
       <div class="section-header">
         <div class="section-title-wrap">
-          <h2 id="titulo-carrera"><i class="fa-solid fa-chart-line" aria-hidden="true"></i> Mi carrera</h2>
-          <p>Tu recorrido personal: cómo venís con el promedio y dónde coordinar un cambio de comisión.</p>
+          <h2 id="titulo-carrera"><i class="fa-solid fa-calculator" aria-hidden="true"></i> Mi promedio</h2>
+          <p>Llevá el control de tus notas y mirá cuánto llevás de la carrera. Con y sin aplazos, como lo calcula la UNLP.</p>
         </div>
       </div>
 
-      <div class="tabs" role="tablist" aria-label="Secciones de mi carrera">
-        <button type="button" class="tab" role="tab" id="tab-promedio" data-tab="promedio"
-                aria-controls="panel-promedio" aria-selected="true">
-          <i class="fa-solid fa-calculator" aria-hidden="true"></i> Mi promedio
-        </button>
-        <button type="button" class="tab" role="tab" id="tab-permutas" data-tab="permutas"
-                aria-controls="panel-permutas" aria-selected="false" tabindex="-1">
-          <i class="fa-solid fa-right-left" aria-hidden="true"></i> Permutas de comisión
-        </button>
-      </div>
 
-      <div class="tab-panel" id="panel-promedio" role="tabpanel" aria-labelledby="tab-promedio" tabindex="0">
+      <div id="panel-promedio">
 
         <!-- Ofrecimiento de sincronizar, en contexto y no como modal al
              entrar. Lo pinta js/sync.js según el estado de la sesión. -->
@@ -551,42 +538,6 @@
 
         <div id="calculadora-materias-lista"></div>
       </div>
-
-      <div class="tab-panel" id="panel-permutas" role="tabpanel" aria-labelledby="tab-permutas" tabindex="0" hidden>
-        <div class="callout">
-          <i class="fa-solid fa-right-left" aria-hidden="true"></i>
-          <div>
-            <h3>Cómo funciona una permuta</h3>
-            <p>Publicás en qué comisión estás y a cuál necesitás pasar. Cuando alguien busca el cambio inverso, se contactan y presentan la nota juntos en Alumnos. Las publicaciones se guardan en tu navegador.</p>
-          </div>
-        </div>
-
-        <div class="filter-bar">
-          <div class="filter-group">
-            <div class="field">
-              <label class="field-label" for="permutas-filter-anio">Año</label>
-              <select id="permutas-filter-anio" class="form-select">
-                <option value="todos">Todos los años</option>
-                <option value="1°">1° año</option>
-                <option value="2°">2° año</option>
-                <option value="3°">3° año</option>
-                <option value="4°">4° año</option>
-                <option value="5°">5° año</option>
-              </select>
-            </div>
-            <div class="field search-field">
-              <label class="field-label" for="permutas-search-input">Buscar materia</label>
-              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-              <input type="search" id="permutas-search-input" class="form-control" placeholder="Operatoria, Periodoncia…">
-            </div>
-          </div>
-          <button type="button" class="btn btn-magenta" data-action="abrirNuevaPermuta">
-            <i class="fa-solid fa-plus" aria-hidden="true"></i> Publicar una permuta
-          </button>
-        </div>
-
-        <p class="results-summary" id="permutas-summary" role="status" aria-live="polite"></p>
-        <div class="permutas-grid" id="permutas-grid"></div>
       </div>
     </div>
   </section>
@@ -671,61 +622,6 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-permuta" role="dialog" aria-modal="true" aria-labelledby="permuta-modal-title" aria-hidden="true">
-  <div class="modal-card">
-    <form id="form-permuta">
-      <div class="modal-card-header">
-        <h2 id="permuta-modal-title">Publicar una permuta</h2>
-        <button type="button" class="btn btn-icon btn-secondary" data-action="cerrarPermuta" aria-label="Cerrar">
-          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-        </button>
-      </div>
-      <div class="modal-card-body stack">
-        <div class="field">
-          <label class="field-label" for="permuta-estudiante">Tu nombre o cómo querés que te identifiquen</label>
-          <input type="text" id="permuta-estudiante" class="form-control" required maxlength="60" placeholder="Ej: Ana G.">
-          <p class="field-hint">Se muestra públicamente en la tarjeta. Podés usar un apodo.</p>
-        </div>
-        <div class="field">
-          <label class="field-label" for="permuta-materia">Materia</label>
-          <input type="text" id="permuta-materia" class="form-control" required maxlength="80" placeholder="Ej: Operatoria Dental II">
-        </div>
-        <div class="field">
-          <label class="field-label" for="permuta-anio">Año</label>
-          <select id="permuta-anio" class="form-select" required>
-            <option value="1°">1° año</option>
-            <option value="2°">2° año</option>
-            <option value="3°">3° año</option>
-            <option value="4°">4° año</option>
-            <option value="5°">5° año</option>
-          </select>
-        </div>
-        <div class="field">
-          <label class="field-label" for="permuta-actual">Comisión en la que estás</label>
-          <input type="text" id="permuta-actual" class="form-control" required maxlength="60" placeholder="Ej: Comisión 3 · Lunes 8 a 12">
-        </div>
-        <div class="field">
-          <label class="field-label" for="permuta-deseada">Comisión que necesitás</label>
-          <input type="text" id="permuta-deseada" class="form-control" required maxlength="60" placeholder="Ej: Comisión 7 · Jueves 14 a 18">
-        </div>
-        <div class="field">
-          <label class="field-label" for="permuta-motivo">Motivo <span class="field-hint">(opcional)</span></label>
-          <input type="text" id="permuta-motivo" class="form-control" maxlength="140" placeholder="Ej: Se me superpone con el trabajo">
-        </div>
-        <div class="field">
-          <label class="field-label" for="permuta-contacto">WhatsApp de contacto</label>
-          <input type="tel" id="permuta-contacto" class="form-control" required maxlength="20" inputmode="tel" placeholder="Ej: 2215550192">
-          <p class="field-hint">Sin 0 ni 15. Quedará visible para quien quiera coordinar la permuta con vos.</p>
-        </div>
-      </div>
-      <div class="modal-card-footer">
-        <button type="button" class="btn btn-secondary" data-action="cerrarPermuta">Cancelar</button>
-        <button type="submit" class="btn btn-magenta"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Publicar</button>
-      </div>
-    </form>
-  </div>
-</div>
-
 <!-- ==========================================================================
      ACCESO — dos pasos: email y código
      ========================================================================== -->
@@ -759,8 +655,8 @@
           <div>
             <h3>No hace falta cuenta para lo importante</h3>
             <p>Las mesas, las reválidas, las historias clínicas, el instrumental y la
-               biblioteca están abiertos. La cuenta sirve para sincronizar tu promedio,
-               publicar permutas y avisarte cuándo rendís.</p>
+               biblioteca están abiertos. La cuenta sirve para sincronizar tu promedio
+               y avisarte cuándo rendís.</p>
           </div>
         </div>
       </div>
@@ -990,8 +886,7 @@
           <li><a href="#fechas/revalidas" data-nav="fechas/revalidas">Reválidas</a></li>
           <li><a href="#cursada/historias" data-nav="cursada/historias">Historias clínicas</a></li>
           <li><a href="#cursada/instrumental" data-nav="cursada/instrumental">Instrumental</a></li>
-          <li><a href="#carrera/promedio" data-nav="carrera/promedio">Mi promedio</a></li>
-          <li><a href="#carrera/permutas" data-nav="carrera/permutas">Permutas</a></li>
+          <li><a href="#carrera" data-nav="carrera">Mi promedio</a></li>
         </ul>
       </div>
 
@@ -1031,7 +926,6 @@
 <script src="js/calculator.js"></script>
 <script src="js/sync.js"></script>
 <script src="js/auth.js"></script>
-<script src="js/permutas.js"></script>
 <script src="js/chatbot.js"></script>
 <script src="js/app.js"></script>
 </body>

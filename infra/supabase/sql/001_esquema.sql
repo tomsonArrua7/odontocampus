@@ -96,8 +96,8 @@ create trigger perfiles_actualizado_at
 
 alter table public.perfiles enable row level security;
 
--- Los perfiles son visibles entre estudiantes: sin esto, una permuta no
--- puede mostrar de quién es. Sólo para quien inició sesión, nunca anónimo.
+-- Los perfiles son visibles entre estudiantes: sin esto, una publicación de
+-- la bolsa no puede mostrar de quién es. Sólo para quien inició sesión.
 create policy "perfiles: lectura autenticada"
   on public.perfiles for select
   to authenticated
@@ -228,73 +228,6 @@ create policy "notas: sólo el dueño"
 
 
 -- ==========================================================================
--- PERMUTAS DE COMISIÓN
--- La primera función que necesita un servidor para existir: hoy vive en
--- localStorage y cada persona ve solamente las suyas.
--- ==========================================================================
-
-create table if not exists public.permutas (
-  id                uuid primary key default gen_random_uuid(),
-  usuario_id        uuid not null references auth.users(id) on delete cascade,
-  materia           text not null check (char_length(trim(materia)) between 2 and 90),
-  anio              smallint not null check (anio between 1 and 5),
-  comision_actual   text not null check (char_length(trim(comision_actual)) between 1 and 80),
-  comision_deseada  text not null check (char_length(trim(comision_deseada)) between 1 and 80),
-  motivo            text check (char_length(motivo) <= 200),
-  estado            text not null default 'abierta'
-                      check (estado in ('abierta', 'resuelta', 'retirada')),
-  creado_at         timestamptz not null default now(),
-  -- Las publicaciones viejas son lo que mata cualquier tablón. Vencen solas.
-  expira_at         timestamptz not null default (now() + interval '60 days')
-);
-
-create index if not exists permutas_vigentes_idx
-  on public.permutas (anio, materia)
-  where estado = 'abierta';
-
-create index if not exists permutas_usuario_idx
-  on public.permutas (usuario_id);
-
-alter table public.permutas enable row level security;
-
-create policy "permutas: ver las vigentes"
-  on public.permutas for select
-  to authenticated
-  using (
-    estado = 'abierta' and expira_at > now()
-    or (select auth.uid()) = usuario_id   -- las propias siempre, aun vencidas
-  );
-
--- El WITH CHECK hace tres cosas: que la fila sea tuya, que estés habilitado
--- (cuenta activa + 24 h), y que no superes 5 publicaciones abiertas.
-create policy "permutas: publicar la propia"
-  on public.permutas for insert
-  to authenticated
-  with check (
-    (select auth.uid()) = usuario_id
-    and public.puede_publicar((select auth.uid()))
-    and (
-      select count(*)
-      from public.permutas p
-      where p.usuario_id = (select auth.uid())
-        and p.estado = 'abierta'
-        and p.expira_at > now()
-    ) < 5
-  );
-
-create policy "permutas: editar la propia"
-  on public.permutas for update
-  to authenticated
-  using  ((select auth.uid()) = usuario_id)
-  with check ((select auth.uid()) = usuario_id);
-
-create policy "permutas: borrar la propia"
-  on public.permutas for delete
-  to authenticated
-  using ((select auth.uid()) = usuario_id);
-
-
--- ==========================================================================
 -- BOLSA DE COMPRA Y VENTA
 -- Sin pagos en la plataforma, a propósito: el sitio dice "coordiná en la
 -- facultad". Sin dinero de por medio, la estafa posible es mucho menor.
@@ -365,7 +298,7 @@ create policy "bolsa: borrar la propia"
 
 create table if not exists public.reportes (
   id            uuid primary key default gen_random_uuid(),
-  tipo_objeto   text not null check (tipo_objeto in ('permuta', 'bolsa', 'perfil')),
+  tipo_objeto   text not null check (tipo_objeto in ('bolsa', 'perfil')),
   objeto_id     uuid not null,
   reportante_id uuid not null references auth.users(id) on delete cascade,
   motivo        text not null check (char_length(trim(motivo)) between 5 and 500),
@@ -406,7 +339,6 @@ revoke all on all tables in schema public from anon;
 grant usage on schema public to authenticated;
 
 grant select, insert, update, delete on
-  public.permutas,
   public.publicaciones_bolsa,
   public.notas_academicas
   to authenticated;

@@ -349,7 +349,7 @@
    ========================================================================== */
 .card,
 .news-card, .hc-card, .biblio-card, .bolsa-card,
-.permuta-card, .guia-card, .mesa-card, .revalida-card {
+.guia-card, .mesa-card, .revalida-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -363,7 +363,7 @@
 
 .card:hover,
 .news-card:hover, .hc-card:hover, .biblio-card:hover, .bolsa-card:hover,
-.permuta-card:hover, .guia-card:hover, .mesa-card:hover, .revalida-card:hover {
+.guia-card:hover, .mesa-card:hover, .revalida-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-lg);
   border-color: var(--accent);
@@ -396,7 +396,7 @@
   gap: var(--gap-grid);
 }
 .news-grid, .hc-grid, .biblio-grid, .bolsa-grid,
-.permutas-grid, .guia-grid, .mesas-grid, .revalidas-grid {
+.guia-grid, .mesas-grid, .revalidas-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: var(--gap-grid);

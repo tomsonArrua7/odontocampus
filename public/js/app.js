@@ -19,7 +19,7 @@
     fechas:     { titulo: "Cuándo rindo", tabs: ["mesas", "revalidas"] },
     cursada:    { titulo: "Cursada y clínica", tabs: ["historias", "instrumental", "bolsa"] },
     biblioteca: { titulo: "Biblioteca de apuntes", tabs: null },
-    carrera:    { titulo: "Mi carrera", tabs: ["promedio", "permutas"] }
+    carrera:    { titulo: "Mi promedio", tabs: null }
   };
 
   /* Enlaces viejos que la gente pudo haber guardado o compartido por WhatsApp.
@@ -30,9 +30,10 @@
     historias: "cursada/historias",
     instrumental: "cursada/instrumental",
     bolsa: "cursada/bolsa",
-    calculadora: "carrera/promedio",
-    promedio: "carrera/promedio",
-    permutas: "carrera/permutas"
+    calculadora: "carrera",
+    promedio: "carrera",
+    // Enlaces viejos a las permutas: llevan al promedio en vez de a un 404.
+    permutas: "carrera"
   };
 
   var OdontoApp = {
@@ -62,7 +63,6 @@
       this.initBuscadorGlobal();
 
       if (global.OdontoCalculator) global.OdontoCalculator.init();
-      if (global.OdontoPermutas) global.OdontoPermutas.init();
       if (global.OdontoBot) global.OdontoBot.init();
       if (global.OdontoLiveSheets) global.OdontoLiveSheets.init();
 
@@ -186,7 +186,18 @@
     },
 
     aplicarRutaDeUrl: function () {
-      this.mostrar(this.parsearRuta(global.location.hash), false);
+      var destino = this.parsearRuta(global.location.hash);
+
+      /* Normalizamos la URL sin dejar rastro en el historial. Un enlace viejo
+         como #carrera/permutas abre la sección correcta, pero si la barra de
+         direcciones sigue mostrando una ruta que ya no existe, lo que se
+         comparte o se guarda en favoritos vuelve a ser la ruta muerta. */
+      var canonica = "#" + destino.seccion + (destino.tab ? "/" + destino.tab : "");
+      if (global.location.hash !== canonica) {
+        global.history.replaceState(null, "", canonica);
+      }
+
+      this.mostrar(destino, false);
     },
 
     mostrar: function (destino, forzarFoco) {
@@ -238,9 +249,8 @@
       if (seccion === "fechas" && global.OdontoLiveSheets) {
         if (tab === "revalidas") global.OdontoLiveSheets.renderRevalidas();
         else global.OdontoLiveSheets.renderMesasExamen();
-      } else if (seccion === "carrera") {
-        if (tab === "permutas" && global.OdontoPermutas) global.OdontoPermutas.render();
-        else if (global.OdontoCalculator) global.OdontoCalculator.renderTabla();
+      } else if (seccion === "carrera" && global.OdontoCalculator) {
+        global.OdontoCalculator.renderTabla();
       }
     },
 

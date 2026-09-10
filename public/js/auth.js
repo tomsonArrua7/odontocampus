@@ -276,7 +276,6 @@
       Promise.all([
         Api.seleccionar("perfiles", "select=*&id=eq." + usuario.id).catch(function () { return []; }),
         Api.seleccionar("consentimientos", "select=*").catch(function () { return []; }),
-        Api.seleccionar("permutas", "select=*&usuario_id=eq." + usuario.id).catch(function () { return []; }),
         Api.seleccionar("notas_academicas", "select=*").catch(function () { return []; })
       ]).then(function (partes) {
         var paquete = {
@@ -284,8 +283,7 @@
           cuenta: { id: usuario.id, email: usuario.email, creada: usuario.created_at },
           perfil: partes[0],
           consentimientos: partes[1],
-          permutas: partes[2],
-          notas_academicas: partes[3],
+          notas_academicas: partes[2],
           nota: "Las notas figuran cifradas: sólo se descifran en tu navegador " +
                 "con tu clave de notas. Ni siquiera quien administra el servidor " +
                 "puede leerlas."
@@ -318,7 +316,7 @@
       global.OdontoApp.mostrarModalGenerico(
         "<h2>Eliminar mi cuenta</h2>",
         "<p>Podemos borrar tu cuenta y todo lo asociado: perfil, notas " +
-        "sincronizadas, permutas y publicaciones.</p>" +
+        "sincronizadas y publicaciones.</p>" +
         '<div class="callout callout-warning" style="margin-top:1.25rem">' +
           '<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>' +
           "<div><h3>Todavía no es automático</h3>" +

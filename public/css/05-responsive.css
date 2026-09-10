@@ -48,7 +48,7 @@
   .filter-group .field { min-width: 0; }
 
   .news-grid, .hc-grid, .biblio-grid, .bolsa-grid,
-  .permutas-grid, .guia-grid, .mesas-grid, .revalidas-grid,
+  .guia-grid, .mesas-grid, .revalidas-grid,
   .grid-cards, .skeleton-grid {
     grid-template-columns: 1fr;
   }
@@ -94,7 +94,7 @@
   .day-group-header { gap: var(--sp-2); }
   .mesa-card, .revalida-card, .card,
   .news-card, .hc-card, .biblio-card, .bolsa-card,
-  .permuta-card, .guia-card { padding: var(--sp-4); }
+  .guia-card { padding: var(--sp-4); }
 }
 
 /* ---- Pantallas anchas ---------------------------------------------------- */
@@ -110,5 +110,5 @@
     --text-muted: var(--gray-700);
   }
   .card, .news-card, .hc-card, .biblio-card, .bolsa-card,
-  .permuta-card, .guia-card, .mesa-card, .revalida-card { border-width: 2px; }
+  .guia-card, .mesa-card, .revalida-card { border-width: 2px; }
 }
