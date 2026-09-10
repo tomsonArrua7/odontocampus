@@ -68,19 +68,76 @@ Let's Encrypt Certificate**. Agregá también `www.odontocampus.com.ar`.
 
 Certificado Let's Encrypt igual que el anterior.
 
-### DNS (antes de pedir los certificados)
+### DNS: delegar nic.ar a Cloudflare
 
-Let's Encrypt valida por HTTP: si el DNS no resuelve todavía, la emisión falla.
+Un `.com.ar` se registra en **nic.ar**, que por defecto queda con los
+servidores de nombres del propio NIC. Para que manden los registros que cargás
+en Cloudflare hay que **delegar**: decirle a nic.ar que la autoridad sobre la
+zona pasa a los servidores de Cloudflare.
 
-| Tipo | Nombre | Valor |
-|---|---|---|
-| A | `@` | IP del servidor |
-| A | `www` | IP del servidor |
-| A | `api` | IP del servidor |
+**Cargar los registros en Cloudflare no alcanza.** Mientras la delegación no
+esté hecha, esos registros no los ve nadie: el dominio sigue resolviendo (o no
+resolviendo) por nic.ar. Es el error más común y cuesta darse cuenta, porque el
+panel de Cloudflare muestra todo en verde.
 
-`.com.ar` se tramita en **nic.ar y requiere CUIT argentino**. Conviene definir
-antes a nombre de quién queda: si va a nombre de una persona y esa persona se
-aleja de FOE, la agrupación pierde el dominio.
+#### 1. Los servidores de Cloudflare
+
+En Cloudflare, botón **Continue to activation**. Te da dos nombres del estilo:
+
+```
+alice.ns.cloudflare.com
+bob.ns.cloudflare.com
+```
+
+Son **específicos de tu cuenta**: no sirven los de otro dominio tuyo.
+
+#### 2. Cargarlos en nic.ar
+
+1. Entrar a [nic.ar](https://nic.ar) e iniciar sesión (Clave Fiscal de AFIP).
+2. **Mis dominios** → `odontocampus.com.ar`.
+3. Buscar la opción de **delegación** o **DNS** del dominio.
+4. Reemplazar los servidores que estén cargados por los dos de Cloudflare.
+5. Guardar y confirmar.
+
+> Las etiquetas exactas del panel de nic.ar cambian cada tanto. Lo que buscás
+> es la pantalla donde se editan los *servidores de nombres* (nameservers) del
+> dominio, no los registros A: esos van del lado de Cloudflare.
+
+#### 3. Esperar y verificar
+
+La propagación suele tardar entre unas horas y un día. Cloudflare avisa por
+correo cuando la zona queda activa, pero conviene comprobarlo:
+
+```bash
+# ¿Quién manda sobre el dominio? Deben aparecer los de Cloudflare.
+nslookup -type=NS odontocampus.com.ar
+
+# ¿Resuelven los tres nombres a la IP del servidor?
+nslookup odontocampus.com.ar 1.1.1.1
+nslookup www.odontocampus.com.ar 1.1.1.1
+nslookup api.odontocampus.com.ar 1.1.1.1
+```
+
+Los tres tienen que devolver la IP del servidor. **Recién entonces** se piden
+los certificados.
+
+### Registros en Cloudflare
+
+| Tipo | Nombre | Valor | Proxy |
+|---|---|---|---|
+| A | `@` | IP del servidor | DNS only (nube gris) |
+| A | `www` | IP del servidor | DNS only |
+| A | `api` | IP del servidor | DNS only |
+
+**Dejá la nube gris hasta tener los certificados emitidos.** Let's Encrypt
+valida por HTTP contra el servidor: si Cloudflare intercepta el tráfico antes,
+la validación se complica innecesariamente.
+
+### A nombre de quién
+
+`.com.ar` requiere CUIT argentino. Conviene definir a nombre de quién queda
+antes de tramitarlo: si va a nombre de una persona y esa persona se aleja de
+FOE, la agrupación pierde el dominio.
 
 ---
 
