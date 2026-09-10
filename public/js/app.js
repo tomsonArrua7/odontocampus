@@ -66,6 +66,11 @@
       if (global.OdontoBot) global.OdontoBot.init();
       if (global.OdontoLiveSheets) global.OdontoLiveSheets.init();
 
+      /* Cuentas. Se inicializan siempre, pero se apagan solas si el backend
+         todavía no está configurado: el sitio funciona completo sin ellas. */
+      if (global.OdontoAuth) global.OdontoAuth.init();
+      if (global.OdontoSync) global.OdontoSync.init();
+
       this.aplicarRutaDeUrl();
       on(global, "hashchange", this.aplicarRutaDeUrl.bind(this));
     },

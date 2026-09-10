@@ -42,11 +42,22 @@
       }
     },
 
-    guardarNotas: function (notas) {
+    /**
+     * @param {object}  notas
+     * @param {boolean} vieneDelServidor  true cuando la escritura la origina
+     *        la sincronización al bajar datos. Evita el rebote de volver a
+     *        subir lo que se acaba de recibir.
+     */
+    guardarNotas: function (notas, vieneDelServidor) {
       try {
         localStorage.setItem(this.storageKey, JSON.stringify(notas));
       } catch (e) {
         UI.toast("No pudimos guardar la nota. Si navegás en modo privado, los datos no persisten.", "warning");
+      }
+
+      // localStorage es la fuente de verdad; el servidor es un espejo.
+      if (!vieneDelServidor && global.OdontoSync) {
+        global.OdontoSync.notificarCambio();
       }
     },
 

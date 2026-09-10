@@ -204,6 +204,11 @@ create policy "consentimientos: revocar el propio"
 create table if not exists public.notas_academicas (
   usuario_id      uuid primary key references auth.users(id) on delete cascade,
   payload_cifrado text not null check (char_length(payload_cifrado) <= 200000),
+  -- La sal de derivación (PBKDF2). No es secreta: sirve para que dos personas
+  -- con la misma clave no produzcan el mismo material criptográfico. Sin ella
+  -- las notas no se pueden descifrar ni siquiera con la clave correcta, así
+  -- que viaja junto al paquete.
+  sal             text not null check (char_length(sal) between 16 and 64),
   version_formato smallint not null default 1,
   actualizado_at  timestamptz not null default now()
 );

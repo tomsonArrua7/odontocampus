@@ -1,0 +1,184 @@
+/* ==========================================================================
+   ODONTOCAMPUS — 06 · CUENTAS
+   Acceso, panel de cuenta y sincronización de notas.
+   Sigue los mismos tokens que el resto: ningún color ni tamaño suelto.
+   ========================================================================== */
+
+/* ==========================================================================
+   BOTÓN DE CUENTA EN EL ENCABEZADO
+   ========================================================================== */
+.zona-cuenta { display: flex; align-items: center; }
+
+.btn-cuenta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 40px;
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--on-brand-muted);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semi);
+  cursor: pointer;
+  transition: var(--transition);
+  max-width: 190px;
+}
+.btn-cuenta:hover { background: rgba(255, 255, 255, 0.20); color: #fff; }
+.btn-cuenta span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.btn-cuenta-activa { border-color: var(--accent); color: #fff; }
+
+.avatar-inicial {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-on);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-black);
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   MODALES DE ACCESO
+   ========================================================================== */
+.modal-angosto { max-width: 460px; }
+
+/* Campo del código: monoespaciado y espaciado para que se lea de un vistazo
+   mientras se copia del correo. */
+.campo-codigo {
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xl);
+  letter-spacing: 0.4em;
+  text-align: center;
+  padding-inline: var(--sp-3);
+}
+.campo-codigo::placeholder { letter-spacing: 0.3em; }
+
+.acciones-secundarias {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.acciones-secundarias .btn[disabled] { opacity: 0.5; }
+
+/* ==========================================================================
+   PANEL DE CUENTA
+   ========================================================================== */
+.datos-cuenta {
+  display: grid;
+  gap: var(--sp-4);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4);
+}
+.datos-cuenta dt {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--text-muted);
+  font-weight: var(--fw-bold);
+  margin-bottom: 2px;
+}
+.datos-cuenta dd {
+  font-size: var(--fs-base);
+  color: var(--text-strong);
+  font-weight: var(--fw-semi);
+  word-break: break-word;
+}
+
+.acciones-cuenta { display: flex; gap: var(--sp-3); flex-wrap: wrap; }
+.acciones-cuenta .btn { flex: 1; min-width: 190px; }
+
+/* ==========================================================================
+   FUERZA DE LA CLAVE
+   Informa, no bloquea: bloquear claves débiles frustra y empuja a la gente a
+   anotarlas en cualquier lado.
+   ========================================================================== */
+.clave-fuerza {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  align-self: flex-start;
+}
+.clave-corta,
+.clave-debil  { background: var(--danger-bg);  color: var(--danger); }
+.clave-media  { background: var(--warning-bg); color: var(--warning); }
+.clave-fuerte { background: var(--success-bg); color: var(--success); }
+
+/* ==========================================================================
+   PANEL DE SINCRONIZACIÓN
+   Va dentro de la sección del promedio, en contexto. Nunca como modal al
+   entrar al sitio: quien viene a ver a qué hora rinde no tiene por qué
+   toparse con un ofrecimiento de cuenta.
+   ========================================================================== */
+.sync-panel {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-4) var(--sp-5);
+  margin-bottom: var(--sp-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+}
+.sync-panel > i {
+  font-size: var(--fs-xl);
+  color: var(--accent-text);
+  flex-shrink: 0;
+}
+.sync-panel > div { flex: 1; min-width: 220px; }
+.sync-panel strong {
+  display: block;
+  font-size: var(--fs-base);
+  color: var(--text-strong);
+}
+.sync-panel p {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.sync-activa { border-left-color: var(--success); }
+.sync-activa > i { color: var(--success); }
+
+.sync-error { border-left-color: var(--warning); }
+.sync-error > i { color: var(--warning); }
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 1180px) {
+  /* En pantallas angostas el botón queda sólo con la inicial: el correo
+     completo empujaba el resto del encabezado fuera de la pantalla. */
+  .btn-cuenta span { display: none; }
+  .btn-cuenta { width: 40px; padding: 0; justify-content: center; }
+  .btn-cuenta .avatar-inicial { width: 24px; height: 24px; }
+}
+
+@media (max-width: 768px) {
+  .acciones-cuenta { flex-direction: column; }
+  .acciones-cuenta .btn { width: 100%; min-width: 0; }
+  .acciones-secundarias { flex-direction: column; align-items: stretch; }
+  .campo-codigo { font-size: var(--fs-xl); letter-spacing: 0.3em; }
+  .sync-panel { flex-direction: column; align-items: stretch; }
+  .sync-panel .btn { width: 100%; }
+}

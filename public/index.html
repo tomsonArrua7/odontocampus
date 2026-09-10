@@ -42,6 +42,7 @@
   <link rel="stylesheet" href="css/03-components.css">
   <link rel="stylesheet" href="css/04-sections.css">
   <link rel="stylesheet" href="css/05-responsive.css">
+  <link rel="stylesheet" href="css/06-cuentas.css">
 </head>
 <body>
 
@@ -77,6 +78,11 @@
           <span>Buscar</span>
           <span class="kbd-shortcut" aria-hidden="true">Ctrl K</span>
         </button>
+
+        <!-- Se rellena desde js/auth.js. Queda oculto mientras no haya
+             backend configurado: ofrecer una cuenta que no funciona es peor
+             que no ofrecerla. -->
+        <div class="zona-cuenta" id="zona-cuenta" hidden></div>
 
         <button type="button" class="theme-toggle" id="theme-toggle" data-action="cambiarTema"
                 aria-pressed="false" aria-label="Cambiar a tema oscuro">
@@ -478,6 +484,10 @@
 
       <div class="tab-panel" id="panel-promedio" role="tabpanel" aria-labelledby="tab-promedio" tabindex="0">
 
+        <!-- Ofrecimiento de sincronizar, en contexto y no como modal al
+             entrar. Lo pinta js/sync.js según el estado de la sesión. -->
+        <div class="sync-panel" id="panel-sync" hidden></div>
+
         <div class="calc-dashboard">
           <div class="calc-stats-grid">
             <div class="stat-card">
@@ -717,6 +727,239 @@
 </div>
 
 <!-- ==========================================================================
+     ACCESO — dos pasos: email y código
+     ========================================================================== -->
+<div class="modal-overlay" id="modal-acceso" role="dialog" aria-modal="true" aria-labelledby="acceso-titulo" aria-hidden="true">
+  <div class="modal-card modal-angosto">
+    <div class="modal-card-header">
+      <h2 id="acceso-titulo">Ingresar a OdontoCampus</h2>
+      <button type="button" class="btn btn-icon btn-secondary" data-action="cerrarAcceso" aria-label="Cerrar">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="modal-card-body">
+      <!-- Paso 1 -->
+      <div id="paso-email">
+        <p class="modal-lead">Te mandamos un código de 6 dígitos por correo. Sin contraseñas que recordar.</p>
+
+        <form id="form-acceso-email" class="stack" style="margin-top:1.25rem">
+          <div class="field">
+            <label class="field-label" for="acceso-email">Tu correo electrónico</label>
+            <input type="email" id="acceso-email" class="form-control" required
+                   autocomplete="email" inputmode="email" placeholder="nombre@ejemplo.com">
+          </div>
+          <button type="submit" class="btn btn-magenta btn-block" id="btn-enviar-codigo">
+            <i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Enviarme el código
+          </button>
+        </form>
+
+        <div class="callout" style="margin-top:1.5rem">
+          <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+          <div>
+            <h3>No hace falta cuenta para lo importante</h3>
+            <p>Las mesas, las reválidas, las historias clínicas, el instrumental y la
+               biblioteca están abiertos. La cuenta sirve para sincronizar tu promedio,
+               publicar permutas y avisarte cuándo rendís.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paso 2 -->
+      <div id="paso-codigo" hidden>
+        <p class="modal-lead">
+          Te enviamos un código a <strong id="acceso-email-destino"></strong>.
+          Revisá también el correo no deseado.
+        </p>
+
+        <form id="form-acceso-codigo" class="stack" style="margin-top:1.25rem">
+          <div class="field">
+            <label class="field-label" for="acceso-codigo">Código de 6 dígitos</label>
+            <input type="text" id="acceso-codigo" class="form-control campo-codigo" required
+                   inputmode="numeric" autocomplete="one-time-code" maxlength="6"
+                   pattern="[0-9]{6}" placeholder="······">
+          </div>
+          <button type="submit" class="btn btn-magenta btn-block" id="btn-confirmar-codigo">
+            <i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> Ingresar
+          </button>
+        </form>
+
+        <div class="acciones-secundarias">
+          <button type="button" class="btn btn-ghost btn-sm" data-action="volverAEmail">
+            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Cambiar el correo
+          </button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-reenviar" data-action="reenviarCodigo" disabled>
+            Reenviar el código
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     MI CUENTA
+     ========================================================================== -->
+<div class="modal-overlay" id="modal-cuenta" role="dialog" aria-modal="true" aria-labelledby="cuenta-titulo" aria-hidden="true">
+  <div class="modal-card modal-angosto">
+    <div class="modal-card-header">
+      <h2 id="cuenta-titulo">Mi cuenta</h2>
+      <button type="button" class="btn btn-icon btn-secondary" data-action="cerrarCuenta" aria-label="Cerrar">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="modal-card-body stack">
+      <dl class="datos-cuenta">
+        <div>
+          <dt>Correo</dt>
+          <dd id="cuenta-email"></dd>
+        </div>
+        <div>
+          <dt>Sincronización de notas</dt>
+          <dd id="cuenta-estado-sync"></dd>
+        </div>
+      </dl>
+
+      <div class="callout callout-info">
+        <i class="fa-solid fa-scale-balanced" aria-hidden="true"></i>
+        <div>
+          <h3>Tus datos son tuyos</h3>
+          <p>Podés descargar todo lo que guardamos sobre vos, o pedir que borremos
+             la cuenta entera. Es un derecho que te da la Ley 25.326.</p>
+        </div>
+      </div>
+
+      <div class="acciones-cuenta">
+        <button type="button" class="btn btn-secondary" data-action="exportarDatos">
+          <i class="fa-solid fa-download" aria-hidden="true"></i> Descargar mis datos
+        </button>
+        <button type="button" class="btn btn-danger-soft" data-action="eliminarCuenta">
+          <i class="fa-solid fa-trash-can" aria-hidden="true"></i> Eliminar mi cuenta
+        </button>
+      </div>
+    </div>
+
+    <div class="modal-card-footer">
+      <button type="button" class="btn btn-secondary" data-action="cerrarSesion">
+        <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i> Cerrar sesión
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     CONSENTIMIENTO PARA SINCRONIZAR
+     El sitio prometió desde el primer día que las notas quedaban sólo en el
+     dispositivo. Cambiar eso requiere pedirlo de frente, no en letra chica.
+     ========================================================================== -->
+<div class="modal-overlay" id="modal-consentimiento" role="dialog" aria-modal="true" aria-labelledby="consentimiento-titulo" aria-hidden="true">
+  <div class="modal-card">
+    <div class="modal-card-header">
+      <h2 id="consentimiento-titulo">Antes de sincronizar, esto</h2>
+      <button type="button" class="btn btn-icon btn-secondary" data-action="cerrarConsentimiento" aria-label="Cerrar">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="modal-card-body">
+      <p class="modal-lead">
+        Hasta ahora tus notas nunca salieron de este dispositivo. Si activás la
+        sincronización, van a guardarse en nuestro servidor. Queremos que sepas
+        exactamente cómo.
+      </p>
+
+      <ul class="check-list" style="margin:1.5rem 0">
+        <li>
+          <i class="fa-solid fa-lock" aria-hidden="true"></i>
+          <span><strong>Se cifran en tu navegador antes de salir.</strong> Al servidor
+          llega un texto ilegible.</span>
+        </li>
+        <li>
+          <i class="fa-solid fa-eye-slash" aria-hidden="true"></i>
+          <span><strong>Nadie de FOE puede leerlas.</strong> Ni quien administra el
+          servidor. La base de datos no tiene siquiera una columna donde figure una
+          nota o un promedio: no se puede armar un ranking porque no hay contra qué
+          consultar.</span>
+        </li>
+        <li>
+          <i class="fa-solid fa-key" aria-hidden="true"></i>
+          <span><strong>Vas a elegir una clave sólo para tus notas.</strong> No se envía
+          a ningún lado. Si la perdés, las notas sincronizadas no se recuperan —
+          justamente por eso nadie más puede leerlas.</span>
+        </li>
+        <li>
+          <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+          <span><strong>Podés desactivarlo cuando quieras</strong> y se borran del
+          servidor al instante.</span>
+        </li>
+      </ul>
+
+      <div class="callout callout-info">
+        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+        <div>
+          <h3>Si preferís que no</h3>
+          <p>La calculadora te sigue funcionando igual que hasta ahora, con todo
+             guardado solamente acá. Las dos opciones están bien.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-card-footer">
+      <button type="button" class="btn btn-secondary" data-action="cerrarConsentimiento">
+        Mejor no
+      </button>
+      <button type="button" class="btn btn-magenta" data-action="confirmarConsentimiento">
+        Entiendo, quiero sincronizar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     CLAVE DE NOTAS
+     ========================================================================== -->
+<div class="modal-overlay" id="modal-clave-notas" role="dialog" aria-modal="true" aria-labelledby="clave-notas-titulo" aria-hidden="true">
+  <div class="modal-card modal-angosto">
+    <form id="form-clave-notas">
+      <div class="modal-card-header">
+        <h2 id="clave-notas-titulo">Elegí una clave para tus notas</h2>
+        <button type="button" class="btn btn-icon btn-secondary" data-action="cerrarClaveNotas" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="modal-card-body stack">
+        <p id="clave-notas-ayuda"></p>
+
+        <div class="field">
+          <label class="field-label" for="clave-notas">Clave de notas</label>
+          <input type="password" id="clave-notas" class="form-control" required
+                 minlength="8" autocomplete="off" placeholder="Al menos 8 caracteres">
+          <p class="clave-fuerza" id="clave-fuerza" hidden></p>
+          <p class="field-hint">Anotala en algún lado seguro. No hay forma de recuperarla.</p>
+        </div>
+
+        <div class="callout callout-warning" id="clave-notas-aviso">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+          <div>
+            <h3>Esto no se puede deshacer</h3>
+            <p>No guardamos tu clave en ningún lado, así que no podemos ayudarte a
+               recuperarla. Si la perdés, perdés las notas sincronizadas. Las que
+               están en este dispositivo se conservan.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-card-footer">
+        <button type="button" class="btn btn-secondary" data-action="cerrarClaveNotas">Cancelar</button>
+        <button type="submit" class="btn btn-magenta" id="btn-clave-notas">Cifrar y sincronizar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ==========================================================================
      PIE DE PÁGINA
      ========================================================================== -->
 <footer class="main-footer">
@@ -778,11 +1021,16 @@
   </div>
 </footer>
 
-<!-- Scripts: núcleo primero, módulos después, controlador al final -->
+<!-- Scripts: configuración y núcleo primero, módulos después, controlador al final -->
+<script src="js/config.js"></script>
 <script src="js/core.js"></script>
+<script src="js/cripto.js"></script>
+<script src="js/api.js"></script>
 <script src="js/data.js"></script>
 <script src="js/live_sheets.js"></script>
 <script src="js/calculator.js"></script>
+<script src="js/sync.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/permutas.js"></script>
 <script src="js/chatbot.js"></script>
 <script src="js/app.js"></script>

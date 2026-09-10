@@ -21,8 +21,10 @@ supone que el anterior está cerrado.
 | Guía de despliegue en CloudPanel | Ejecutarla |
 | Esquema SQL con RLS | Aplicarlo |
 | Script de backup | Instalarlo |
-| Repositorio estructurado y con git | Subirlo a un remoto |
-| — | Dominio, servidor, SMTP, frontend de cuentas |
+| Repositorio en `github.com/tomsonArrua7/odontocampus` | — |
+| Dominio `odontocampus.com.ar` | Apuntar el DNS |
+| Frontend de cuentas completo (acceso, cifrado, sincronización) | Enchufarlo al servidor |
+| — | Servidor, SMTP, aplicar el esquema |
 
 ---
 
@@ -31,15 +33,16 @@ supone que el anterior está cerrado.
 Lo que bloquea a todo lo demás, en orden:
 
 ```
-Dominio (CUIT) ──▶ DNS ──▶ Sitios en CloudPanel ──▶ Certificados
-                                                        │
-                                                        ▼
-                              Supabase ──▶ SMTP ──▶ Frontend de cuentas
+Dominio ✅ ──▶ DNS ──▶ Sitios en CloudPanel ──▶ Certificados
+                                                    │
+                                                    ▼
+                          Supabase ──▶ Esquema ──▶ ANON_KEY en config.js
+                              │
+                              └──▶ SMTP (Resend) ──▶ primer ingreso real
 ```
 
-**El dominio bloquea la publicación, no la construcción.** Mientras se tramita,
-se puede instalar Supabase, cargar el esquema y escribir todo el frontend de
-cuentas contra la IP del servidor. No hay que quedarse esperando.
+El frontend de cuentas ya está escrito y probado. **Lo único que le falta es la
+`ANON_KEY`**: hasta que esté, se apaga solo y el sitio funciona como siempre.
 
 ---
 
@@ -49,16 +52,12 @@ cuentas contra la IP del servidor. No hay que quedarse esperando.
       copia a `htdocs/`. Así `docs/` e `infra/` nunca llegan al navegador.
 - [x] 💻 `.gitignore` que bloquea `.env`, claves y backups
 - [x] 💻 `git init` + primer commit
-- [ ] 🙋 Crear el repositorio remoto y subirlo
+- [x] 🙋 Repositorio remoto creado: `github.com/tomsonArrua7/odontocampus`
+- [x] 💻 Primer push
 
-```bash
-# En GitHub: New repository → odontocampus → PRIVADO → sin README
-git remote add origin git@github.com:USUARIO/odontocampus.git
-git push -u origin main
-```
-
-**Privado, no público.** Todavía no, al menos: hay que revisar antes que no
-haya quedado ningún dato de contacto real ni credencial en el historial.
+> **Revisar que el repositorio sea privado.** En `public/js/data.js` todavía
+> hay un WhatsApp y un email de ejemplo, y conviene reemplazarlos por los
+> reales antes de abrirlo.
 
 ---
 
@@ -67,14 +66,13 @@ haya quedado ningún dato de contacto real ni credencial en el historial.
 Nada de esto lo puedo hacer yo. Es lo que más tarda, así que conviene arrancar
 por acá.
 
-- [ ] **Dominio `odontocampus.com.ar`** en [nic.ar](https://nic.ar).
-      **Requiere CUIT argentino.**
+- [x] **Dominio `odontocampus.com.ar`** ✅ obtenido
 - [ ] 👥 **Decidir a nombre de quién queda.** Si va a nombre de una persona y esa
       persona se aleja de FOE, la agrupación pierde el dominio. Esto se decide
       antes de tramitarlo, no después.
-- [ ] **Proveedor de correo saliente** — [Resend](https://resend.com) o
-      [Brevo](https://brevo.com), capa gratuita. Verificar el dominio y cargar
-      los registros SPF y DKIM.
+- [ ] **Resend: agregar `odontocampus.com.ar`** — la cuenta ya existe y está
+      paga (hoy tiene `dndjursoc.com.ar`), admite varios dominios. Falta
+      *Add domain* y cargar los registros SPF y DKIM que te da.
 - [ ] **Backblaze B2** para los backups (~1 USD/mes).
 - [ ] **Bitwarden compartido** con FOE. Ahí van: dominio, VPS, Postgres,
       `SERVICE_ROLE_KEY`, SMTP, B2, y la frase del backup.
@@ -126,13 +124,15 @@ rsync -avz --delete public/ usuario@servidor:/home/USUARIO/htdocs/odontocampus.c
 
 Acá vuelve el trabajo mío. Archivos nuevos en `public/js/`:
 
-- [ ] `config.js` — URL de la API y `ANON_KEY` (pública, va en el repo)
-- [ ] `supabase.js` — cliente
-- [ ] `auth.js` — modal de acceso, estado de sesión en el encabezado
-- [ ] `cripto.js` — cifrado de las notas **en el navegador**
-- [ ] `calculator.js` — capa de sincronización, local primero
-- [ ] Flujo de consentimiento antes de la primera sincronización
-- [ ] `GET /cuenta/exportar` y borrado de cuenta (Ley 25.326)
+- [x] `config.js` — URL de la API y `ANON_KEY`, con apagado automático
+- [x] `api.js` — cliente propio: sesión, renovación de token, REST
+- [x] `cripto.js` — PBKDF2 + AES-GCM, probado de punta a punta
+- [x] `auth.js` — ingreso en dos pasos y panel de cuenta
+- [x] `sync.js` — consentimiento, cifrado, mezcla local/remoto
+- [x] `calculator.js` — avisa a la sincronización en cada cambio
+- [x] Exportar mis datos (Ley 25.326)
+- [ ] 🙋 Pegar la `ANON_KEY` real en `config.js` cuando exista el servidor
+- [ ] Borrado de cuenta automático (hoy es por correo, y la interfaz lo dice)
 - [ ] CSP estricta en el vhost del sitio
 
 **Principio que no se negocia:** el login suma, no tapa. Mesas, reválidas,
@@ -195,12 +195,17 @@ Menores, pero anotados para que no se pierdan:
 
 ## Empezá por acá
 
-Tres cosas, en este orden, y ninguna depende de mí:
+Con el dominio y el repositorio listos, quedan tres pasos tuyos:
 
-1. **Tramitar el dominio.** Es lo que más tarda y bloquea todo lo público.
-2. **Crear el repositorio remoto y hacer el push.** Cinco minutos, y a partir de
-   ahí el proyecto deja de vivir en una sola computadora.
-3. **Dar de alta el proveedor SMTP y verificar el dominio.** Los registros DNS
-   tardan en propagarse; conviene que estén andando antes de que haga falta.
+1. **DNS**: apuntar `@`, `www` y `api` a la IP del servidor. Todo lo demás
+   espera por esto.
+2. **Resend → Add domain** `odontocampus.com.ar` y cargar SPF y DKIM. Los
+   registros tardan en propagar: conviene largarlo ya aunque falte el resto.
+3. **Swap de 4 GB** antes de instalar Supabase. Son 2 GB de RAM y el margen es
+   chico.
 
-Mientras tanto, decime en qué bloque querés que avance yo.
+Después, los dos sitios en CloudPanel y Supabase. La guía completa está en
+[`despliegue-cloudpanel.md`](despliegue-cloudpanel.md).
+
+Mientras tanto, el próximo bloque de código es **F — permutas al servidor**,
+que ya puede apoyarse en la sesión que construimos.

@@ -50,27 +50,44 @@ enlace o lo compartió por WhatsApp, no se le rompe.
 ## Estructura de archivos
 
 ```
-index.html            Marcado único de toda la aplicación
-run_server.py         Servidor de desarrollo
+public/               EL SITIO. Es exactamente lo que se copia a htdocs/
+  index.html          Marcado único de toda la aplicación
+  css/
+    01-tokens.css     Sistema de diseño: color, tipografía, espaciado, tema oscuro
+    02-base.css       Reset, tipografía base, foco visible, accesibilidad
+    03-components.css Botones, formularios, tarjetas, pestañas, modales, estados
+    04-sections.css   Encabezado, hero, y cada sección de la aplicación
+    05-responsive.css Puntos de corte, alto contraste
+    06-cuentas.css    Acceso, panel de cuenta, sincronización
+  js/
+    config.js         URL de la API y clave pública. Lo único que cambia por entorno
+    core.js           Núcleo: escapado, DOM, acciones, modales, pestañas, tema, fechas
+    cripto.js         Cifrado de las notas en el navegador (WebCrypto)
+    api.js            Cliente de Supabase: sesión, renovación de token, REST
+    data.js           Contenido editable a mano (noticias, plan, apuntes, bolsa…)
+    live_sheets.js    Sincronización con las planillas de mesas y reválidas
+    calculator.js     Promedio y avance de carrera
+    sync.js           Sincronización de notas: consentimiento, cifrado, mezcla
+    auth.js           Ingreso por código de email y panel de cuenta
+    permutas.js       Tablón de permutas de comisión
+    chatbot.js        OdontoBot (buscador de preguntas frecuentes)
+    app.js            Router, inicio, historias clínicas, biblioteca, buscador
 
-css/
-  01-tokens.css       Sistema de diseño: color, tipografía, espaciado, tema oscuro
-  02-base.css         Reset, tipografía base, foco visible, utilidades de accesibilidad
-  03-components.css   Botones, formularios, tarjetas, pestañas, modales, avisos, estados
-  04-sections.css     Encabezado, hero, y cada sección de la aplicación
-  05-responsive.css   Puntos de corte, alto contraste
+infra/                Todo lo del servidor
+  supabase/           Compose de ajustes y esquema SQL con RLS
+  backup/             Backup cifrado y su restauración
 
-js/
-  core.js             Núcleo: escapado, DOM, acciones, modales, pestañas, tema, fechas
-  data.js             Contenido editable a mano (noticias, plan, apuntes, bolsa…)
-  live_sheets.js      Sincronización con las planillas de mesas y reválidas
-  calculator.js       Promedio y avance de carrera
-  permutas.js         Tablón de permutas de comisión
-  chatbot.js          OdontoBot (buscador de preguntas frecuentes)
-  app.js              Router, panel de inicio, historias clínicas, biblioteca, buscador
+docs/                 plan.md, arquitectura.md, despliegue-cloudpanel.md
+run_server.py         Servidor de desarrollo (sirve public/)
 ```
 
-El orden de los `<script>` importa: `core.js` primero, `app.js` último.
+**Por qué `public/` está separado:** es la única carpeta que se sube al
+servidor. Así `docs/` e `infra/` —que incluyen el esquema de la base y los
+procedimientos— no pueden quedar expuestos al navegador por un error de
+configuración. El despliegue es un `rsync` de una sola carpeta.
+
+El orden de los `<script>` importa: `config.js` y `core.js` primero,
+`app.js` último.
 
 ---
 
@@ -106,6 +123,46 @@ aplica el tema antes del primer pintado para que no haya destello blanco.
 ### Movimiento
 
 Todas las animaciones se anulan bajo `prefers-reduced-motion: reduce`.
+
+---
+
+## Cuentas de usuario
+
+El backend es **Supabase autoalojado**. Detalles en
+[`docs/despliegue-cloudpanel.md`](docs/despliegue-cloudpanel.md).
+
+### El sitio funciona sin backend
+
+Mientras `js/config.js` tenga `anonKey: "PENDIENTE"`, todo lo relativo a
+cuentas se apaga solo: no aparece el botón de ingresar ni el panel de
+sincronización, y el sitio queda exactamente como antes. **Nada de lo público
+—mesas, reválidas, historias clínicas, instrumental, biblioteca— depende de la
+cuenta.** Si el servidor se cae, se sigue pudiendo consultar a qué hora rendís.
+
+### Las notas se cifran en el navegador
+
+`cripto.js` deriva una clave con PBKDF2 (310.000 iteraciones) a partir de una
+**clave de notas** que la persona elige y que no se envía a ningún lado, y
+cifra con AES-GCM. El servidor guarda un texto opaco.
+
+Consecuencia buscada: la tabla `notas_academicas` no tiene columna `nota`,
+`promedio` ni `materia`. **No se puede armar un ranking de promedios ni con
+acceso total a la base**, porque no hay contra qué consultar. Es la única
+respuesta seria al miedo, razonable, de que una agrupación política vea quién
+va atrasado.
+
+La contrapartida hay que decirla de frente, y la interfaz la dice: **si se
+pierde esa clave, las notas sincronizadas no se recuperan.** Por eso
+sincronizar es opcional y quien no quiera otra clave simplemente no lo activa.
+
+### La ANON_KEY es pública y está bien
+
+Va en `config.js`, dentro del repositorio, a la vista de cualquiera. Así está
+pensado Supabase. **Lo que protege los datos no es un secreto: son las
+políticas RLS** de `infra/supabase/sql/001_esquema.sql`.
+
+La que nunca va al repositorio ni al navegador es la `SERVICE_ROLE_KEY`:
+saltea todas las políticas y vive sólo en el `.env` del servidor.
 
 ---
 
