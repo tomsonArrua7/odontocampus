@@ -32,7 +32,7 @@
 
        Mientras diga PENDIENTE, todo lo que necesita cuenta queda desactivado
        y el sitio funciona exactamente como hoy: sin login, sin errores. */
-    publishableKey: "PENDIENTE",
+    publishableKey: "sb_publishable_20rdIEuZkZDtbdEDvIvJ_B_7QH9AWs2",
 
     /* Versión del texto de consentimiento. Si cambia el texto, se sube este
        número y se vuelve a pedir. Queda registrado en la tabla

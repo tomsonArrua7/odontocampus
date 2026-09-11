@@ -111,7 +111,7 @@ Guía completa: [`despliegue-cloudpanel.md`](despliegue-cloudpanel.md).
 - [x] Vhost de la API: sólo `/auth`, `/rest`, `/storage`, `/realtime` y `/functions`
 - [x] Supabase levantado, puertos 8000, 5432 y 6543 sólo en 127.0.0.1
 - [x] Verificado desde afuera: puertos cerrados, panel y `/pg/` en 404, Auth responde con la clave publicable
-- [ ] **Correo con código funcionando** (el primer intento dio `535`: clave de Resend rechazada; se corrige con `cambiar-clave-smtp.sh`)
+- [x] **Correo con código funcionando** (el primer intento dio `535`: clave de Resend rechazada; se corrige con `cambiar-clave-smtp.sh`)
 Actualizar el sitio, de ahí en adelante:
 
 ```bash
@@ -145,7 +145,7 @@ Acá vuelve el trabajo mío. Archivos nuevos en `public/js/`:
 - [x] `sync.js` — consentimiento, cifrado, mezcla local/remoto
 - [x] `calculator.js` — avisa a la sincronización en cada cambio
 - [x] Exportar mis datos (Ley 25.326)
-- [ ] 🙋 Pegar la `SUPABASE_PUBLISHABLE_KEY` en `config.js` cuando arranque Supabase
+- [x] 🙋 Pegar la `SUPABASE_PUBLISHABLE_KEY` en `config.js` cuando arranque Supabase
 - [x] Plantillas de correo con código (`public/email/`)
 - [x] Borrado de cuenta real: función `eliminar_mi_cuenta`, con confirmación escrita
 - [ ] CSP estricta en el vhost del sitio
