@@ -37,13 +37,13 @@ Lo que bloquea a todo lo demás, en orden:
 Dominio ✅ ──▶ DNS ✅ ──▶ Sitios en CloudPanel ──▶ Certificados
                                                     │
                                                     ▼
-                          Supabase ──▶ Esquema ──▶ ANON_KEY en config.js
+                          Supabase ──▶ Esquema ──▶ clave publicable en config.js
                               │
                               └──▶ SMTP (Resend) ──▶ primer ingreso real
 ```
 
 El frontend de cuentas ya está escrito y probado. **Lo único que le falta es la
-`ANON_KEY`**: hasta que esté, se apaga solo y el sitio funciona como siempre.
+clave publicable**: hasta que esté, se apaga solo y el sitio funciona como siempre.
 
 ---
 
@@ -124,7 +124,7 @@ cd ~/htdocs/odontocampus.com.ar && git pull --ff-only
 - [ ] Cargar [`001_esquema.sql`](../infra/supabase/sql/001_esquema.sql)
 - [ ] Correr las dos consultas de verificación del final del archivo
 - [ ] **Advisor de Studio sin alertas críticas**
-- [ ] Prueba con `curl` y la `ANON_KEY` desde incógnito: no debe devolver nada
+- [ ] Prueba con `curl` y la clave publicable desde incógnito: no debe devolver nada
 
 ---
 
@@ -139,7 +139,7 @@ Acá vuelve el trabajo mío. Archivos nuevos en `public/js/`:
 - [x] `sync.js` — consentimiento, cifrado, mezcla local/remoto
 - [x] `calculator.js` — avisa a la sincronización en cada cambio
 - [x] Exportar mis datos (Ley 25.326)
-- [ ] 🙋 Pegar la `ANON_KEY` real en `config.js` cuando exista el servidor
+- [ ] 🙋 Pegar la `SUPABASE_PUBLISHABLE_KEY` en `config.js` cuando arranque Supabase
 - [x] Plantillas de correo con código (`public/email/`)
 - [x] Borrado de cuenta real: función `eliminar_mi_cuenta`, con confirmación escrita
 - [ ] CSP estricta en el vhost del sitio

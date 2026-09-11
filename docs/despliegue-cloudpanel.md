@@ -404,18 +404,43 @@ Todo el `.env` se completa con `infra/supabase/generar-claves.sh`, que corre en
 el servidor:
 
 ```bash
-cd /opt/supabase && cp .env.example .env
+cd /opt/supabase
+cp .env.example .env
+cp /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/docker-compose.override.yml .
 bash /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/generar-claves.sh
 ```
 
-Genera los secretos con `openssl`, firma `ANON_KEY` y `SERVICE_ROLE_KEY`,
-configura las URLs y el correo, deja el archivo con permisos 600 y muestra
-**únicamente** la `ANON_KEY`, que es pública.
+Corre los generadores **oficiales** de Supabase (`utils/generate-keys.sh` y
+`utils/add-new-auth-keys.sh`) sin mostrar su salida, configura las URLs, el
+correo y el override, deja el archivo con permisos 600 y **verifica** tres
+cosas antes de dar el OK: que ningún secreto quede vacío o con el valor de
+ejemplo, que las claves asimétricas estén activadas y que Docker Compose cargue
+el override. Al final muestra **únicamente** la `SUPABASE_PUBLISHABLE_KEY`,
+que es pública.
 
 **Por qué no el generador web de la documentación de Supabase:** para usarlo
 hay que pegar el `JWT_SECRET` en una página. Esa es la clave que firma todas
 las sesiones: con ella se puede fabricar un token de administrador. Con el
 script no sale del servidor.
+
+**Por qué envolver los scripts oficiales en vez de correrlos a mano:** imprimen
+en pantalla todos los secretos (incluida la clave privada que firma las
+sesiones), dejan copias `.old` del `.env` con esos secretos adentro y no se
+protegen contra una segunda ejecución.
+
+> **La trampa de `COMPOSE_FILE`.** El `.env.example` trae
+> `COMPOSE_FILE=docker-compose.yml`. Con esa variable definida, Docker Compose
+> usa **sólo** los archivos listados e **ignora `docker-compose.override.yml`
+> sin avisar**: no se aplicaría ni el correo con código ni el atado de puertos.
+> `docker compose config --services` lista los mismos servicios con o sin
+> override, así que no se nota. El script la deja en
+> `docker-compose.yml:docker-compose.override.yml` y comprueba que se aplique.
+
+> **`sh run.sh secrets` imprime las contraseñas.** Usalo sólo para pasarlas al
+> gestor de contraseñas: nunca para una captura ni con alguien mirando.
+
+> **`reset.sh` borra la base, los archivos subidos y el `.env`.** No se corre
+> nunca en producción.
 
 **Se corre una sola vez, antes del primer `docker compose up`.** El script se
 niega a correr de nuevo, por dos razones:
@@ -762,11 +787,11 @@ Los puntos 7, 10, 11 y 14 son los que no se pueden saltear.
 Y una comprobación final, desde una ventana de incógnito, sin sesión iniciada:
 
 ```bash
-# Con la ANON_KEY pública, ninguna de estas debe devolver datos.
+# Con la clave publicable, ninguna de estas debe devolver datos.
 curl -s "https://api.odontocampus.com.ar/rest/v1/notas_academicas?select=*" \
-     -H "apikey: TU_ANON_KEY"
+     -H "apikey: TU_CLAVE_PUBLICABLE"
 curl -s "https://api.odontocampus.com.ar/rest/v1/perfiles?select=*" \
-     -H "apikey: TU_ANON_KEY"
+     -H "apikey: TU_CLAVE_PUBLICABLE"
 ```
 
 Si alguna devuelve filas, hay una política mal escrita. **Esta prueba es la que

@@ -135,7 +135,7 @@ El backend es **Supabase autoalojado**. Detalles en
 
 ### El sitio funciona sin backend
 
-Mientras `js/config.js` tenga `anonKey: "PENDIENTE"`, todo lo relativo a
+Mientras `js/config.js` tenga `publishableKey: "PENDIENTE"`, todo lo relativo a
 cuentas se apaga solo: no aparece el botón de ingresar ni el panel de
 sincronización, y el sitio queda exactamente como antes. **Nada de lo público
 —mesas, reválidas, historias clínicas, instrumental, biblioteca— depende de la
@@ -157,14 +157,16 @@ La contrapartida hay que decirla de frente, y la interfaz la dice: **si se
 pierde esa clave, las notas sincronizadas no se recuperan.** Por eso
 sincronizar es opcional y quien no quiera otra clave simplemente no lo activa.
 
-### La ANON_KEY es pública y está bien
+### La clave publicable es pública y está bien
 
-Va en `config.js`, dentro del repositorio, a la vista de cualquiera. Así está
-pensado Supabase. **Lo que protege los datos no es un secreto: son las
+La `SUPABASE_PUBLISHABLE_KEY` (empieza con `sb_publishable_`) va en `config.js`,
+dentro del repositorio, a la vista de cualquiera. Así está pensado Supabase. **Lo que protege los datos no es un secreto: son las
 políticas RLS** de `infra/supabase/sql/001_esquema.sql`.
 
-La que nunca va al repositorio ni al navegador es la `SERVICE_ROLE_KEY`:
-saltea todas las políticas y vive sólo en el `.env` del servidor.
+Las que nunca van al repositorio ni al navegador son la `SUPABASE_SECRET_KEY`
+y la `SERVICE_ROLE_KEY`: saltean todas las políticas y viven sólo en el `.env`
+del servidor. `config.js` se niega a encender las cuentas si detecta una clave
+que no empiece con `sb_publishable_`.
 
 ---
 

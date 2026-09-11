@@ -151,7 +151,7 @@
     opciones = opciones || {};
 
     var cabeceras = {
-      "apikey": CONFIG.anonKey,
+      "apikey": CONFIG.publishableKey,
       "Content-Type": "application/json"
     };
     Object.keys(opciones.cabeceras || {}).forEach(function (k) {
