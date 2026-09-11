@@ -7,8 +7,11 @@ Guía de montaje para `odontocampus.com.ar`.
 >
 > 1. **La base de datos nunca se publica.** Postgres queda solo en la red
 >    interna de Docker. Se administra por túnel SSH, no por puerto abierto.
-> 2. **Kong (Supabase) usa el puerto 8443, que es el del panel de CloudPanel.**
->    Hay conflicto. Solo publicamos Kong en `127.0.0.1:8000`.
+> 2. **Los servicios de Supabase cambian de nombre entre versiones.** En la
+>    instalada (septiembre de 2026) el gateway es `api-gw` con Envoy, no
+>    `kong`, y `analytics` no existe. El override está escrito contra esa lista:
+>    antes de actualizar Supabase, verificala con
+>    `docker compose --profile "*" config --services`.
 > 3. **El compose oficial de Supabase publica en `0.0.0.0`.** Sin corregirlo,
 >    `http://TU_IP:8000` responde sin TLS y salteando el proxy.
 
@@ -32,7 +35,7 @@ los certificados Let's Encrypt solo. Nosotros solo declaramos los sitios.
                     │               │
                     ▼               ▼
           /home/USUARIO/htdocs   127.0.0.1:8000
-             (nuestros            (Kong de Supabase)
+             (nuestros            (gateway Supabase)
               archivos)                │
                           ┌────────────┼────────────┬─────────────┐
                           ▼            ▼            ▼             ▼
@@ -85,6 +88,36 @@ rastreable.
 CloudPanel → *Sites → odontocampus.com.ar → Settings → Root Directory*.
 Agregale `/public` al final de lo que ya dice —queda algo como
 `htdocs/odontocampus.com.ar/public`— y guardá.
+
+Para confirmar que se aplicó, como root en el servidor:
+
+```bash
+grep -n "root " /etc/nginx/sites-enabled/odontocampus.com.ar.conf
+```
+
+Tiene que terminar en `/public;`.
+
+#### Segunda capa: bloquear archivos ocultos
+
+Aunque la raíz esté bien, conviene que Nginx rechace cualquier ruta que empiece
+con punto (`.git`, `.gitignore`, `.claude`). Si alguna vez alguien cambia la
+raíz por error, esto sigue protegiendo.
+
+En *Sites → odontocampus.com.ar → Vhost*, dentro del bloque `server` que
+escucha en el 443, antes del primer `location`:
+
+```nginx
+# Archivos y carpetas ocultos: nunca se sirven. La única excepción es
+# .well-known, que Let's Encrypt necesita para renovar el certificado.
+location ~ /\.(?!well-known/) {
+    return 404;
+}
+```
+
+> **Esto pasó en la instalación real.** Después de clonar,
+> `https://odontocampus.com.ar/.git/config` respondía `200` con el archivo de
+> configuración de git. La raíz no había quedado en `public/`. Por eso la
+> verificación con `curl` de abajo no es opcional.
 
 #### 2. Clonar, como el usuario del sitio
 
@@ -468,8 +501,6 @@ En **Sites → api.odontocampus.com.ar → Vhost**, dentro del `location /`:
 client_max_body_size 50m;
 
 proxy_http_version 1.1;
-proxy_set_header Upgrade           $http_upgrade;
-proxy_set_header Connection        $connection_upgrade;
 proxy_set_header Host              $host;
 proxy_set_header X-Real-IP         $remote_addr;
 proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
