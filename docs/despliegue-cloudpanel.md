@@ -182,34 +182,6 @@ curl.exe -skI --resolve odontocampus.com.ar:443:179.43.126.185 https://odontocam
 curl.exe -skI --resolve odontocampus.com.ar:443:179.43.126.185 https://odontocampus.com.ar/infra/supabase/sql/001_esquema.sql
 ```
 
-Después, **las migraciones siguientes, en orden**:
-
-```bash
-docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/002_bolsa_y_privacidad.sql
-```
-
-> **Una migración aplicada no se edita nunca.** Si el archivo y la base dejan
-> de coincidir, la próxima instalación desde cero queda distinta de la de
-> producción y nadie lo nota. Todo cambio va en un archivo nuevo con el número
-> siguiente (`003_...`), y se aplica en orden.
-
-Y enseguida, **las pruebas de seguridad**:
-
-```bash
-docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
-  < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/pruebas_rls.sql
-```
-
-Crean dos usuarios de prueba dentro de una transacción, intentan lo que
-intentaría alguien con malas intenciones (leer notas ajenas, reactivarse
-después de una suspensión, saltearse la espera para publicar, reactivar una
-publicación ocultada, antedatar un consentimiento) y terminan en `ROLLBACK`:
-**no queda nada en la base**. Cada prueba imprime `OK` o `FALLA`.
-
-**Una sola `FALLA` es un agujero de seguridad.** Las cuentas no se habilitan en
-el sitio hasta que todas digan `OK`, y se vuelven a correr después de cualquier
-cambio en el esquema.
-
 La primera tiene que dar `200`. **Las otras dos, `404`.**
 
 Cada una prueba una capa distinta:
@@ -568,6 +540,38 @@ mínimo entre reenvíos (60 segundos) y el tope de correos por hora están en
 Después de cambiar una plantilla: `git pull` en el sitio y
 `docker compose restart auth`.
 
+#### Verificar o cambiar la clave de Resend
+
+**Esto pasó en la instalación real:** el primer pedido de código respondió
+`Error sending confirmation email`, y el log de Auth mostraba
+`535 Authentication credentials invalid`. Resend rechazaba la clave guardada.
+Ese error descarta el puerto y las plantillas: si Resend contestó, la conexión
+funcionó.
+
+Para diagnosticarlo o arreglarlo **no se vuelve a correr `generar-claves.sh`**
+(regeneraría todos los secretos y rompería la base), y tampoco se edita el
+`.env` escribiendo la clave en un comando, porque queda en el historial de la
+terminal. Hay un script para eso:
+
+```bash
+# Sólo comprobar la clave guardada, sin cambiar nada
+bash /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/cambiar-clave-smtp.sh --verificar
+
+# Reemplazarla
+bash /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/cambiar-clave-smtp.sh
+```
+
+Comprueba la clave contra la API de Resend **antes de guardarla**, sin enviar
+ningún correo, así un error de copiado no se descubre recién cuando alguien no
+recibe su código. No la muestra ni la pasa como argumento de un proceso (en un
+servidor con varios usuarios, cualquiera puede ver los argumentos de un proceso
+mientras corre), toca sólo `SMTP_PASS` y recrea sólo el contenedor de Auth.
+
+> **`restart` no alcanza para aplicar un cambio del `.env`.** Reinicia el
+> contenedor con la configuración vieja. Hace falta `docker compose up -d auth`,
+> que lo recrea. El modo `--verificar` avisa si el contenedor quedó usando una
+> clave distinta de la del `.env`.
+
 ### 3.3 Cerrar los puertos
 
 Copiá `infra/supabase/docker-compose.override.yml` de este repositorio a
@@ -717,6 +721,35 @@ cd /opt/supabase
 docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
   < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/001_esquema.sql
 ```
+
+Después, **las migraciones siguientes, en orden**:
+
+```bash
+docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/002_bolsa_y_privacidad.sql
+```
+
+> **Una migración aplicada no se edita nunca.** Si el archivo y la base dejan
+> de coincidir, la próxima instalación desde cero queda distinta de la de
+> producción y nadie lo nota. Todo cambio va en un archivo nuevo con el número
+> siguiente (`003_...`), y se aplica en orden.
+
+Y enseguida, **las pruebas de seguridad**:
+
+```bash
+docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
+  < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/pruebas_rls.sql
+```
+
+Crean dos usuarios de prueba dentro de una transacción, intentan lo que
+intentaría alguien con malas intenciones (leer notas ajenas, reactivarse
+después de una suspensión, saltearse la espera para publicar, reactivar una
+publicación ocultada, antedatar un consentimiento) y terminan en `ROLLBACK`:
+**no queda nada en la base**. Cada prueba imprime `OK` o `FALLA`.
+
+**Una sola `FALLA` es un agujero de seguridad.** Las cuentas no se habilitan en
+el sitio hasta que todas digan `OK`, y se vuelven a correr después de cualquier
+cambio en el esquema.
+
 
 ### Por qué RLS es ahora *todo* el modelo de seguridad
 

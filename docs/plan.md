@@ -110,6 +110,8 @@ Guía completa: [`despliegue-cloudpanel.md`](despliegue-cloudpanel.md).
 - [ ] **Verificar desde afuera** que 5432 y 8000 estén cerrados
 - [x] Vhost de la API: sólo `/auth`, `/rest`, `/storage`, `/realtime` y `/functions`
 - [x] Supabase levantado, puertos 8000, 5432 y 6543 sólo en 127.0.0.1
+- [x] Verificado desde afuera: puertos cerrados, panel y `/pg/` en 404, Auth responde con la clave publicable
+- [ ] **Correo con código funcionando** (el primer intento dio `535`: clave de Resend rechazada; se corrige con `cambiar-clave-smtp.sh`)
 Actualizar el sitio, de ahí en adelante:
 
 ```bash
@@ -124,9 +126,9 @@ cd ~/htdocs/odontocampus.com.ar && git pull --ff-only
 ## Bloque D — Base de datos 🙋 aplicar
 
 - [x] Cargar [`001_esquema.sql`](../infra/supabase/sql/001_esquema.sql)
-- [ ] Cargar [`002_bolsa_y_privacidad.sql`](../infra/supabase/sql/002_bolsa_y_privacidad.sql)
+- [x] Cargar [`002_bolsa_y_privacidad.sql`](../infra/supabase/sql/002_bolsa_y_privacidad.sql)
 - [ ] Correr las dos consultas de verificación del final del archivo
-- [ ] **`pruebas_rls.sql`: todas las pruebas en OK** (intenta lo que haría un atacante y deshace todo)
+- [x] **`pruebas_rls.sql`: todas las pruebas en OK** (25 de 25)
 - [ ] **Advisor de Studio sin alertas críticas**
 - [ ] Prueba con `curl` y la clave publicable desde incógnito: no debe devolver nada
 
