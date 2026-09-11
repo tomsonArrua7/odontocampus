@@ -4,6 +4,11 @@
 -- Aplicar con:
 --   docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < 001_esquema.sql
 --
+-- ESTE ARCHIVO YA ESTÁ APLICADO EN PRODUCCIÓN Y NO SE EDITA MÁS.
+-- Los cambios posteriores van en migraciones numeradas (002_..., 003_...),
+-- que se aplican en orden, antes de las pruebas. En particular, 002 corrige
+-- la política de publicar en la bolsa y la privacidad de los perfiles.
+--
 -- Y después, SIEMPRE, las pruebas de seguridad (no dejan nada en la base):
 --   docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < pruebas_rls.sql
 --

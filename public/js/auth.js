@@ -277,7 +277,10 @@
       UI.toast("Preparando tus datos…", "info");
 
       Promise.all([
-        Api.seleccionar("perfiles", "select=*&id=eq." + usuario.id).catch(function () { return []; }),
+        // El perfil propio completo sale de mi_perfil(): la tabla perfiles
+        // sólo deja leer nombre y año, para que nadie junte los WhatsApp
+        // del resto de los usuarios.
+        Api.rpc("mi_perfil").catch(function () { return []; }),
         Api.seleccionar("consentimientos", "select=*").catch(function () { return []; }),
         Api.seleccionar("notas_academicas", "select=*").catch(function () { return []; })
       ]).then(function (partes) {

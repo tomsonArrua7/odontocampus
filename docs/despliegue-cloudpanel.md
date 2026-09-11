@@ -182,6 +182,17 @@ curl.exe -skI --resolve odontocampus.com.ar:443:179.43.126.185 https://odontocam
 curl.exe -skI --resolve odontocampus.com.ar:443:179.43.126.185 https://odontocampus.com.ar/infra/supabase/sql/001_esquema.sql
 ```
 
+Después, **las migraciones siguientes, en orden**:
+
+```bash
+docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/002_bolsa_y_privacidad.sql
+```
+
+> **Una migración aplicada no se edita nunca.** Si el archivo y la base dejan
+> de coincidir, la próxima instalación desde cero queda distinta de la de
+> producción y nadie lo nota. Todo cambio va en un archivo nuevo con el número
+> siguiente (`003_...`), y se aplica en orden.
+
 Y enseguida, **las pruebas de seguridad**:
 
 ```bash

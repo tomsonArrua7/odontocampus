@@ -123,7 +123,8 @@ cd ~/htdocs/odontocampus.com.ar && git pull --ff-only
 
 ## Bloque D — Base de datos 🙋 aplicar
 
-- [ ] Cargar [`001_esquema.sql`](../infra/supabase/sql/001_esquema.sql)
+- [x] Cargar [`001_esquema.sql`](../infra/supabase/sql/001_esquema.sql)
+- [ ] Cargar [`002_bolsa_y_privacidad.sql`](../infra/supabase/sql/002_bolsa_y_privacidad.sql)
 - [ ] Correr las dos consultas de verificación del final del archivo
 - [ ] **`pruebas_rls.sql`: todas las pruebas en OK** (intenta lo que haría un atacante y deshace todo)
 - [ ] **Advisor de Studio sin alertas críticas**
