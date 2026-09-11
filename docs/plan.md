@@ -96,7 +96,8 @@ Guía completa: [`despliegue-cloudpanel.md`](despliegue-cloudpanel.md).
 - [x] Agregarle `www.odontocampus.com.ar` en *Domains*
 - [x] CloudPanel → **Create a Reverse Proxy** para `api.odontocampus.com.ar`
       → `http://127.0.0.1:8000`
-- [x] Raíz del sitio apuntando a `public/`
+- [ ] Raíz del sitio apuntando a `public/` (en el Vhost: los sitios estáticos no tienen el campo en *Settings*)
+- [x] Regla de Nginx que devuelve 404 para archivos ocultos
 - [x] Repositorio clonado como el usuario del sitio
 - [ ] **Verificar que `.git/config` e `infra/` den 404 desde afuera**
 - [x] Certificados Let's Encrypt en ambos (después de que el DNS resuelva)

@@ -85,9 +85,24 @@ rastreable.
 
 #### 1. Cambiar la raíz del sitio
 
-CloudPanel → *Sites → odontocampus.com.ar → Settings → Root Directory*.
-Agregale `/public` al final de lo que ya dice —queda algo como
-`htdocs/odontocampus.com.ar/public`— y guardá.
+Los sitios **Static HTML** de CloudPanel no tienen el campo *Root Directory*
+en *Settings* (solo lo muestran los sitios PHP). La raíz se cambia directamente
+en la configuración de Nginx:
+
+CloudPanel → *Sites → odontocampus.com.ar → **Vhost*** (el editor web, no la
+consola). Buscá la línea:
+
+```nginx
+root /home/odontocampus/htdocs/odontocampus.com.ar;
+```
+
+y dejala así:
+
+```nginx
+root /home/odontocampus/htdocs/odontocampus.com.ar/public;
+```
+
+Guardá.
 
 Para confirmar que se aplicó, como root en el servidor:
 
@@ -96,6 +111,17 @@ grep -n "root " /etc/nginx/sites-enabled/odontocampus.com.ar.conf
 ```
 
 Tiene que terminar en `/public;`.
+
+Si CloudPanel no acepta el cambio o lo pierde al emitir un certificado, la
+alternativa es no tocar Nginx: clonar el repositorio fuera de `htdocs/` y
+dejar en su lugar un enlace simbólico a `public/`.
+
+```bash
+cd ~
+git clone https://github.com/tomsonArrua7/odontocampus.git repo-odontocampus
+mv ~/htdocs/odontocampus.com.ar ~/htdocs/odontocampus.com.ar.clon-anterior
+ln -s ~/repo-odontocampus/public ~/htdocs/odontocampus.com.ar
+```
 
 #### Segunda capa: bloquear archivos ocultos
 
@@ -150,9 +176,14 @@ curl.exe -skI --resolve odontocampus.com.ar:443:179.43.126.185 https://odontocam
 curl.exe -skI --resolve odontocampus.com.ar:443:179.43.126.185 https://odontocampus.com.ar/infra/supabase/sql/001_esquema.sql
 ```
 
-La primera tiene que dar `200`. **Las otras dos, `404`.** Si cualquiera de esas
-dos da `200`, la raíz del sitio no quedó en `public/`: corregilo antes de
-seguir con cualquier otra cosa.
+La primera tiene que dar `200`. **Las otras dos, `404`.**
+
+Cada una prueba una capa distinta:
+
+- `.git/config` da 404 gracias a la regla de archivos ocultos, **aunque la raíz
+  esté mal**. Que dé 404 no confirma que la raíz esté bien.
+- `infra/...` no empieza con punto: solo da 404 si la raíz está en `public/`.
+  **Esta es la que confirma la raíz.**
 
 > En PowerShell, `curl` a secas es un alias de `Invoke-WebRequest` y no entiende
 > estas opciones. Usá `curl.exe`.
