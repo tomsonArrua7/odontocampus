@@ -263,12 +263,31 @@ y el servidor se cae sin ningún aviso previo. Es la forma lenta en que mueren
 los servidores chicos, y la más difícil de diagnosticar.
 
 ```bash
-cp /home/USUARIO_DEL_SITIO/htdocs/odontocampus.com.ar/infra/docker/daemon.json /etc/docker/daemon.json
+mkdir -p /etc/docker
+cat > /etc/docker/daemon.json <<'EOF'
+{
+  "log-driver": "json-file",
+  "log-opts": { "max-size": "10m", "max-file": "3" }
+}
+EOF
 systemctl restart docker
+systemctl is-active docker
 ```
 
-Limita cada contenedor a tres archivos de 10 MB. El archivo está versionado en
-`infra/docker/daemon.json`.
+Limita cada contenedor a tres archivos de 10 MB. El contenido es el mismo que
+`infra/docker/daemon.json` del repositorio; se escribe directamente para no
+depender de haber clonado antes.
+
+El último comando tiene que responder `active`. Si el JSON quedó mal escrito,
+Docker no arranca y ahí se nota enseguida.
+
+> **Hacelo antes de levantar Supabase.** La configuración de logs se aplica a
+> los contenedores que se crean después del cambio; los que ya existían siguen
+> sin límite hasta que se recrean.
+
+> **No agregues usuarios al grupo `docker`.** Pertenecer a ese grupo equivale a
+> ser root en el servidor: cualquiera que pueda hablar con Docker puede montar
+> el disco entero dentro de un contenedor. Docker se maneja sólo como root.
 
 #### Docker saltea el firewall
 
