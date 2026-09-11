@@ -93,7 +93,7 @@ root. Si clonás como root, los archivos quedan con dueño root y después el
 propio usuario del sitio no puede actualizarlos.
 
 ```bash
-ssh USUARIO_DEL_SITIO@179.43.126.185
+ssh -p 5469 USUARIO_DEL_SITIO@179.43.126.185
 cd ~/htdocs
 mv odontocampus.com.ar odontocampus.com.ar.placeholder
 git clone https://github.com/tomsonArrua7/odontocampus.git odontocampus.com.ar
@@ -405,7 +405,7 @@ CloudPanel trae uno. Dejá abiertos solo:
 
 | Puerto | Para qué |
 |---|---|
-| 22 | SSH |
+| **5469** | SSH. Puerto propio de este servidor: si lo cerrás, te quedás afuera |
 | 80 | Let's Encrypt y redirección |
 | 443 | El sitio |
 | 8443 | Panel de CloudPanel (mejor, restringido por IP) |
@@ -445,7 +445,7 @@ dice que el problema es la duplicación.
 ### Studio, por túnel SSH
 
 ```bash
-ssh -L 8000:127.0.0.1:8000 usuario@servidor
+ssh -p 5469 -L 8000:127.0.0.1:8000 usuario@servidor
 ```
 
 Y abrís `http://localhost:8000` en tu navegador. Usuario y contraseña son
@@ -454,7 +454,7 @@ Y abrís `http://localhost:8000` en tu navegador. Usuario y contraseña son
 Para Postgres con un cliente gráfico (DBeaver, TablePlus):
 
 ```bash
-ssh -L 5432:127.0.0.1:5432 usuario@servidor
+ssh -p 5469 -L 5432:127.0.0.1:5432 usuario@servidor
 ```
 
 ---
@@ -466,7 +466,7 @@ seguridad a nivel de fila (RLS)**.
 
 ```bash
 scp infra/supabase/sql/001_esquema.sql usuario@servidor:/tmp/
-ssh usuario@servidor
+ssh -p 5469 usuario@servidor
 cd /opt/supabase
 docker compose exec -T db psql -U postgres -d postgres < /tmp/001_esquema.sql
 ```

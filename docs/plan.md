@@ -104,7 +104,7 @@ Guía completa: [`despliegue-cloudpanel.md`](despliegue-cloudpanel.md).
 - [ ] Supabase en `/opt/supabase`
 - [ ] Claves generadas de cero. **Las del `.env.example` son públicas.**
 - [ ] `docker-compose.override.yml` copiado (cierra los puertos)
-- [ ] Firewall: solo 22, 80, 443 y el panel
+- [ ] Firewall: solo 5469 (SSH), 80, 443 y el panel. **No cierres el 5469**
 - [ ] **Verificar desde afuera** que 5432 y 8000 estén cerrados
 - [ ] Ajustes del vhost de la API (websockets, `client_max_body_size`)
 Actualizar el sitio, de ahí en adelante:

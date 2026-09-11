@@ -103,7 +103,7 @@ pérdida total en proyectos de este tamaño.
 Para administrarla se usa un túnel SSH, no un puerto abierto:
 
 ```bash
-ssh -L 5432:localhost:5432 deploy@servidor
+ssh -p 5469 -L 5432:localhost:5432 deploy@servidor
 ```
 
 ### Por qué Caddy y no Nginx
