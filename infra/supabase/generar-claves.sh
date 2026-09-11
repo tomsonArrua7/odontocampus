@@ -79,6 +79,35 @@ if [[ -d "$DATOS_DB" ]] && [[ -n "$(ls -A "$DATOS_DB" 2>/dev/null)" ]]; then
 fi
 
 # --------------------------------------------------------------------------
+# Claves asimétricas: este script todavía NO las genera
+#
+# Las versiones de Supabase de 2026 agregaron un segundo sistema de claves
+# (JWT_KEYS, JWT_JWKS, SUPABASE_PUBLISHABLE_KEY, SUPABASE_SECRET_KEY,
+# ANON_KEY_ASYMMETRIC, SERVICE_ROLE_KEY_ASYMMETRIC). Si el .env las trae y el
+# script las dejara como están, quedarían los valores de ejemplo del
+# repositorio de Supabase: públicos, conocidos por cualquiera y suficientes
+# para fabricar un token de administrador.
+#
+# Mejor no correr que correr así: se aborta antes de tocar nada.
+# --------------------------------------------------------------------------
+NO_SOPORTADAS=(JWT_KEYS JWT_JWKS SUPABASE_PUBLISHABLE_KEY SUPABASE_SECRET_KEY ANON_KEY_ASYMMETRIC SERVICE_ROLE_KEY_ASYMMETRIC)
+encontradas=()
+for variable in "${NO_SOPORTADAS[@]}"; do
+  if grep -q "^${variable}=" "$ENV_FILE"; then
+    encontradas+=("$variable")
+  fi
+done
+
+if (( ${#encontradas[@]} )); then
+  rojo "Tu versión de Supabase usa claves que este script todavía no sabe generar:"
+  echo "  ${encontradas[*]}"
+  echo
+  echo "Dejarlas con los valores de ejemplo permitiría fabricar tokens de administrador."
+  echo "No se modificó nada."
+  exit 1
+fi
+
+# --------------------------------------------------------------------------
 # La clave de Resend se pide ANTES de escribir nada: si falta, no queda un
 # .env a medio configurar.
 # --------------------------------------------------------------------------

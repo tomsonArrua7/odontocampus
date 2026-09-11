@@ -103,7 +103,7 @@ Aunque la raíz esté bien, conviene que Nginx rechace cualquier ruta que empiec
 con punto (`.git`, `.gitignore`, `.claude`). Si alguna vez alguien cambia la
 raíz por error, esto sigue protegiendo.
 
-En *Sites → odontocampus.com.ar → Vhost*, dentro del bloque `server` que
+En *Sites → odontocampus.com.ar → Vhost* (el editor web de CloudPanel, **no la consola**), dentro del bloque `server` que
 escucha en el 443, antes del primer `location`:
 
 ```nginx
