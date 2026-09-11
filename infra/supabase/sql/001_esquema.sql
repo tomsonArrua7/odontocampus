@@ -28,7 +28,6 @@
 begin;
 
 create extension if not exists "pgcrypto";
-create extension if not exists "citext";
 
 
 -- ==========================================================================
@@ -47,6 +46,31 @@ end;
 $$;
 
 
+-- ==========================================================================
+-- PERFILES
+-- Fila 1:1 con auth.users. No guardamos nombre real: no lo necesitamos y
+-- pedirlo espanta gente. `nombre_visible` puede ser un apodo.
+-- ==========================================================================
+
+create table if not exists public.perfiles (
+  id                   uuid primary key references auth.users(id) on delete cascade,
+  nombre_visible       text not null check (char_length(trim(nombre_visible)) between 2 and 60),
+  anio_carrera         smallint check (anio_carrera between 1 and 5),
+  whatsapp             text check (whatsapp ~ '^[0-9]{8,15}$'),
+  estado               text not null default 'activo'
+                         check (estado in ('activo', 'suspendido')),
+  -- Ver public.puede_publicar()
+  puede_publicar_desde timestamptz not null default (now() + interval '24 hours'),
+  creado_at            timestamptz not null default now(),
+  actualizado_at       timestamptz not null default now()
+);
+
+-- Esta función va DESPUÉS de la tabla, a propósito. Está escrita en
+-- `language sql`, y Postgres valida el cuerpo de esas funciones en el
+-- momento de crearlas: si `perfiles` todavía no existe, falla. (Las
+-- funciones en plpgsql no se validan al crearse, por eso las demás pueden
+-- ir antes.)
+--
 -- ¿Esta persona está habilitada para publicar?
 --
 -- Dos condiciones: cuenta activa y pasadas las primeras 24 horas.
@@ -72,26 +96,6 @@ as $$
       and p.puede_publicar_desde <= now()
   );
 $$;
-
-
--- ==========================================================================
--- PERFILES
--- Fila 1:1 con auth.users. No guardamos nombre real: no lo necesitamos y
--- pedirlo espanta gente. `nombre_visible` puede ser un apodo.
--- ==========================================================================
-
-create table if not exists public.perfiles (
-  id                   uuid primary key references auth.users(id) on delete cascade,
-  nombre_visible       text not null check (char_length(trim(nombre_visible)) between 2 and 60),
-  anio_carrera         smallint check (anio_carrera between 1 and 5),
-  whatsapp             text check (whatsapp ~ '^[0-9]{8,15}$'),
-  estado               text not null default 'activo'
-                         check (estado in ('activo', 'suspendido')),
-  -- Ver public.puede_publicar()
-  puede_publicar_desde timestamptz not null default (now() + interval '24 hours'),
-  creado_at            timestamptz not null default now(),
-  actualizado_at       timestamptz not null default now()
-);
 
 create trigger perfiles_actualizado_at
   before update on public.perfiles
