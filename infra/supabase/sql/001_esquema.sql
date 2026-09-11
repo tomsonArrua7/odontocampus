@@ -2,7 +2,10 @@
 -- OdontoCampus — Esquema inicial
 --
 -- Aplicar con:
---   docker compose exec -T db psql -U postgres -d postgres < 001_esquema.sql
+--   docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < 001_esquema.sql
+--
+-- Y después, SIEMPRE, las pruebas de seguridad (no dejan nada en la base):
+--   docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < pruebas_rls.sql
 --
 -- --------------------------------------------------------------------------
 -- LEER ESTO ANTES DE TOCAR NADA
@@ -277,16 +280,21 @@ create policy "bolsa: publicar la propia"
     ) < 5
   );
 
+-- Una publicación ocultada por moderación no la puede tocar su dueño: si
+-- pudiera, la reactivaría. Y el dueño sólo la mueve entre los estados que le
+-- corresponden a él: 'oculta' es una decisión de moderación.
 create policy "bolsa: editar la propia"
   on public.publicaciones_bolsa for update
   to authenticated
-  using  ((select auth.uid()) = usuario_id)
-  with check ((select auth.uid()) = usuario_id);
+  using  ((select auth.uid()) = usuario_id and estado <> 'oculta')
+  with check ((select auth.uid()) = usuario_id and estado in ('activa', 'pausada', 'vendida'));
 
+-- Tampoco se puede borrar una publicación ocultada: sería borrar la evidencia
+-- de lo que se moderó. (Al eliminar la cuenta sí se borra, en cascada.)
 create policy "bolsa: borrar la propia"
   on public.publicaciones_bolsa for delete
   to authenticated
-  using ((select auth.uid()) = usuario_id);
+  using ((select auth.uid()) = usuario_id and estado <> 'oculta');
 
 
 -- ==========================================================================
@@ -373,16 +381,48 @@ grant execute on function public.eliminar_mi_cuenta() to authenticated;
 -- clínicas, biblioteca) sigue siendo estático: no pasa por acá.
 revoke all on all tables in schema public from anon;
 
+-- Supabase también le concede TODO a `authenticated` por defecto, sobre todas
+-- las columnas. RLS decide QUÉ FILAS puede tocar cada quien, pero no QUÉ
+-- COLUMNAS. Sin recortar esto, un usuario podría, en su propia fila:
+--   · reactivarse después de una suspensión   (perfiles.estado)
+--   · saltearse la espera de 24 horas          (perfiles.puede_publicar_desde)
+--   · extender sin límite una publicación     (publicaciones_bolsa.expira_at)
+--   · antedatar un consentimiento             (consentimientos.otorgado_at)
+-- Se revoca todo y se concede columna por columna lo que el sitio necesita.
+-- Las pruebas de pruebas_rls.sql intentan cada una de estas cosas.
+revoke all on all tables in schema public from authenticated;
+
 grant usage on schema public to authenticated;
 
-grant select, insert, update, delete on
-  public.publicaciones_bolsa,
-  public.notas_academicas
-  to authenticated;
+grant select on public.perfiles to authenticated;
+grant update (nombre_visible, anio_carrera, whatsapp)
+  on public.perfiles to authenticated;
 
-grant select, update on public.perfiles to authenticated;
-grant select, insert, update on public.consentimientos to authenticated;
-grant select, insert on public.reportes to authenticated;
+grant select on public.consentimientos to authenticated;
+grant insert (usuario_id, tipo, version_texto)
+  on public.consentimientos to authenticated;
+grant update (revocado_at)
+  on public.consentimientos to authenticated;
+
+-- Las notas son de su dueño por completo: es un texto cifrado que sólo él
+-- puede descifrar, y RLS impide tocar las de otra persona.
+grant select, insert, update, delete on public.notas_academicas to authenticated;
+
+grant select, delete on public.publicaciones_bolsa to authenticated;
+grant insert (usuario_id, titulo, categoria, precio_texto, estado_uso, ubicacion, descripcion)
+  on public.publicaciones_bolsa to authenticated;
+grant update (titulo, categoria, precio_texto, estado_uso, ubicacion, descripcion, estado)
+  on public.publicaciones_bolsa to authenticated;
+
+grant select on public.reportes to authenticated;
+grant insert (tipo_objeto, objeto_id, reportante_id, motivo)
+  on public.reportes to authenticated;
+
+-- puede_publicar() es SECURITY DEFINER y Postgres deja ejecutar funciones
+-- nuevas a PUBLIC. Sin esto, cualquiera sin sesión podría preguntar por
+-- /rest/v1/rpc/puede_publicar si un id de usuario está activo o suspendido.
+revoke all on function public.puede_publicar(uuid) from public, anon;
+grant execute on function public.puede_publicar(uuid) to authenticated;
 
 -- PostgREST guarda en memoria qué tablas y funciones existen. Sin este
 -- aviso, lo recién creado responde 404 hasta reiniciar el contenedor.

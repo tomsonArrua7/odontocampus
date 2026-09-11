@@ -182,6 +182,23 @@ curl.exe -skI --resolve odontocampus.com.ar:443:179.43.126.185 https://odontocam
 curl.exe -skI --resolve odontocampus.com.ar:443:179.43.126.185 https://odontocampus.com.ar/infra/supabase/sql/001_esquema.sql
 ```
 
+Y enseguida, **las pruebas de seguridad**:
+
+```bash
+docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
+  < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/pruebas_rls.sql
+```
+
+Crean dos usuarios de prueba dentro de una transacción, intentan lo que
+intentaría alguien con malas intenciones (leer notas ajenas, reactivarse
+después de una suspensión, saltearse la espera para publicar, reactivar una
+publicación ocultada, antedatar un consentimiento) y terminan en `ROLLBACK`:
+**no queda nada en la base**. Cada prueba imprime `OK` o `FALLA`.
+
+**Una sola `FALLA` es un agujero de seguridad.** Las cuentas no se habilitan en
+el sitio hasta que todas digan `OK`, y se vuelven a correr después de cualquier
+cambio en el esquema.
+
 La primera tiene que dar `200`. **Las otras dos, `404`.**
 
 Cada una prueba una capa distinta:
@@ -686,7 +703,7 @@ seguridad a nivel de fila (RLS)**.
 
 ```bash
 cd /opt/supabase
-docker compose exec -T db psql -U postgres -d postgres \
+docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
   < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/001_esquema.sql
 ```
 

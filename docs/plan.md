@@ -108,7 +108,8 @@ Guía completa: [`despliegue-cloudpanel.md`](despliegue-cloudpanel.md).
 - [x] `docker-compose.override.yml` copiado (cierra los puertos)
 - [ ] Firewall: solo 5469 (SSH), 80, 443 y el panel. **No cierres el 5469**
 - [ ] **Verificar desde afuera** que 5432 y 8000 estén cerrados
-- [ ] Vhost de la API: sólo `/auth`, `/rest`, `/storage`, `/realtime` y `/functions`
+- [x] Vhost de la API: sólo `/auth`, `/rest`, `/storage`, `/realtime` y `/functions`
+- [x] Supabase levantado, puertos 8000, 5432 y 6543 sólo en 127.0.0.1
 Actualizar el sitio, de ahí en adelante:
 
 ```bash
@@ -124,6 +125,7 @@ cd ~/htdocs/odontocampus.com.ar && git pull --ff-only
 
 - [ ] Cargar [`001_esquema.sql`](../infra/supabase/sql/001_esquema.sql)
 - [ ] Correr las dos consultas de verificación del final del archivo
+- [ ] **`pruebas_rls.sql`: todas las pruebas en OK** (intenta lo que haría un atacante y deshace todo)
 - [ ] **Advisor de Studio sin alertas críticas**
 - [ ] Prueba con `curl` y la clave publicable desde incógnito: no debe devolver nada
 
