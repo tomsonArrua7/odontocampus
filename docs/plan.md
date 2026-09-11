@@ -72,7 +72,7 @@ por acá.
 - [ ] 👥 **Decidir a nombre de quién queda.** Si va a nombre de una persona y esa
       persona se aleja de FOE, la agrupación pierde el dominio. Esto se decide
       antes de tramitarlo, no después.
-- [ ] **Resend: agregar `odontocampus.com.ar`** — la cuenta ya existe y está
+- [x] **Resend: agregar `odontocampus.com.ar`** — la cuenta ya existe y está
       paga (hoy tiene `dndjursoc.com.ar`), admite varios dominios. Falta
       *Add domain* y cargar los registros SPF y DKIM que te da.
 - [ ] **Backblaze B2** para los backups (~1 USD/mes).
@@ -91,18 +91,18 @@ por acá.
 Guía completa: [`despliegue-cloudpanel.md`](despliegue-cloudpanel.md).
 
 - [x] DNS: `@`, `www` y `api` apuntando a `179.43.126.185`, en **DNS only**
-- [ ] Delegar el dominio en nic.ar a los nameservers de Cloudflare
+- [x] Delegar el dominio en nic.ar a los nameservers de Cloudflare
 - [x] CloudPanel → **Create a Static HTML Site** para `odontocampus.com.ar`
-- [ ] Agregarle `www.odontocampus.com.ar` en *Domains*
+- [x] Agregarle `www.odontocampus.com.ar` en *Domains*
 - [x] CloudPanel → **Create a Reverse Proxy** para `api.odontocampus.com.ar`
       → `http://127.0.0.1:8000`
-- [ ] Raíz del sitio apuntando a `public/`
-- [ ] Repositorio clonado como el usuario del sitio
+- [x] Raíz del sitio apuntando a `public/`
+- [x] Repositorio clonado como el usuario del sitio
 - [ ] **Verificar que `.git/config` e `infra/` den 404 desde afuera**
-- [ ] Certificados Let's Encrypt en ambos (después de que el DNS resuelva)
-- [ ] Docker instalado, con rotación de logs
+- [x] Certificados Let's Encrypt en ambos (después de que el DNS resuelva)
+- [x] Docker instalado, con rotación de logs
 - [ ] Supabase en `/opt/supabase`
-- [ ] Claves generadas de cero. **Las del `.env.example` son públicas.**
+- [ ] Claves con `infra/supabase/generar-claves.sh` (**una sola vez**, antes del primer arranque)
 - [ ] `docker-compose.override.yml` copiado (cierra los puertos)
 - [ ] Firewall: solo 5469 (SSH), 80, 443 y el panel. **No cierres el 5469**
 - [ ] **Verificar desde afuera** que 5432 y 8000 estén cerrados
@@ -139,7 +139,8 @@ Acá vuelve el trabajo mío. Archivos nuevos en `public/js/`:
 - [x] `calculator.js` — avisa a la sincronización en cada cambio
 - [x] Exportar mis datos (Ley 25.326)
 - [ ] 🙋 Pegar la `ANON_KEY` real en `config.js` cuando exista el servidor
-- [ ] Borrado de cuenta automático (hoy es por correo, y la interfaz lo dice)
+- [x] Plantillas de correo con código (`public/email/`)
+- [x] Borrado de cuenta real: función `eliminar_mi_cuenta`, con confirmación escrita
 - [ ] CSP estricta en el vhost del sitio
 
 **Principio que no se negocia:** el login suma, no tapa. Mesas, reválidas,

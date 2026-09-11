@@ -41,7 +41,8 @@
         cerrarCuenta: function () { UI.closeModal("modal-cuenta"); },
         cerrarSesion: function () { self.salir(); },
         exportarDatos: function () { self.exportar(); },
-        eliminarCuenta: function () { self.eliminar(); }
+        eliminarCuenta: function () { self.eliminar(); },
+        confirmarEliminarCuenta: function () { self.confirmarEliminacion(); }
       });
 
       var formEmail = document.getElementById("form-acceso-email");
@@ -166,14 +167,16 @@
         });
     },
 
-    /** El reenvío se habilita recién a los 45 segundos: evita el bombardeo
-        de correos y, de paso, da tiempo a que el mensaje llegue. */
+    /** El reenvío se habilita a los 60 segundos, que es exactamente lo que
+        exige el servidor (GOTRUE_SMTP_MAX_FREQUENCY en el override de
+        Supabase). Si fueran distintos, la persona tocaría "Reenviar" y
+        recibiría un error. Cambiar uno obliga a cambiar el otro. */
     arrancarCuentaRegresiva: function () {
       var self = this;
       var boton = document.getElementById("btn-reenviar");
       if (!boton) return;
 
-      this.reenvioHasta = Date.now() + 45000;
+      this.reenvioHasta = Date.now() + 60000;
       global.clearInterval(this.temporizador);
 
       function pintar() {
@@ -305,29 +308,88 @@
       });
     },
 
+    /**
+     * Eliminar la cuenta.
+     *
+     * Es inmediato y no tiene vuelta atrás. Para que no pase por un toque
+     * accidental, se pide escribir ELIMINAR: un botón de confirmación
+     * común se aprieta sin leer.
+     *
+     * El borrado lo hace la función `eliminar_mi_cuenta` en la base: desde
+     * el navegador no se puede tocar auth.users, y está bien que así sea.
+     */
     eliminar: function () {
-      /* El borrado real lo hace una función del servidor con permisos
-         elevados: desde el navegador no se puede eliminar una cuenta de
-         auth.users, y está bien que sea así.
+      if (!Api.usuario()) return;
 
-         Hasta que exista esa función, no simulamos que funciona: decimos la
-         verdad y damos un camino que sí sirve. Un botón que promete borrar y
-         no borra es peor que no tenerlo. */
       global.OdontoApp.mostrarModalGenerico(
         "<h2>Eliminar mi cuenta</h2>",
-        "<p>Podemos borrar tu cuenta y todo lo asociado: perfil, notas " +
-        "sincronizadas y publicaciones.</p>" +
-        '<div class="callout callout-warning" style="margin-top:1.25rem">' +
-          '<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>' +
-          "<div><h3>Todavía no es automático</h3>" +
-          "<p>Escribinos a <strong>contacto@foe-unlp.org.ar</strong> desde la " +
-          "misma dirección con la que te registraste y lo hacemos dentro de las " +
-          "72 horas. Te confirmamos por correo cuando esté hecho.</p></div>" +
+        '<p class="modal-lead">Se borran tu cuenta y todo lo asociado: perfil, ' +
+        "notas sincronizadas, consentimientos y publicaciones. " +
+        "<strong>No se puede deshacer.</strong></p>" +
+        '<div class="callout callout-info" style="margin-top:1.25rem">' +
+          '<i class="fa-solid fa-mobile-screen" aria-hidden="true"></i>' +
+          "<div><h3>Lo que está en este dispositivo no se toca</h3>" +
+          "<p>Las notas que cargaste en la calculadora de este navegador se " +
+          "conservan. Si también querés borrarlas, usá <strong>Borrar mis " +
+          "notas</strong> en Mi promedio.</p></div>" +
         "</div>" +
-        "<p style='margin-top:1rem'>Mientras tanto podés dejar de sincronizar " +
-        "desde <strong>Mi carrera</strong>: eso borra las notas del servidor al " +
-        "instante y las deja sólo en este dispositivo.</p>"
+        '<div class="field" style="margin-top:1.25rem">' +
+          '<label class="field-label" for="confirmar-eliminacion">' +
+            "Para confirmar, escribí <strong>ELIMINAR</strong></label>" +
+          '<input type="text" id="confirmar-eliminacion" class="form-control" ' +
+                 'autocomplete="off" autocapitalize="characters" spellcheck="false">' +
+        "</div>" +
+        '<div class="modal-card-footer" style="border:0;background:none;padding-inline:0">' +
+          '<button type="button" class="btn btn-secondary" data-action="cerrarModal">Cancelar</button>' +
+          '<button type="button" class="btn btn-danger-soft" id="btn-confirmar-eliminacion" ' +
+                  'data-action="confirmarEliminarCuenta">' +
+            '<i class="fa-solid fa-trash-can" aria-hidden="true"></i> Eliminar definitivamente' +
+          "</button>" +
+        "</div>"
       );
+    },
+
+    confirmarEliminacion: function () {
+      var campo = document.getElementById("confirmar-eliminacion");
+      if (!campo || campo.value.trim().toUpperCase() !== "ELIMINAR") {
+        UI.toast("Escribí ELIMINAR para confirmar", "warning");
+        if (campo) campo.focus();
+        return;
+      }
+
+      var usuario = Api.usuario();
+      var boton = document.getElementById("btn-confirmar-eliminacion");
+      var textoBoton = boton ? boton.innerHTML : "";
+      if (boton) {
+        boton.disabled = true;
+        boton.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i> Eliminando…';
+      }
+
+      Api.rpc("eliminar_mi_cuenta")
+        .then(function () {
+          // La clave de notas de este dispositivo ya no abre nada: se olvida.
+          if (usuario && global.OdontoCripto) global.OdontoCripto.olvidarClave(usuario.id);
+          if (global.OdontoSync) {
+            global.OdontoSync.activo = false;
+            global.OdontoSync.clave = null;
+          }
+          // La cuenta ya no existe; cerrarSesion limpia lo local y tolera
+          // que el servidor rechace el aviso de salida.
+          return Api.cerrarSesion();
+        })
+        .then(function () {
+          UI.closeModal("modal-generico");
+          UI.closeModal("modal-cuenta");
+          if (global.OdontoSync) global.OdontoSync.pintarPanel();
+          UI.toast("Tu cuenta y sus datos fueron eliminados", "success");
+        })
+        .catch(function (error) {
+          UI.toast(error.message, "danger");
+          if (boton) {
+            boton.disabled = false;
+            boton.innerHTML = textoBoton;
+          }
+        });
     }
   };
 

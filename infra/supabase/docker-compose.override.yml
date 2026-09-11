@@ -79,3 +79,37 @@ services:
   # ------------------------------------------------------------------
   studio:
     ports: !override []
+
+  # ------------------------------------------------------------------
+  # Auth (GoTrue) — acceso por CÓDIGO enviado por correo
+  #
+  # Por defecto Supabase manda un ENLACE, no un código. En el celular ese
+  # enlace se abre en el navegador interno de la app de correo, no en el
+  # navegador donde la persona pidió entrar: la sesión queda iniciada en el
+  # lugar equivocado y parece que no funcionó. Con un código eso no pasa.
+  #
+  # Hay DOS plantillas porque Supabase usa una distinta según la dirección
+  # ya tenga cuenta (magic link) o no (confirmation). Si se personaliza una
+  # sola, la primera persona que se registra recibe el correo por defecto:
+  # en inglés y con un enlace en lugar del código que la pantalla le pide.
+  #
+  # Las plantillas las sirve el propio sitio (public/email/). Después de
+  # cambiarlas: git pull en el sitio y `docker compose restart auth`.
+  # ------------------------------------------------------------------
+  auth:
+    environment:
+      GOTRUE_MAILER_OTP_LENGTH: "6"
+      # 10 minutos: lo que dice el correo y la pantalla.
+      GOTRUE_MAILER_OTP_EXP: "600"
+      # Tiempo mínimo entre dos correos a la misma dirección. El botón
+      # "Reenviar" del sitio espera exactamente esto (js/auth.js): si no
+      # coinciden, la persona toca el botón y recibe un error.
+      GOTRUE_SMTP_MAX_FREQUENCY: "60s"
+      # Tope GLOBAL de correos por hora, para toda la instancia. El valor
+      # por defecto de Supabase es muy bajo: con un curso entero entrando el
+      # primer día, los códigos dejarían de salir en minutos.
+      GOTRUE_RATE_LIMIT_EMAIL_SENT: "200"
+      GOTRUE_MAILER_SUBJECTS_CONFIRMATION: "Tu código para crear tu cuenta en OdontoCampus"
+      GOTRUE_MAILER_SUBJECTS_MAGIC_LINK: "Tu código para ingresar a OdontoCampus"
+      GOTRUE_MAILER_TEMPLATES_CONFIRMATION: "https://odontocampus.com.ar/email/confirmacion.html"
+      GOTRUE_MAILER_TEMPLATES_MAGIC_LINK: "https://odontocampus.com.ar/email/codigo.html"

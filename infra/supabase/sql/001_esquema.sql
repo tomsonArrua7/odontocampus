@@ -325,6 +325,43 @@ create policy "reportes: reportar"
 
 
 -- ==========================================================================
+-- ELIMINAR MI CUENTA  (Ley 25.326, derecho de supresión)
+--
+-- Desde el navegador no se puede borrar una fila de auth.users, y está bien
+-- que así sea. Esta función corre con los permisos de su dueño (SECURITY
+-- DEFINER), pero sólo sabe borrar UNA cuenta: la de quien la llama. No
+-- recibe parámetros, así que no hay forma de pasarle el id de otra persona.
+--
+-- El borrado arrastra todo lo demás: perfil, notas cifradas,
+-- consentimientos, publicaciones y reportes están declarados con
+-- `on delete cascade` hacia auth.users.
+--
+-- Se llama desde el sitio con:  POST /rest/v1/rpc/eliminar_mi_cuenta
+-- ==========================================================================
+
+create or replace function public.eliminar_mi_cuenta()
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  uid uuid := auth.uid();
+begin
+  if uid is null then
+    raise exception 'Se necesita una sesión iniciada' using errcode = '28000';
+  end if;
+
+  delete from auth.users where id = uid;
+end;
+$$;
+
+-- Postgres deja ejecutar cualquier función nueva a PUBLIC por defecto.
+-- Sin este revoke, la función quedaría expuesta también a `anon`.
+revoke all on function public.eliminar_mi_cuenta() from public, anon;
+grant execute on function public.eliminar_mi_cuenta() to authenticated;
+
+-- ==========================================================================
 -- PERMISOS
 -- Supabase concede permisos amplios a `anon` y `authenticated` por defecto.
 -- Acá los recortamos a lo mínimo. RLS filtra las filas; esto limita
@@ -346,6 +383,10 @@ grant select, insert, update, delete on
 grant select, update on public.perfiles to authenticated;
 grant select, insert, update on public.consentimientos to authenticated;
 grant select, insert on public.reportes to authenticated;
+
+-- PostgREST guarda en memoria qué tablas y funciones existen. Sin este
+-- aviso, lo recién creado responde 404 hasta reiniciar el contenedor.
+notify pgrst, 'reload schema';
 
 commit;
 

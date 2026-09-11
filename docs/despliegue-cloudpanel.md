@@ -308,78 +308,86 @@ Como root, **fuera** del directorio de los sitios:
 ```bash
 sudo mkdir -p /opt/supabase && cd /opt/supabase
 sudo git clone --depth 1 https://github.com/supabase/supabase.git repo
-sudo cp -r repo/docker/* .
+sudo cp -r repo/docker/. .
 sudo cp .env.example .env
 ```
 
-### 3.1 Generar las claves
+### 3.1 Claves y configuración: con el script, no a mano
 
-Necesitás cuatro secretos. **Ninguno se reutiliza de otro proyecto.**
+Todo el `.env` se completa con `infra/supabase/generar-claves.sh`, que corre en
+el servidor:
 
 ```bash
-# JWT_SECRET  (mínimo 40 caracteres)
-openssl rand -base64 48 | tr -d '\n'
-
-# POSTGRES_PASSWORD
-openssl rand -base64 32 | tr -d '\n/+='
-
-# DASHBOARD_PASSWORD
-openssl rand -base64 24 | tr -d '\n/+='
-
-# SECRET_KEY_BASE  (Realtime)
-openssl rand -base64 48 | tr -d '\n'
+cd /opt/supabase && cp .env.example .env
+bash /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/generar-claves.sh
 ```
 
-`ANON_KEY` y `SERVICE_ROLE_KEY` son JWT firmados con tu `JWT_SECRET`. Se generan
-con el generador de la documentación de Supabase (*Self-Hosting → Generate API
-Keys*) pegando ahí el `JWT_SECRET`. No sirven los del `.env.example`: son
-públicos y conocidos por todo el mundo.
+Genera los secretos con `openssl`, firma `ANON_KEY` y `SERVICE_ROLE_KEY`,
+configura las URLs y el correo, deja el archivo con permisos 600 y muestra
+**únicamente** la `ANON_KEY`, que es pública.
+
+**Por qué no el generador web de la documentación de Supabase:** para usarlo
+hay que pegar el `JWT_SECRET` en una página. Esa es la clave que firma todas
+las sesiones: con ella se puede fabricar un token de administrador. Con el
+script no sale del servidor.
+
+**Se corre una sola vez, antes del primer `docker compose up`.** El script se
+niega a correr de nuevo, por dos razones:
+
+- `POSTGRES_PASSWORD` queda grabada en la base la primera vez que arranca. Si
+  después cambia en el `.env`, los servicios no pueden conectarse.
+- Cambiar `JWT_SECRET` invalida todas las sesiones y la `ANON_KEY` que ya está
+  en `config.js`: el sitio deja de poder hablar con la API.
 
 > **`SERVICE_ROLE_KEY` saltea todas las políticas de seguridad.** Nunca va al
-> navegador, nunca al repositorio, nunca a un mensaje de WhatsApp. Solo vive en
-> el `.env` del servidor.
+> navegador, nunca al repositorio, nunca a una captura de pantalla ni a un
+> chat. Solo vive en el `.env` del servidor y en el gestor de contraseñas.
 
-### 3.2 Variables que hay que cambiar sí o sí
+### 3.2 Correo: Resend y código de acceso
 
-```dotenv
-POSTGRES_PASSWORD=<generado>
-JWT_SECRET=<generado>
-ANON_KEY=<generado a partir del JWT_SECRET>
-SERVICE_ROLE_KEY=<generado a partir del JWT_SECRET>
-SECRET_KEY_BASE=<generado>
+#### La clave de Resend
 
-DASHBOARD_USERNAME=foe
-DASHBOARD_PASSWORD=<generado>
+En Resend → *API Keys* → *Create API Key*:
 
-SITE_URL=https://odontocampus.com.ar
-API_EXTERNAL_URL=https://api.odontocampus.com.ar
-SUPABASE_PUBLIC_URL=https://api.odontocampus.com.ar
-ADDITIONAL_REDIRECT_URLS=https://www.odontocampus.com.ar
+| Campo | Valor |
+|---|---|
+| Permission | **Sending access** (no *Full access*) |
+| Domain | `odontocampus.com.ar` |
 
-# Correo: sin esto NADIE puede iniciar sesión
-SMTP_HOST=smtp.resend.com
-SMTP_PORT=587
-SMTP_USER=resend
-SMTP_PASS=<clave del proveedor>
-SMTP_ADMIN_EMAIL=hola@odontocampus.com.ar
-SMTP_SENDER_NAME=OdontoCampus
+Una clave propia para este proyecto, no la de dndjursoc. Si alguna vez se
+filtra, solo sirve para mandar correo desde este dominio y se revoca sin tocar
+el otro sitio. El script la pide sin mostrarla en pantalla.
 
-ENABLE_EMAIL_SIGNUP=true
-ENABLE_EMAIL_AUTOCONFIRM=false
-ENABLE_ANONYMOUS_USERS=false
-DISABLE_SIGNUP=false
-```
+#### Código, no enlace
 
-**El SMTP es la pieza que más se olvida.** El acceso es por código enviado al
-email: sin correo saliente funcionando, el sistema queda inutilizable. Resend o
-Brevo tienen capa gratuita suficiente. Hay que verificar el dominio y cargar los
-registros SPF y DKIM, o los códigos van a parar a spam.
+Por defecto Supabase manda un **enlace** para ingresar. En el celular ese
+enlace se abre en el navegador interno de la app de correo, no en el navegador
+donde la persona pidió entrar: la sesión queda iniciada en el lugar equivocado
+y parece que no funcionó. Por eso el sitio pide un **código de 6 dígitos**, que
+confirma igual que el correo es de quien lo usa.
 
-Permisos del `.env`, que contiene todos los secretos:
+Las plantillas están en `public/email/` y las sirve el propio sitio:
 
-```bash
-sudo chmod 600 /opt/supabase/.env
-```
+| Archivo | Cuándo se usa |
+|---|---|
+| `confirmacion.html` | La dirección todavía no tiene cuenta |
+| `codigo.html` | La dirección ya tiene cuenta |
+
+**Tienen que ser las dos.** Supabase elige una u otra según el caso; si se
+personaliza una sola, la primera persona que se registra recibe el correo por
+defecto, en inglés y con un enlace.
+
+Las URLs de las plantillas, el vencimiento del código (10 minutos), el tiempo
+mínimo entre reenvíos (60 segundos) y el tope de correos por hora están en
+`docker-compose.override.yml`, bloque `auth`.
+
+> **El tiempo entre reenvíos está en dos lugares y tienen que coincidir:**
+> `GOTRUE_SMTP_MAX_FREQUENCY` en el override y la cuenta regresiva de
+> `public/js/auth.js`. Si el botón se habilita antes de lo que permite el
+> servidor, la persona lo toca y recibe un error.
+
+Después de cambiar una plantilla: `git pull` en el sitio y
+`docker compose restart auth`.
 
 ### 3.3 Cerrar los puertos
 
@@ -484,10 +492,9 @@ ssh -p 5469 -L 5432:127.0.0.1:5432 usuario@servidor
 seguridad a nivel de fila (RLS)**.
 
 ```bash
-scp infra/supabase/sql/001_esquema.sql usuario@servidor:/tmp/
-ssh -p 5469 usuario@servidor
 cd /opt/supabase
-docker compose exec -T db psql -U postgres -d postgres < /tmp/001_esquema.sql
+docker compose exec -T db psql -U postgres -d postgres \
+  < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/001_esquema.sql
 ```
 
 ### Por qué RLS es ahora *todo* el modelo de seguridad

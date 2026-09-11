@@ -292,6 +292,14 @@
     return pedirAutenticado("/rest/v1/" + tabla + "?" + consulta, { metodo: "DELETE" });
   }
 
+  /** Ejecuta una función de Postgres expuesta por PostgREST. */
+  function rpc(nombre, argumentos) {
+    return pedirAutenticado("/rest/v1/rpc/" + nombre, {
+      metodo: "POST",
+      cuerpo: argumentos || {}
+    });
+  }
+
   global.OdontoApi = {
     hayBackend: function () { return CONFIG.hayBackend(); },
     haySesion: haySesion,
@@ -308,6 +316,7 @@
     insertar: insertar,
     actualizar: actualizar,
     borrar: borrar,
+    rpc: rpc,
     pedirAutenticado: pedirAutenticado
   };
 })(window);
