@@ -67,9 +67,14 @@
       if (global.OdontoLiveSheets) global.OdontoLiveSheets.init();
 
       /* Cuentas. Se inicializan siempre, pero se apagan solas si el backend
-         todavía no está configurado: el sitio funciona completo sin ellas. */
+         todavía no está configurado: el sitio funciona completo sin ellas.
+         Carrera va antes que Auth: el registro usa su texto de términos. */
+      if (global.OdontoCarrera) global.OdontoCarrera.init();
       if (global.OdontoAuth) global.OdontoAuth.init();
-      if (global.OdontoSync) global.OdontoSync.init();
+
+      /* Llegada desde el botón de un correo (confirmar la cuenta o elegir una
+         contraseña nueva): se atiende antes de mostrar la sección. */
+      if (global.OdontoAuth) global.OdontoAuth.procesarEnlaceDeCorreo();
 
       this.aplicarRutaDeUrl();
       on(global, "hashchange", this.aplicarRutaDeUrl.bind(this));
@@ -249,8 +254,9 @@
       if (seccion === "fechas" && global.OdontoLiveSheets) {
         if (tab === "revalidas") global.OdontoLiveSheets.renderRevalidas();
         else global.OdontoLiveSheets.renderMesasExamen();
-      } else if (seccion === "carrera" && global.OdontoCalculator) {
-        global.OdontoCalculator.renderTabla();
+      } else if (seccion === "carrera" && global.OdontoCarrera) {
+        // Decide si mostrar el promedio o pedir cuenta primero.
+        global.OdontoCarrera.mostrar();
       }
     },
 

@@ -133,7 +133,7 @@
             <p class="hero-title">Sabé <span>cuándo rendís</span> sin dar veinte vueltas.</p>
             <p class="hero-subtitle">
               Mesas de finales y reválidas actualizadas al instante, con aula, horario y datos de Zoom.
-              Además: historias clínicas para imprimir, tu promedio y apuntes de cátedra. Todo abierto, sin cuenta ni contraseña.
+              Además: historias clínicas para imprimir, apuntes de cátedra y tu promedio. Todo abierto sin cuenta; solo tu promedio pide una, para guardarlo.
             </p>
             <div class="hero-cta-group">
               <a href="#fechas/mesas" class="btn btn-magenta btn-lg" data-nav="fechas/mesas">
@@ -469,11 +469,14 @@
       </div>
 
 
-      <div id="panel-promedio">
+      <!-- Crear cuenta, ingresar, aceptar qué se guarda o esperar la carga.
+           Lo pinta js/carrera.js: el promedio aparece recién cuando hay cuenta. -->
+      <div id="carrera-acceso" class="carrera-acceso"></div>
 
-        <!-- Ofrecimiento de sincronizar, en contexto y no como modal al
-             entrar. Lo pinta js/sync.js según el estado de la sesión. -->
-        <div class="sync-panel" id="panel-sync" hidden></div>
+      <div id="panel-promedio" hidden>
+
+        <!-- Materias cargadas en este navegador antes de que existieran las cuentas -->
+        <div id="carrera-anteriores" class="carrera-anteriores" hidden></div>
 
         <div class="calc-dashboard">
           <div class="calc-stats-grid">
@@ -528,8 +531,9 @@
           <div class="filter-group" style="flex:0 0 auto; align-items:center;">
             <p class="privacy-note">
               <i class="fa-solid fa-lock" aria-hidden="true"></i>
-              Tus notas quedan solo en este dispositivo. No se envían a ningún servidor.
+              Se guardan en tu cuenta. Otros estudiantes no pueden verlas.
             </p>
+            <span class="estado-guardado" id="estado-guardado"></span>
             <button type="button" class="btn btn-secondary btn-sm" data-action="reiniciarNotas">
               <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Borrar mis notas
             </button>
@@ -537,7 +541,6 @@
         </div>
 
         <div id="calculadora-materias-lista"></div>
-      </div>
       </div>
     </div>
   </section>
@@ -623,7 +626,8 @@
 </div>
 
 <!-- ==========================================================================
-     ACCESO — dos pasos: email y código
+     ACCESO — un solo diálogo con cuatro vistas: ingresar, crear cuenta,
+     olvidé mi contraseña y "revisá tu correo". Lo maneja js/auth.js.
      ========================================================================== -->
 <div class="modal-overlay" id="modal-acceso" role="dialog" aria-modal="true" aria-labelledby="acceso-titulo" aria-hidden="true">
   <div class="modal-card modal-angosto">
@@ -635,57 +639,148 @@
     </div>
 
     <div class="modal-card-body">
-      <!-- Paso 1 -->
-      <div id="paso-email">
-        <p class="modal-lead">Te mandamos un código de 6 dígitos por correo. Sin contraseñas que recordar.</p>
-
-        <form id="form-acceso-email" class="stack" style="margin-top:1.25rem">
-          <div class="field">
-            <label class="field-label" for="acceso-email">Tu correo electrónico</label>
-            <input type="email" id="acceso-email" class="form-control" required
-                   autocomplete="email" inputmode="email" placeholder="nombre@ejemplo.com">
-          </div>
-          <button type="submit" class="btn btn-magenta btn-block" id="btn-enviar-codigo">
-            <i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Enviarme el código
-          </button>
-        </form>
-
-        <div class="callout" style="margin-top:1.5rem">
-          <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-          <div>
-            <h3>No hace falta cuenta para lo importante</h3>
-            <p>Las mesas, las reválidas, las historias clínicas, el instrumental y la
-               biblioteca están abiertos. La cuenta sirve para sincronizar tu promedio
-               y avisarte cuándo rendís.</p>
-          </div>
-        </div>
+      <div class="callout callout-warning aviso-acceso" id="acceso-aviso" hidden>
+        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+        <div><p id="acceso-aviso-texto"></p></div>
       </div>
 
-      <!-- Paso 2 -->
-      <div id="paso-codigo" hidden>
-        <p class="modal-lead">
-          Te enviamos un código a <strong id="acceso-email-destino"></strong>.
-          Revisá también el correo no deseado.
-        </p>
-
-        <form id="form-acceso-codigo" class="stack" style="margin-top:1.25rem">
+      <!-- Ingresar -->
+      <div id="vista-ingresar">
+        <form id="form-ingresar" class="stack" novalidate>
           <div class="field">
-            <label class="field-label" for="acceso-codigo">Código de 6 dígitos</label>
-            <input type="text" id="acceso-codigo" class="form-control campo-codigo" required
-                   inputmode="numeric" autocomplete="one-time-code" maxlength="6"
-                   pattern="[0-9]{6}" placeholder="······">
+            <label class="field-label" for="ingresar-email">Correo electrónico</label>
+            <input type="email" id="ingresar-email" class="form-control" required
+                   autocomplete="username" inputmode="email" placeholder="nombre@ejemplo.com">
           </div>
-          <button type="submit" class="btn btn-magenta btn-block" id="btn-confirmar-codigo">
+          <div class="field">
+            <label class="field-label" for="ingresar-clave">Contraseña</label>
+            <div class="campo-clave">
+              <input type="password" id="ingresar-clave" class="form-control" required
+                     autocomplete="current-password">
+              <button type="button" class="btn-ver-clave" data-action="alternarClave" data-campo="ingresar-clave"
+                      aria-label="Mostrar la contraseña" aria-pressed="false">
+                <i class="fa-regular fa-eye" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-magenta btn-block" id="btn-ingresar">
             <i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> Ingresar
           </button>
         </form>
 
-        <div class="acciones-secundarias">
-          <button type="button" class="btn btn-ghost btn-sm" data-action="volverAEmail">
-            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Cambiar el correo
+        <p class="acceso-enlaces">
+          <button type="button" class="btn-enlace" data-action="irAVista" data-vista="olvide">
+            ¿Olvidaste tu contraseña?
           </button>
-          <button type="button" class="btn btn-ghost btn-sm" id="btn-reenviar" data-action="reenviarCodigo" disabled>
-            Reenviar el código
+        </p>
+
+        <div class="acceso-alternativa">
+          <span>¿Todavía no tenés cuenta?</span>
+          <button type="button" class="btn btn-outline-magenta btn-block" data-action="irAVista" data-vista="registro">
+            <i class="fa-solid fa-user-plus" aria-hidden="true"></i> Crear mi cuenta
+          </button>
+        </div>
+      </div>
+
+      <!-- Crear cuenta -->
+      <div id="vista-registro" hidden>
+        <p class="modal-lead">Te lleva un minuto. Después confirmás tu correo tocando un botón, una sola vez.</p>
+
+        <form id="form-registro" class="stack" style="margin-top:1.25rem" novalidate>
+          <div class="field">
+            <label class="field-label" for="registro-nombre">¿Cómo querés que te llamemos?</label>
+            <input type="text" id="registro-nombre" class="form-control" required
+                   minlength="2" maxlength="60" autocomplete="nickname" placeholder="Tu nombre o apodo">
+          </div>
+          <div class="field">
+            <label class="field-label" for="registro-email">Correo electrónico</label>
+            <input type="email" id="registro-email" class="form-control" required
+                   autocomplete="username" inputmode="email" placeholder="nombre@ejemplo.com">
+          </div>
+          <div class="field">
+            <label class="field-label" for="registro-clave">Contraseña</label>
+            <div class="campo-clave">
+              <input type="password" id="registro-clave" class="form-control" required
+                     minlength="8" autocomplete="new-password"
+                     aria-describedby="registro-clave-fuerza registro-clave-ayuda">
+              <button type="button" class="btn-ver-clave" data-action="alternarClave" data-campo="registro-clave"
+                      aria-label="Mostrar la contraseña" aria-pressed="false">
+                <i class="fa-regular fa-eye" aria-hidden="true"></i>
+              </button>
+            </div>
+            <p class="clave-fuerza" id="registro-clave-fuerza" aria-live="polite" hidden></p>
+            <p class="field-hint" id="registro-clave-ayuda">Al menos 8 caracteres. Mejor si no es la misma que usás en Instagram o en tu correo.</p>
+          </div>
+
+          <div class="resumen-terminos">
+            <p>Guardamos tu nombre, tu correo y las materias que cargues, sólo para mostrarte tu promedio.</p>
+            <details>
+              <summary>Ver qué se guarda y quién lo ve</summary>
+              <!-- Lo completa js/auth.js con el texto de js/carrera.js: hay uno solo. -->
+              <div id="registro-terminos"></div>
+            </details>
+          </div>
+
+          <label class="casilla" for="registro-acepto">
+            <input type="checkbox" id="registro-acepto" required>
+            <span>Leí qué se guarda y quiero crear mi cuenta.</span>
+          </label>
+
+          <button type="submit" class="btn btn-magenta btn-block" id="btn-registro">
+            <i class="fa-solid fa-user-plus" aria-hidden="true"></i> Crear mi cuenta
+          </button>
+        </form>
+
+        <div class="acceso-alternativa">
+          <span>¿Ya tenés cuenta?</span>
+          <button type="button" class="btn btn-secondary btn-block" data-action="irAVista" data-vista="ingresar">
+            Ingresar
+          </button>
+        </div>
+      </div>
+
+      <!-- Olvidé mi contraseña -->
+      <div id="vista-olvide" hidden>
+        <p class="modal-lead">Escribí el correo de tu cuenta y te mandamos un botón para elegir una contraseña nueva.</p>
+
+        <form id="form-olvide" class="stack" style="margin-top:1.25rem" novalidate>
+          <div class="field">
+            <label class="field-label" for="olvide-email">Correo electrónico</label>
+            <input type="email" id="olvide-email" class="form-control" required
+                   autocomplete="username" inputmode="email" placeholder="nombre@ejemplo.com">
+          </div>
+          <button type="submit" class="btn btn-magenta btn-block" id="btn-olvide">
+            <i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Enviarme el correo
+          </button>
+        </form>
+
+        <p class="acceso-enlaces">
+          <button type="button" class="btn-enlace" data-action="irAVista" data-vista="ingresar">
+            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Volver a ingresar
+          </button>
+        </p>
+      </div>
+
+      <!-- Revisá tu correo -->
+      <div id="vista-correo" hidden>
+        <div class="correo-enviado">
+          <span class="correo-icono" aria-hidden="true"><i class="fa-solid fa-envelope-open-text"></i></span>
+          <p class="modal-lead">Te mandamos un correo a <strong id="correo-destino"></strong>.</p>
+          <p id="correo-explicacion"></p>
+        </div>
+
+        <ul class="check-list correo-consejos">
+          <li><i class="fa-solid fa-clock" aria-hidden="true"></i><span>Puede tardar un par de minutos.</span></li>
+          <li><i class="fa-solid fa-filter" aria-hidden="true"></i><span>Si no aparece, buscalo en <strong>Spam</strong> o <strong>Promociones</strong>.</span></li>
+        </ul>
+        <p class="field-hint" id="correo-nota"></p>
+
+        <div class="acciones-secundarias">
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-correo-volver" data-action="irAVista" data-vista="ingresar">
+            Ya confirmé: ingresar
+          </button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-reenviar" data-action="reenviarCorreo" disabled>
+            Reenviar el correo
           </button>
         </div>
       </div>
@@ -708,21 +803,25 @@
     <div class="modal-card-body stack">
       <dl class="datos-cuenta">
         <div>
+          <dt>Nombre</dt>
+          <dd id="cuenta-nombre"></dd>
+        </div>
+        <div>
           <dt>Correo</dt>
           <dd id="cuenta-email"></dd>
         </div>
-        <div>
-          <dt>Sincronización de notas</dt>
-          <dd id="cuenta-estado-sync"></dd>
-        </div>
       </dl>
+
+      <button type="button" class="btn btn-secondary btn-block" data-action="abrirCambioClave">
+        <i class="fa-solid fa-key" aria-hidden="true"></i> Cambiar mi contraseña
+      </button>
 
       <div class="callout callout-info">
         <i class="fa-solid fa-scale-balanced" aria-hidden="true"></i>
         <div>
           <h3>Tus datos son tuyos</h3>
-          <p>Podés descargar todo lo que guardamos sobre vos, o pedir que borremos
-             la cuenta entera. Es un derecho que te da la Ley 25.326.</p>
+          <p>Podés descargar todo lo que guardamos sobre vos, o borrar la cuenta
+             entera. Es un derecho que te da la Ley 25.326.</p>
         </div>
       </div>
 
@@ -745,111 +844,59 @@
 </div>
 
 <!-- ==========================================================================
-     CONSENTIMIENTO PARA SINCRONIZAR
-     El sitio prometió desde el primer día que las notas quedaban sólo en el
-     dispositivo. Cambiar eso requiere pedirlo de frente, no en letra chica.
+     CONTRASEÑA NUEVA — desde el correo de recuperación o desde Mi cuenta
      ========================================================================== -->
-<div class="modal-overlay" id="modal-consentimiento" role="dialog" aria-modal="true" aria-labelledby="consentimiento-titulo" aria-hidden="true">
-  <div class="modal-card">
-    <div class="modal-card-header">
-      <h2 id="consentimiento-titulo">Antes de sincronizar, esto</h2>
-      <button type="button" class="btn btn-icon btn-secondary" data-action="cerrarConsentimiento" aria-label="Cerrar">
-        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-      </button>
-    </div>
-
-    <div class="modal-card-body">
-      <p class="modal-lead">
-        Hasta ahora tus notas nunca salieron de este dispositivo. Si activás la
-        sincronización, van a guardarse en nuestro servidor. Queremos que sepas
-        exactamente cómo.
-      </p>
-
-      <ul class="check-list" style="margin:1.5rem 0">
-        <li>
-          <i class="fa-solid fa-lock" aria-hidden="true"></i>
-          <span><strong>Se cifran en tu navegador antes de salir.</strong> Al servidor
-          llega un texto ilegible.</span>
-        </li>
-        <li>
-          <i class="fa-solid fa-eye-slash" aria-hidden="true"></i>
-          <span><strong>Nadie de FOE puede leerlas.</strong> Ni quien administra el
-          servidor. La base de datos no tiene siquiera una columna donde figure una
-          nota o un promedio: no se puede armar un ranking porque no hay contra qué
-          consultar.</span>
-        </li>
-        <li>
-          <i class="fa-solid fa-key" aria-hidden="true"></i>
-          <span><strong>Vas a elegir una clave sólo para tus notas.</strong> No se envía
-          a ningún lado. Si la perdés, las notas sincronizadas no se recuperan —
-          justamente por eso nadie más puede leerlas.</span>
-        </li>
-        <li>
-          <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
-          <span><strong>Podés desactivarlo cuando quieras</strong> y se borran del
-          servidor al instante.</span>
-        </li>
-      </ul>
-
-      <div class="callout callout-info">
-        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-        <div>
-          <h3>Si preferís que no</h3>
-          <p>La calculadora te sigue funcionando igual que hasta ahora, con todo
-             guardado solamente acá. Las dos opciones están bien.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-card-footer">
-      <button type="button" class="btn btn-secondary" data-action="cerrarConsentimiento">
-        Mejor no
-      </button>
-      <button type="button" class="btn btn-magenta" data-action="confirmarConsentimiento">
-        Entiendo, quiero sincronizar
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ==========================================================================
-     CLAVE DE NOTAS
-     ========================================================================== -->
-<div class="modal-overlay" id="modal-clave-notas" role="dialog" aria-modal="true" aria-labelledby="clave-notas-titulo" aria-hidden="true">
+<div class="modal-overlay" id="modal-clave-nueva" role="dialog" aria-modal="true" aria-labelledby="clave-nueva-titulo" aria-hidden="true">
   <div class="modal-card modal-angosto">
-    <form id="form-clave-notas">
+    <form id="form-clave-nueva" novalidate>
       <div class="modal-card-header">
-        <h2 id="clave-notas-titulo">Elegí una clave para tus notas</h2>
-        <button type="button" class="btn btn-icon btn-secondary" data-action="cerrarClaveNotas" aria-label="Cerrar">
+        <h2 id="clave-nueva-titulo">Elegí tu contraseña nueva</h2>
+        <button type="button" class="btn btn-icon btn-secondary" data-action="cerrarClaveNueva" aria-label="Cerrar">
           <i class="fa-solid fa-xmark" aria-hidden="true"></i>
         </button>
       </div>
 
       <div class="modal-card-body stack">
-        <p id="clave-notas-ayuda"></p>
+        <p id="clave-nueva-ayuda"></p>
 
-        <div class="field">
-          <label class="field-label" for="clave-notas">Clave de notas</label>
-          <input type="password" id="clave-notas" class="form-control" required
-                 minlength="8" autocomplete="off" placeholder="Al menos 8 caracteres">
-          <p class="clave-fuerza" id="clave-fuerza" hidden></p>
-          <p class="field-hint">Anotala en algún lado seguro. No hay forma de recuperarla.</p>
+        <div class="callout callout-warning aviso-acceso" id="clave-nueva-aviso" hidden>
+          <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+          <div><p id="clave-nueva-aviso-texto"></p></div>
         </div>
 
-        <div class="callout callout-warning" id="clave-notas-aviso">
-          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-          <div>
-            <h3>Esto no se puede deshacer</h3>
-            <p>No guardamos tu clave en ningún lado, así que no podemos ayudarte a
-               recuperarla. Si la perdés, perdés las notas sincronizadas. Las que
-               están en este dispositivo se conservan.</p>
+        <!-- Para el gestor de contraseñas: de qué cuenta es la clave nueva. -->
+        <input type="email" id="clave-nueva-usuario" autocomplete="username" hidden>
+
+        <div class="field" id="bloque-clave-actual" hidden>
+          <label class="field-label" for="clave-actual">Contraseña actual</label>
+          <div class="campo-clave">
+            <input type="password" id="clave-actual" class="form-control" autocomplete="current-password">
+            <button type="button" class="btn-ver-clave" data-action="alternarClave" data-campo="clave-actual"
+                    aria-label="Mostrar la contraseña" aria-pressed="false">
+              <i class="fa-regular fa-eye" aria-hidden="true"></i>
+            </button>
           </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="clave-nueva">Contraseña nueva</label>
+          <div class="campo-clave">
+            <input type="password" id="clave-nueva" class="form-control" required
+                   minlength="8" autocomplete="new-password"
+                   aria-describedby="clave-nueva-fuerza clave-nueva-pista">
+            <button type="button" class="btn-ver-clave" data-action="alternarClave" data-campo="clave-nueva"
+                    aria-label="Mostrar la contraseña" aria-pressed="false">
+              <i class="fa-regular fa-eye" aria-hidden="true"></i>
+            </button>
+          </div>
+          <p class="clave-fuerza" id="clave-nueva-fuerza" aria-live="polite" hidden></p>
+          <p class="field-hint" id="clave-nueva-pista">Al menos 8 caracteres. Una frase de varias palabras es fácil de recordar y difícil de adivinar.</p>
         </div>
       </div>
 
       <div class="modal-card-footer">
-        <button type="button" class="btn btn-secondary" data-action="cerrarClaveNotas">Cancelar</button>
-        <button type="submit" class="btn btn-magenta" id="btn-clave-notas">Cifrar y sincronizar</button>
+        <button type="button" class="btn btn-secondary" data-action="cerrarClaveNueva">Cancelar</button>
+        <button type="submit" class="btn btn-magenta" id="btn-clave-nueva">Guardar</button>
       </div>
     </form>
   </div>
@@ -866,7 +913,7 @@
           <img src="FOE.jpg" alt="" width="40" height="40">
           <h3>Odonto<span>Campus</span></h3>
         </div>
-        <p>Plataforma académica y gremial de las y los estudiantes de la Facultad de Odontología de la UNLP. Información abierta, sin cuenta y sin restricciones.</p>
+        <p>Plataforma académica y gremial de las y los estudiantes de la Facultad de Odontología de la UNLP. Información abierta y sin cuenta. Solo Mi promedio pide una, para guardar tus materias.</p>
         <div class="footer-social">
           <a href="https://instagram.com/foe_odontounlp" target="_blank" rel="noopener noreferrer"
              class="btn btn-icon" aria-label="Instagram de FOE (se abre en una pestaña nueva)">
@@ -919,12 +966,11 @@
 <!-- Scripts: configuración y núcleo primero, módulos después, controlador al final -->
 <script src="js/config.js"></script>
 <script src="js/core.js"></script>
-<script src="js/cripto.js"></script>
 <script src="js/api.js"></script>
 <script src="js/data.js"></script>
 <script src="js/live_sheets.js"></script>
 <script src="js/calculator.js"></script>
-<script src="js/sync.js"></script>
+<script src="js/carrera.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/chatbot.js"></script>
 <script src="js/app.js"></script>

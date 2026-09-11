@@ -34,13 +34,17 @@
        y el sitio funciona exactamente como hoy: sin login, sin errores. */
     publishableKey: "sb_publishable_20rdIEuZkZDtbdEDvIvJ_B_7QH9AWs2",
 
-    /* Versión del texto de consentimiento. Si cambia el texto, se sube este
-       número y se vuelve a pedir. Queda registrado en la tabla
-       `consentimientos` junto con la versión aceptada. */
-    versionConsentimiento: "2026-09-1",
+    /* Versión del texto de "qué guardamos" que se acepta al crear la cuenta.
+       Si cambia ese texto (en index.html y en js/carrera.js), se sube este
+       número: a quien aceptó una versión anterior se le vuelve a pedir antes
+       de entrar a Mi promedio. Queda en la tabla `consentimientos`.
+       Máximo 20 caracteres: la base corta lo que sobre. */
+    versionTerminos: "2026-09-2",
 
-    /* Mínimo para la clave de notas. Ver js/cripto.js. */
-    minLargoClaveNotas: 8
+    /* Largo mínimo de la contraseña. TIENE que ser igual a
+       GOTRUE_PASSWORD_MIN_LENGTH en infra/supabase/docker-compose.override.yml:
+       si el sitio pide menos, deja pasar contraseñas que el servidor rechaza. */
+    minLargoClave: 8
   };
 
   /**

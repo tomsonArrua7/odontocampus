@@ -59,17 +59,16 @@ public/               EL SITIO. Es exactamente lo que se copia a htdocs/
     03-components.css Botones, formularios, tarjetas, pestañas, modales, estados
     04-sections.css   Encabezado, hero, y cada sección de la aplicación
     05-responsive.css Puntos de corte, alto contraste
-    06-cuentas.css    Acceso, panel de cuenta, sincronización
+    06-cuentas.css    Acceso, panel de cuenta, entrada a Mi promedio
   js/
     config.js         URL de la API y clave pública. Lo único que cambia por entorno
     core.js           Núcleo: escapado, DOM, acciones, modales, pestañas, tema, fechas
-    cripto.js         Cifrado de las notas en el navegador (WebCrypto)
     api.js            Cliente de Supabase: sesión, renovación de token, REST
     data.js           Contenido editable a mano (noticias, plan, apuntes, bolsa…)
     live_sheets.js    Sincronización con las planillas de mesas y reválidas
-    calculator.js     Promedio y avance de carrera
-    sync.js           Sincronización de notas: consentimiento, cifrado, mezcla
-    auth.js           Ingreso por código de email y panel de cuenta
+    calculator.js     Promedio y avance de carrera (sólo calcula y dibuja)
+    carrera.js        Mi promedio con cuenta: acceso, guardado, copia local
+    auth.js           Registro, ingreso con contraseña, recuperación, Mi cuenta
     chatbot.js        OdontoBot (buscador de preguntas frecuentes)
     app.js            Router, inicio, historias clínicas, biblioteca, buscador
 
@@ -136,26 +135,30 @@ El backend es **Supabase autoalojado**. Detalles en
 ### El sitio funciona sin backend
 
 Mientras `js/config.js` tenga `publishableKey: "PENDIENTE"`, todo lo relativo a
-cuentas se apaga solo: no aparece el botón de ingresar ni el panel de
-sincronización, y el sitio queda exactamente como antes. **Nada de lo público
-—mesas, reválidas, historias clínicas, instrumental, biblioteca— depende de la
-cuenta.** Si el servidor se cae, se sigue pudiendo consultar a qué hora rendís.
+cuentas se apaga solo: no aparece el botón de ingresar y Mi promedio avisa que
+todavía no está disponible. **Nada de lo público —mesas, reválidas, historias
+clínicas, instrumental, biblioteca— depende de la cuenta.** Si el servidor se
+cae, se sigue pudiendo consultar a qué hora rendís.
 
-### Las notas se cifran en el navegador
+### Cuentas con contraseña
 
-`cripto.js` deriva una clave con PBKDF2 (310.000 iteraciones) a partir de una
-**clave de notas** que la persona elige y que no se envía a ningún lado, y
-cifra con AES-GCM. El servidor guarda un texto opaco.
+Se entra con correo y contraseña. El correo se usa dos veces: para confirmar
+la cuenta, una sola vez, y para elegir una contraseña nueva si se olvidó. Los
+dos correos traen un botón que abre el sitio con un token, y `auth.js` lo
+canjea (el porqué está al principio de ese archivo).
 
-Consecuencia buscada: la tabla `notas_academicas` no tiene columna `nota`,
-`promedio` ni `materia`. **No se puede armar un ranking de promedios ni con
-acceso total a la base**, porque no hay contra qué consultar. Es la única
-respuesta seria al miedo, razonable, de que una agrupación política vea quién
-va atrasado.
+### Mi promedio pide cuenta
 
-La contrapartida hay que decirla de frente, y la interfaz la dice: **si se
-pierde esa clave, las notas sincronizadas no se recuperan.** Por eso
-sincronizar es opcional y quien no quiera otra clave simplemente no lo activa.
+Es lo único del sitio que la pide, porque guarda datos de la persona. Las
+materias viven en la tabla `materias_cursadas`, una fila por materia,
+protegidas por RLS: nadie ve las de otra persona. Quien administra el servidor
+sí puede leerlas, y se le dice así a cada estudiante antes de su primera
+carga.
+
+`carrera.js` guarda además una copia por usuario en el navegador, para que el
+promedio se vea sin señal y ningún cambio se pierda si se corta el wifi: cada
+cambio queda pendiente hasta que el servidor confirma que lo guardó. Al cerrar
+sesión, esa copia se borra.
 
 ### La clave publicable es pública y está bien
 

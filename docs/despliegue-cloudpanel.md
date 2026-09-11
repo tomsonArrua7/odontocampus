@@ -494,7 +494,7 @@ niega a correr de nuevo, por dos razones:
 > navegador, nunca al repositorio, nunca a una captura de pantalla ni a un
 > chat. Solo vive en el `.env` del servidor y en el gestor de contraseñas.
 
-### 3.2 Correo: Resend y código de acceso
+### 3.2 Correo: Resend, confirmación y recuperación
 
 #### La clave de Resend
 
@@ -509,36 +509,74 @@ Una clave propia para este proyecto, no la de dndjursoc. Si alguna vez se
 filtra, solo sirve para mandar correo desde este dominio y se revoca sin tocar
 el otro sitio. El script la pide sin mostrarla en pantalla.
 
-#### Código, no enlace
+#### Cuentas con contraseña: el correo se usa dos veces
 
-Por defecto Supabase manda un **enlace** para ingresar. En el celular ese
-enlace se abre en el navegador interno de la app de correo, no en el navegador
-donde la persona pidió entrar: la sesión queda iniciada en el lugar equivocado
-y parece que no funcionó. Por eso el sitio pide un **código de 6 dígitos**, que
-confirma igual que el correo es de quien lo usa.
+Se entra con correo y contraseña. El correo sirve para **confirmar la cuenta,
+una sola vez**, y para **elegir una contraseña nueva** si alguien la olvida.
 
 Las plantillas están en `public/email/` y las sirve el propio sitio:
 
 | Archivo | Cuándo se usa |
 |---|---|
-| `confirmacion.html` | La dirección todavía no tiene cuenta |
-| `codigo.html` | La dirección ya tiene cuenta |
+| `confirmacion.html` | Al crear la cuenta |
+| `recuperar.html` | Al pedir "¿Olvidaste tu contraseña?" |
 
-**Tienen que ser las dos.** Supabase elige una u otra según el caso; si se
-personaliza una sola, la primera persona que se registra recibe el correo por
-defecto, en inglés y con un enlace.
+Los dos correos traen un botón que abre **el sitio** con un token en la
+dirección (`/?cuenta=confirmar&token=...`), y es el sitio el que lo canjea con
+`POST /auth/v1/verify`. No se usa el enlace de Supabase: los antivirus de
+correo abren los enlaces antes que la persona y gastarían el token. La
+recuperación, además, recién se canjea cuando la persona escribe la
+contraseña nueva y toca Guardar.
 
-Las URLs de las plantillas, el vencimiento del código (10 minutos), el tiempo
-mínimo entre reenvíos (60 segundos) y el tope de correos por hora están en
-`docker-compose.override.yml`, bloque `auth`.
+Todo lo de Auth está en `docker-compose.override.yml`, bloque `auth`:
 
-> **El tiempo entre reenvíos está en dos lugares y tienen que coincidir:**
-> `GOTRUE_SMTP_MAX_FREQUENCY` en el override y la cuenta regresiva de
-> `public/js/auth.js`. Si el botón se habilita antes de lo que permite el
-> servidor, la persona lo toca y recibe un error.
+| Ajuste | Valor | Para qué |
+|---|---|---|
+| `GOTRUE_PASSWORD_MIN_LENGTH` | `8` | Largo mínimo. Igual a `minLargoClave` en `config.js` |
+| `GOTRUE_PASSWORD_HIBP_ENABLED` | `true` | Rechaza contraseñas que aparecen en filtraciones |
+| `GOTRUE_MAILER_OTP_EXP` | `3600` | Los botones de los correos vencen en 1 hora |
+| `GOTRUE_SMTP_MAX_FREQUENCY` | `60s` | Tiempo entre reenvíos. Igual a la cuenta regresiva de `auth.js` |
+| `GOTRUE_RATE_LIMIT_EMAIL_SENT` | `200` | Tope global de correos por hora |
+| `GOTRUE_RATE_LIMIT_HEADER` | `X-Real-IP` | Sin esto, **no hay ningún límite de intentos por IP** |
+| `GOTRUE_RATE_LIMIT_TOKEN_REFRESH` | `300` | Ingresos y renovaciones por IP, cada 5 minutos |
+
+> **Dos valores viven en dos lugares y tienen que coincidir:** el largo mínimo
+> de la contraseña (override y `config.js`) y el tiempo entre reenvíos
+> (override y `auth.js`).
 
 Después de cambiar una plantilla: `git pull` en el sitio y
-`docker compose restart auth`.
+`docker compose restart auth`. Después de cambiar el override: copiarlo otra
+vez a `/opt/supabase/` y `docker compose up -d auth` (`restart` no relee la
+configuración).
+
+#### Comprobar que el límite por IP funciona
+
+GoTrue sólo limita si le llega el encabezado `X-Real-IP`, que pone el Vhost de
+CloudPanel. Si no le llega, **no limita nada** y lo deja escrito en el log.
+Después de ingresar una vez al sitio:
+
+```bash
+cd /opt/supabase && docker compose logs --since 10m auth | grep -c "rate limiting is not applied"
+```
+
+Tiene que dar `0`. Si da otro número, el encabezado se pierde en el camino y
+cualquiera puede probar contraseñas sin freno.
+
+Supone que `api.odontocampus.com.ar` está en **DNS only** en Cloudflare. Si
+alguna vez se pasa a *Proxied*, la IP que ve Nginx es la de Cloudflare y todo
+el país comparte un mismo límite: hay que resolver eso antes de cambiarlo.
+
+#### Comprobar que se rechazan las contraseñas filtradas
+
+Desde el sitio, crear una cuenta de prueba con un correo propio que no se use
+(en Gmail sirve `tunombre+prueba@gmail.com`) y la contraseña `12345678`. Tiene
+que responder *"Esa contraseña aparece en filtraciones de otros sitios"*. Si en
+cambio muestra "Revisá tu correo", el ajuste no se aplicó.
+
+#### El ingreso por código queda cerrado
+
+GoTrue no deja apagar el ingreso por código o enlace mágico sin apagar
+también el registro. Se cierra en el Vhost de la API (sección 4).
 
 #### Verificar o cambiar la clave de Resend
 
@@ -665,6 +703,13 @@ por:
     try_files $uri =404;
   }
 
+  # Ingreso por código o enlace mágico: el sitio usa contraseña, y GoTrue no
+  # permite apagarlos sin apagar también el registro. Va ANTES del bloque
+  # siguiente: Nginx usa la primera expresión regular que coincide.
+  location ~ ^/auth/v1/(otp|magiclink)$ {
+    return 404;
+  }
+
   # Las únicas rutas que llegan a Supabase.
   location ~ ^/(auth|rest|storage|realtime|functions)/v1/ {
     client_max_body_size 50m;
@@ -690,9 +735,11 @@ duplicación.
 curl.exe -skI https://api.odontocampus.com.ar/
 curl.exe -skI https://api.odontocampus.com.ar/pg/
 curl.exe -sk https://api.odontocampus.com.ar/auth/v1/health -H "apikey: TU_CLAVE_PUBLICABLE"
+curl.exe -sk -o NUL -w "%{http_code}\n" -X POST https://api.odontocampus.com.ar/auth/v1/otp -H "apikey: TU_CLAVE_PUBLICABLE"
 ```
 
-Las dos primeras, `404`. La tercera tiene que devolver un JSON de GoTrue.
+La primera, la segunda y la cuarta, `404`. La tercera tiene que devolver un
+JSON de GoTrue.
 
 ### Studio, por túnel SSH
 
@@ -726,6 +773,7 @@ Después, **las migraciones siguientes, en orden**:
 
 ```bash
 docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/002_bolsa_y_privacidad.sql
+docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/003_cuentas_con_contrasena.sql
 ```
 
 > **Una migración aplicada no se edita nunca.** Si el archivo y la base dejan
@@ -797,22 +845,26 @@ credencial expuesta.** Estuvo accesible, y no hay forma de saber quién la leyó
 
 ---
 
-## 6. Las notas siguen siendo ilegibles para FOE
+## 6. Las notas: en la cuenta, protegidas por RLS
 
-El diseño del documento de arquitectura **no cambia** con Supabase; si acaso, se
-vuelve más necesario.
+**Esto cambió en septiembre de 2026** (migración 003). Antes las notas se
+cifraban en el navegador con una segunda clave. El equipo decidió guardarlas
+en la cuenta, en columnas legibles: la segunda clave era un paso más, y quien
+la olvidaba perdía sus notas para siempre.
 
-RLS impide que un estudiante lea las notas de otro. Pero **`SERVICE_ROLE_KEY` y
-el acceso directo a Postgres saltean RLS por completo**. Quien administre el
-servidor puede leer cualquier fila.
+Lo que eso significa, sin vueltas:
 
-Por eso las notas se cifran **en el navegador** antes de enviarse. El servidor
-guarda un texto opaco. La base no tiene una columna `nota`, ni `promedio`, ni
-`materia`: **no se puede construir un ranking de promedios ni con acceso total a
-la base**, porque no hay contra qué consultar.
+- **RLS impide que un estudiante vea o toque las materias de otro.** Las
+  pruebas 14 a 16 de `pruebas_rls.sql` lo intentan.
+- **Quien administra el servidor sí puede leerlas.** `SERVICE_ROLE_KEY` y el
+  acceso directo a Postgres saltean RLS. Se le dice así a cada persona antes
+  de que cargue su primera materia.
+- **Usarlas para cualquier otra cosa** que mostrarle a cada quien lo suyo
+  (estadísticas, rankings, listados) **requiere un consentimiento nuevo,
+  explícito y aparte.** El que se acepta al crear la cuenta no lo cubre.
 
-Esa es la única respuesta seria al miedo —razonable— de que una agrupación
-política vea quién va atrasado.
+**Regla para quien administra:** `materias_cursadas` se abre sólo para resolver
+un problema técnico de una persona, y a pedido de esa persona.
 
 ---
 
@@ -855,7 +907,7 @@ necesitamos para las fases 1 a 3 son cuatro.
 | Componente | ¿Hace falta? | Para qué |
 |---|---|---|
 | **PostgreSQL** | Sí | La base |
-| **GoTrue** (auth) | Sí | Acceso por código de email |
+| **GoTrue** (auth) | Sí | Cuentas con correo y contraseña |
 | **PostgREST** (rest) | Sí | Leer y escribir desde el navegador |
 | **Kong** (gateway) | Sí | Unifica todo bajo `api.odontocampus.com.ar` |
 | Storage | Recién en fase 4 | Subida de apuntes |
@@ -923,7 +975,7 @@ Sumale que CloudPanel ya tiene su propio Nginx y sus servicios corriendo.
 9. [ ] Ajustes del vhost de la API (websockets, tamaño de cuerpo)
 10. [ ] Esquema y RLS cargados, verificados con la consulta de `pg_tables`
 11. [ ] **Advisor de Studio sin alertas críticas**
-12. [ ] SMTP probado: que llegue un código real a una casilla real
+12. [ ] SMTP probado: que lleguen el correo de confirmación y el de recuperación a una casilla real
 13. [ ] Backup en cron **y una restauración probada**
 14. [ ] Segunda clave SSH y credenciales en el gestor compartido
 
@@ -933,7 +985,7 @@ Y una comprobación final, desde una ventana de incógnito, sin sesión iniciada
 
 ```bash
 # Con la clave publicable, ninguna de estas debe devolver datos.
-curl -s "https://api.odontocampus.com.ar/rest/v1/notas_academicas?select=*" \
+curl -s "https://api.odontocampus.com.ar/rest/v1/materias_cursadas?select=*" \
      -H "apikey: TU_CLAVE_PUBLICABLE"
 curl -s "https://api.odontocampus.com.ar/rest/v1/perfiles?select=*" \
      -H "apikey: TU_CLAVE_PUBLICABLE"

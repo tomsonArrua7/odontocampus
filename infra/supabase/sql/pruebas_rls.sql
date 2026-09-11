@@ -1,7 +1,7 @@
 -- ==========================================================================
 -- OdontoCampus — Pruebas de seguridad del esquema (RLS y permisos)
 --
--- Correr DESPUÉS de aplicar todas las migraciones (001, 002, ...), y otra
+-- Correr DESPUÉS de aplicar todas las migraciones (001, 002, 003, ...), y otra
 -- vez después de cualquier cambio:
 --
 --   cd /opt/supabase
@@ -9,14 +9,14 @@
 --     < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/pruebas_rls.sql
 --
 -- --------------------------------------------------------------------------
--- Todo corre dentro de UNA transacción que termina en ROLLBACK: crea dos
--- usuarios de prueba, intenta lo que intentaría alguien con malas
--- intenciones y deshace todo. No queda nada en la base, ni siquiera si el
--- script se corta a mitad de camino.
+-- Todo corre dentro de UNA transacción que termina en ROLLBACK: crea usuarios
+-- de prueba, intenta lo que intentaría alguien con malas intenciones y deshace
+-- todo. No queda nada en la base, ni siquiera si el script se corta a mitad
+-- de camino.
 --
 -- Cada prueba imprime OK o FALLA.
--- UNA SOLA FALLA ES UN AGUJERO DE SEGURIDAD: las cuentas no se habilitan en
--- el sitio hasta que todas digan OK.
+-- UNA SOLA FALLA ES UN AGUJERO DE SEGURIDAD: no se publica ningún cambio del
+-- sitio que dependa de la base hasta que todas digan OK.
 --
 -- Cómo simula a los usuarios: `set local role` cambia al rol que usa la API
 -- (anon o authenticated) y `request.jwt.claims` es exactamente lo que
@@ -38,8 +38,8 @@ insert into auth.users (id, email, raw_user_meta_data) values
 update public.perfiles set whatsapp = '2215559999'
 where id = '00000000-0000-4000-8000-00000000000b';
 
-insert into public.notas_academicas (usuario_id, payload_cifrado, sal)
-values ('00000000-0000-4000-8000-00000000000b', 'v1.cifrado-de-b', repeat('s', 24));
+insert into public.materias_cursadas (usuario_id, materia_id, estado, nota, aplazos)
+values ('00000000-0000-4000-8000-00000000000b', '101', 'aprobada', 8, 0);
 
 do $$ begin
   if (select count(*) from public.perfiles
@@ -47,6 +47,33 @@ do $$ begin
     raise notice 'OK     00. Al registrarse se crea el perfil automáticamente';
   else
     raise notice 'FALLA  00. El registro no creó los perfiles';
+  end if;
+end $$;
+
+-- Registro con un correo de una letra y un nombre de una letra: con la versión
+-- de 001, esto hacía fallar el alta entera.
+do $$ begin
+  insert into auth.users (id, email, raw_user_meta_data) values
+    ('00000000-0000-4000-8000-00000000000c', 'x@odontocampus.invalid',
+     '{"nombre_visible":"y","version_terminos":"prueba-v"}');
+  if exists (select 1 from public.perfiles
+             where id = '00000000-0000-4000-8000-00000000000c'
+               and char_length(nombre_visible) >= 2) then
+    raise notice 'OK     01. Un correo o un nombre muy corto no rompen el registro';
+  else
+    raise notice 'FALLA  01. El registro no creó el perfil';
+  end if;
+exception when others then
+  raise notice 'FALLA  01. Un nombre corto rompe el registro: %', sqlerrm;
+end $$;
+
+do $$ begin
+  if exists (select 1 from public.consentimientos
+             where usuario_id = '00000000-0000-4000-8000-00000000000c'
+               and tipo = 'terminos' and version_texto = 'prueba-v') then
+    raise notice 'OK     02. Al registrarse queda anotado qué versión de los términos aceptó';
+  else
+    raise notice 'FALLA  02. El registro no dejó el consentimiento';
   end if;
 end $$;
 
@@ -59,33 +86,33 @@ do $$ begin perform set_config('request.jwt.claims', '{"role":"anon"}', true); e
 
 do $$ begin
   perform count(*) from public.perfiles;
-  raise notice 'FALLA  01. Sin sesión se pueden leer los perfiles';
+  raise notice 'FALLA  03. Sin sesión se pueden leer los perfiles';
 exception when insufficient_privilege then
-  raise notice 'OK     01. Sin sesión no se leen los perfiles';
+  raise notice 'OK     03. Sin sesión no se leen los perfiles';
 end $$;
 
 do $$ begin
-  perform count(*) from public.notas_academicas;
-  raise notice 'FALLA  02. Sin sesión se puede leer la tabla de notas';
+  perform count(*) from public.materias_cursadas;
+  raise notice 'FALLA  04. Sin sesión se pueden leer las materias';
 exception when insufficient_privilege then
-  raise notice 'OK     02. Sin sesión no se lee la tabla de notas';
+  raise notice 'OK     04. Sin sesión no se leen las materias';
 end $$;
 
 do $$ begin
   perform public.eliminar_mi_cuenta();
-  raise notice 'FALLA  03. Sin sesión se puede llamar a eliminar_mi_cuenta';
+  raise notice 'FALLA  05. Sin sesión se puede llamar a eliminar_mi_cuenta';
 exception
   when insufficient_privilege then
-    raise notice 'OK     03. Sin sesión no se puede llamar a eliminar_mi_cuenta';
+    raise notice 'OK     05. Sin sesión no se puede llamar a eliminar_mi_cuenta';
   when others then
-    raise notice 'FALLA  03. eliminar_mi_cuenta es ejecutable sin sesión (%)', sqlerrm;
+    raise notice 'FALLA  05. eliminar_mi_cuenta es ejecutable sin sesión (%)', sqlerrm;
 end $$;
 
 do $$ begin
   perform public.puedo_publicar();
-  raise notice 'FALLA  04. Sin sesión se puede llamar a puedo_publicar';
+  raise notice 'FALLA  06. Sin sesión se puede llamar a puedo_publicar';
 exception when insufficient_privilege then
-  raise notice 'OK     04. Sin sesión no se puede llamar a puedo_publicar';
+  raise notice 'OK     06. Sin sesión no se puede llamar a puedo_publicar';
 end $$;
 
 reset role;
@@ -105,91 +132,184 @@ do $$ declare n int; begin
   update public.perfiles set nombre_visible = 'Prueba A editada'
   where id = '00000000-0000-4000-8000-00000000000a';
   get diagnostics n = row_count;
-  if n = 1 then raise notice 'OK     05. Cada quien edita su propio nombre';
-  else raise notice 'FALLA  05. No se pudo editar el propio nombre (% filas)', n; end if;
+  if n = 1 then raise notice 'OK     07. Cada quien edita su propio nombre';
+  else raise notice 'FALLA  07. No se pudo editar el propio nombre (% filas)', n; end if;
 exception when others then
-  raise notice 'FALLA  05. No se pudo editar el propio nombre: %', sqlerrm;
+  raise notice 'FALLA  07. No se pudo editar el propio nombre: %', sqlerrm;
 end $$;
 
 do $$ begin
   update public.perfiles set estado = 'activo'
   where id = '00000000-0000-4000-8000-00000000000a';
-  raise notice 'FALLA  06. Un usuario puede cambiar su estado (se reactivaría tras una suspensión)';
+  raise notice 'FALLA  08. Un usuario puede cambiar su estado (se reactivaría tras una suspensión)';
 exception when insufficient_privilege then
-  raise notice 'OK     06. Un usuario no puede cambiar su propio estado';
+  raise notice 'OK     08. Un usuario no puede cambiar su propio estado';
 end $$;
 
 do $$ begin
   update public.perfiles set puede_publicar_desde = now() - interval '1 day'
   where id = '00000000-0000-4000-8000-00000000000a';
-  raise notice 'FALLA  07. Un usuario puede saltearse la espera de 24 h';
+  raise notice 'FALLA  09. Un usuario puede saltearse la espera de 24 h';
 exception when insufficient_privilege then
-  raise notice 'OK     07. Un usuario no puede saltearse la espera de 24 h';
+  raise notice 'OK     09. Un usuario no puede saltearse la espera de 24 h';
 end $$;
 
 do $$ declare n int; begin
   update public.perfiles set whatsapp = '2215550000'
   where id = '00000000-0000-4000-8000-00000000000a';
   get diagnostics n = row_count;
-  if n = 1 then raise notice 'OK     08. Cada quien carga su propio WhatsApp';
-  else raise notice 'FALLA  08. No se pudo cargar el propio WhatsApp (% filas)', n; end if;
+  if n = 1 then raise notice 'OK     10. Cada quien carga su propio WhatsApp';
+  else raise notice 'FALLA  10. No se pudo cargar el propio WhatsApp (% filas)', n; end if;
 exception when others then
-  raise notice 'FALLA  08. No se pudo cargar el propio WhatsApp: %', sqlerrm;
+  raise notice 'FALLA  10. No se pudo cargar el propio WhatsApp: %', sqlerrm;
 end $$;
 
 do $$ declare n int; begin
   select count(*) into n from public.perfiles
   where id = '00000000-0000-4000-8000-00000000000b' and nombre_visible is not null;
-  if n = 1 then raise notice 'OK     09. Se ve el nombre de otra persona (para mostrar quién publica)';
-  else raise notice 'FALLA  09. No se ve el nombre de otra persona'; end if;
+  if n = 1 then raise notice 'OK     11. Se ve el nombre de otra persona (para mostrar quién publica)';
+  else raise notice 'FALLA  11. No se ve el nombre de otra persona'; end if;
 exception when others then
-  raise notice 'FALLA  09. No se ve el nombre de otra persona: %', sqlerrm;
+  raise notice 'FALLA  11. No se ve el nombre de otra persona: %', sqlerrm;
 end $$;
 
 do $$ begin
   perform whatsapp from public.perfiles
   where id = '00000000-0000-4000-8000-00000000000b';
-  raise notice 'FALLA  10. Se ve el WhatsApp de otra persona';
+  raise notice 'FALLA  12. Se ve el WhatsApp de otra persona';
 exception when insufficient_privilege then
-  raise notice 'OK     10. No se ve el WhatsApp de otra persona';
+  raise notice 'OK     12. No se ve el WhatsApp de otra persona';
 end $$;
 
 do $$ declare n int; begin
   select count(*) into n from public.mi_perfil() where whatsapp = '2215550000';
-  if n = 1 then raise notice 'OK     11. Cada quien ve su perfil completo con mi_perfil()';
-  else raise notice 'FALLA  11. mi_perfil() no devolvió el perfil propio completo'; end if;
+  if n = 1 then raise notice 'OK     13. Cada quien ve su perfil completo con mi_perfil()';
+  else raise notice 'FALLA  13. mi_perfil() no devolvió el perfil propio completo'; end if;
 exception when others then
-  raise notice 'FALLA  11. mi_perfil() falló: %', sqlerrm;
+  raise notice 'FALLA  13. mi_perfil() falló: %', sqlerrm;
 end $$;
 
--- ---------------------------------------------------------------- notas
+-- ---------------------------------------------------------------- materias
 do $$ declare n int; begin
-  select count(*) into n from public.notas_academicas
+  select count(*) into n from public.materias_cursadas
   where usuario_id = '00000000-0000-4000-8000-00000000000b';
-  if n = 0 then raise notice 'OK     12. No se ven las notas de otra persona';
-  else raise notice 'FALLA  12. Se ven las notas de otra persona'; end if;
+  if n = 0 then raise notice 'OK     14. No se ven las materias de otra persona';
+  else raise notice 'FALLA  14. Se ven las materias de otra persona'; end if;
 exception when others then
-  raise notice 'FALLA  12. Error inesperado al leer notas: %', sqlerrm;
+  raise notice 'FALLA  14. Error inesperado al leer materias: %', sqlerrm;
 end $$;
 
 do $$ begin
-  insert into public.notas_academicas (usuario_id, payload_cifrado, sal)
-  values ('00000000-0000-4000-8000-00000000000b', 'v1.falso', repeat('s', 24));
-  raise notice 'FALLA  13. Se pueden guardar notas a nombre de otra persona';
-exception
-  when insufficient_privilege then
-    raise notice 'OK     13. No se guardan notas a nombre de otra persona';
-  when unique_violation then
-    raise notice 'FALLA  13. El intento llegó hasta la tabla (lo frenó la clave primaria, no la seguridad)';
+  insert into public.materias_cursadas (usuario_id, materia_id, estado, nota, aplazos)
+  values ('00000000-0000-4000-8000-00000000000b', '102', 'aprobada', 10, 0);
+  raise notice 'FALLA  15. Se pueden guardar materias a nombre de otra persona';
+exception when insufficient_privilege then
+  raise notice 'OK     15. No se guardan materias a nombre de otra persona';
+end $$;
+
+do $$ declare n int; begin
+  update public.materias_cursadas set nota = 4
+  where usuario_id = '00000000-0000-4000-8000-00000000000b';
+  get diagnostics n = row_count;
+  if n = 0 then raise notice 'OK     16. No se modifican las materias de otra persona';
+  else raise notice 'FALLA  16. Se modificó la nota de otra persona'; end if;
+exception when others then
+  raise notice 'OK     16. No se modifican las materias de otra persona (%)', sqlerrm;
+end $$;
+
+-- Exactamente lo que manda la API al guardar: insertar o actualizar.
+do $$ declare n int; e text; begin
+  insert into public.materias_cursadas (usuario_id, materia_id, estado, nota, aplazos)
+  values ('00000000-0000-4000-8000-00000000000a', '101', 'regular', null, 0)
+  on conflict (usuario_id, materia_id) do update
+    set usuario_id = excluded.usuario_id, materia_id = excluded.materia_id,
+        estado = excluded.estado, nota = excluded.nota, aplazos = excluded.aplazos;
+
+  insert into public.materias_cursadas (usuario_id, materia_id, estado, nota, aplazos)
+  values ('00000000-0000-4000-8000-00000000000a', '101', 'aprobada', 8.5, 1)
+  on conflict (usuario_id, materia_id) do update
+    set usuario_id = excluded.usuario_id, materia_id = excluded.materia_id,
+        estado = excluded.estado, nota = excluded.nota, aplazos = excluded.aplazos;
+
+  select count(*), max(estado) into n, e from public.materias_cursadas
+  where usuario_id = '00000000-0000-4000-8000-00000000000a';
+  if n = 1 and e = 'aprobada' then raise notice 'OK     17. Cada quien guarda y corrige sus materias';
+  else raise notice 'FALLA  17. No se guardó bien la materia propia (% filas, estado %)', n, e; end if;
+exception when others then
+  raise notice 'FALLA  17. No se pudo guardar la materia propia: %', sqlerrm;
+end $$;
+
+do $$ begin
+  insert into public.materias_cursadas (usuario_id, materia_id, estado, actualizado_at)
+  values ('00000000-0000-4000-8000-00000000000a', '103', 'cursando', now() + interval '10 years');
+  raise notice 'FALLA  18. Se puede elegir la fecha de actualización';
+exception when insufficient_privilege then
+  raise notice 'OK     18. La fecha de actualización la pone la base, no el navegador';
+end $$;
+
+do $$ begin
+  insert into public.materias_cursadas (usuario_id, materia_id, estado, nota)
+  values ('00000000-0000-4000-8000-00000000000a', '104', 'aprobada', 11);
+  raise notice 'FALLA  19. Se guardó una nota fuera de rango';
+exception when check_violation then
+  raise notice 'OK     19. No se guardan notas fuera del 4 al 10';
+end $$;
+
+do $$ begin
+  insert into public.materias_cursadas (usuario_id, materia_id, estado, nota)
+  values ('00000000-0000-4000-8000-00000000000a', '105', 'regular', 7);
+  raise notice 'FALLA  20. Se guardó una nota en una materia no aprobada';
+exception when check_violation then
+  raise notice 'OK     20. Sólo una materia aprobada tiene nota';
+end $$;
+
+do $$ declare n int; begin
+  insert into public.materias_cursadas (usuario_id, materia_id, estado)
+  select '00000000-0000-4000-8000-00000000000a', 'x' || g, 'cursando'
+  from generate_series(1, 58) g;
+  get diagnostics n = row_count;
+  if n = 58 then raise notice 'OK     21. Se guardan muchas materias de una vez (59 en total)';
+  else raise notice 'FALLA  21. No se guardaron las 58 materias (% filas)', n; end if;
+exception when others then
+  raise notice 'FALLA  21. No se pudieron guardar 58 materias: %', sqlerrm;
+end $$;
+
+-- Con 59 guardadas, dos más en una sola sentencia llegarían a 61.
+do $$ begin
+  insert into public.materias_cursadas (usuario_id, materia_id, estado) values
+    ('00000000-0000-4000-8000-00000000000a', 'y1', 'cursando'),
+    ('00000000-0000-4000-8000-00000000000a', 'y2', 'cursando');
+  raise notice 'FALLA  22. Se superó el tope de 60 materias con una inserción múltiple';
+exception when insufficient_privilege then
+  raise notice 'OK     22. No se supera el tope de 60 materias, ni con una inserción múltiple';
+end $$;
+
+do $$ declare n int; begin
+  insert into public.materias_cursadas (usuario_id, materia_id, estado)
+  values ('00000000-0000-4000-8000-00000000000a', 'y1', 'cursando');
+
+  -- Con el tope alcanzado, corregir una materia existente tiene que seguir andando.
+  insert into public.materias_cursadas (usuario_id, materia_id, estado, nota, aplazos)
+  values ('00000000-0000-4000-8000-00000000000a', '101', 'aprobada', 9, 1)
+  on conflict (usuario_id, materia_id) do update
+    set usuario_id = excluded.usuario_id, materia_id = excluded.materia_id,
+        estado = excluded.estado, nota = excluded.nota, aplazos = excluded.aplazos;
+
+  select count(*) into n from public.materias_cursadas
+  where usuario_id = '00000000-0000-4000-8000-00000000000a';
+  if n = 60 then raise notice 'OK     23. Con 60 materias se puede seguir corrigiendo cualquiera';
+  else raise notice 'FALLA  23. El tope quedó mal (% filas)', n; end if;
+exception when others then
+  raise notice 'FALLA  23. Con el tope alcanzado no se pudo corregir una materia: %', sqlerrm;
 end $$;
 
 -- ---------------------------------------------------------------- bolsa
 do $$ begin
   insert into public.publicaciones_bolsa (usuario_id, titulo, categoria, precio_texto, estado_uso, ubicacion)
   values ('00000000-0000-4000-8000-00000000000a', 'Turbina de prueba', 'Instrumental', '$10.000', 'Usada', 'Hall');
-  raise notice 'FALLA  14. Una cuenta recién creada puede publicar';
+  raise notice 'FALLA  24. Una cuenta recién creada puede publicar';
 exception when insufficient_privilege then
-  raise notice 'OK     14. Una cuenta recién creada no puede publicar en las primeras 24 h';
+  raise notice 'OK     24. Una cuenta recién creada no puede publicar en las primeras 24 h';
 end $$;
 
 -- Pasan las 24 horas (lo simula postgres)
@@ -202,10 +322,10 @@ do $$ declare n int; begin
   insert into public.publicaciones_bolsa (usuario_id, titulo, categoria, precio_texto, estado_uso, ubicacion)
   values ('00000000-0000-4000-8000-00000000000a', 'Turbina de prueba', 'Instrumental', '$10.000', 'Usada', 'Hall');
   get diagnostics n = row_count;
-  if n = 1 then raise notice 'OK     15. Pasadas las 24 h se puede publicar';
-  else raise notice 'FALLA  15. Pasadas las 24 h no se pudo publicar'; end if;
+  if n = 1 then raise notice 'OK     25. Pasadas las 24 h se puede publicar';
+  else raise notice 'FALLA  25. Pasadas las 24 h no se pudo publicar'; end if;
 exception when others then
-  raise notice 'FALLA  15. Pasadas las 24 h no se pudo publicar: %', sqlerrm;
+  raise notice 'FALLA  25. Pasadas las 24 h no se pudo publicar: %', sqlerrm;
 end $$;
 
 -- Con una sola publicación activa: lo único que puede frenar esto es el
@@ -213,9 +333,9 @@ end $$;
 do $$ begin
   insert into public.publicaciones_bolsa (usuario_id, titulo, categoria, precio_texto, estado_uso, ubicacion, expira_at)
   values ('00000000-0000-4000-8000-00000000000a', 'Turbina eterna', 'Instrumental', '$1', 'Usada', 'Hall', now() + interval '50 years');
-  raise notice 'FALLA  16. Se puede publicar con vencimiento a elección';
+  raise notice 'FALLA  26. Se puede publicar con vencimiento a elección';
 exception when insufficient_privilege then
-  raise notice 'OK     16. No se puede elegir el vencimiento de una publicación';
+  raise notice 'OK     26. No se puede elegir el vencimiento de una publicación';
 end $$;
 
 do $$ declare n int; begin
@@ -225,20 +345,20 @@ do $$ declare n int; begin
     ('00000000-0000-4000-8000-00000000000a', 'Articulo 4', 'Instrumental', '$1', 'Usado', 'Hall'),
     ('00000000-0000-4000-8000-00000000000a', 'Articulo 5', 'Instrumental', '$1', 'Usado', 'Hall');
   get diagnostics n = row_count;
-  if n = 4 then raise notice 'OK     17. Se puede llegar a 5 publicaciones activas';
-  else raise notice 'FALLA  17. No se pudo llegar a 5 publicaciones activas (% filas)', n; end if;
+  if n = 4 then raise notice 'OK     27. Se puede llegar a 5 publicaciones activas';
+  else raise notice 'FALLA  27. No se pudo llegar a 5 publicaciones activas (% filas)', n; end if;
 exception when others then
-  raise notice 'FALLA  17. No se pudo llegar a 5 publicaciones activas: %', sqlerrm;
+  raise notice 'FALLA  27. No se pudo llegar a 5 publicaciones activas: %', sqlerrm;
 end $$;
 
--- Inserción múltiple: con la versión anterior del límite, esto pasaba.
+-- Inserción múltiple: con la versión de 001 del límite, esto pasaba.
 do $$ begin
   insert into public.publicaciones_bolsa (usuario_id, titulo, categoria, precio_texto, estado_uso, ubicacion) values
     ('00000000-0000-4000-8000-00000000000a', 'Articulo 6', 'Instrumental', '$1', 'Usado', 'Hall'),
     ('00000000-0000-4000-8000-00000000000a', 'Articulo 7', 'Instrumental', '$1', 'Usado', 'Hall');
-  raise notice 'FALLA  18. Se superó el límite de 5 publicaciones con una inserción múltiple';
+  raise notice 'FALLA  28. Se superó el límite de 5 publicaciones con una inserción múltiple';
 exception when insufficient_privilege then
-  raise notice 'OK     18. No se supera el límite de 5, ni con una inserción múltiple';
+  raise notice 'OK     28. No se supera el límite de 5, ni con una inserción múltiple';
 end $$;
 
 -- Moderación oculta las publicaciones (lo simula postgres)
@@ -251,47 +371,47 @@ do $$ declare n int; begin
   update public.publicaciones_bolsa set estado = 'activa'
   where usuario_id = '00000000-0000-4000-8000-00000000000a';
   get diagnostics n = row_count;
-  if n = 0 then raise notice 'OK     19. No se reactiva una publicación ocultada por moderación';
-  else raise notice 'FALLA  19. Se reactivó una publicación ocultada por moderación'; end if;
+  if n = 0 then raise notice 'OK     29. No se reactiva una publicación ocultada por moderación';
+  else raise notice 'FALLA  29. Se reactivó una publicación ocultada por moderación'; end if;
 exception when others then
-  raise notice 'OK     19. No se reactiva una publicación ocultada por moderación (%)', sqlerrm;
+  raise notice 'OK     29. No se reactiva una publicación ocultada por moderación (%)', sqlerrm;
 end $$;
 
 do $$ declare n int; begin
   delete from public.publicaciones_bolsa
   where usuario_id = '00000000-0000-4000-8000-00000000000a';
   get diagnostics n = row_count;
-  if n = 0 then raise notice 'OK     20. No se borra una publicación ocultada por moderación';
-  else raise notice 'FALLA  20. Se borró una publicación ocultada por moderación'; end if;
+  if n = 0 then raise notice 'OK     30. No se borra una publicación ocultada por moderación';
+  else raise notice 'FALLA  30. Se borró una publicación ocultada por moderación'; end if;
 exception when others then
-  raise notice 'OK     20. No se borra una publicación ocultada por moderación (%)', sqlerrm;
+  raise notice 'OK     30. No se borra una publicación ocultada por moderación (%)', sqlerrm;
 end $$;
 
 -- ---------------------------------------------------------------- consentimientos
 do $$ declare n int; begin
   insert into public.consentimientos (usuario_id, tipo, version_texto)
-  values ('00000000-0000-4000-8000-00000000000a', 'sincronizar_notas', 'prueba');
+  values ('00000000-0000-4000-8000-00000000000a', 'terminos', 'prueba');
   get diagnostics n = row_count;
-  if n = 1 then raise notice 'OK     21. Se registra el propio consentimiento';
-  else raise notice 'FALLA  21. No se pudo registrar el consentimiento'; end if;
+  if n = 1 then raise notice 'OK     31. Se registra el propio consentimiento';
+  else raise notice 'FALLA  31. No se pudo registrar el consentimiento'; end if;
 exception when others then
-  raise notice 'FALLA  21. No se pudo registrar el consentimiento: %', sqlerrm;
+  raise notice 'FALLA  31. No se pudo registrar el consentimiento: %', sqlerrm;
 end $$;
 
 do $$ begin
   insert into public.consentimientos (usuario_id, tipo, version_texto, otorgado_at)
   values ('00000000-0000-4000-8000-00000000000a', 'terminos', 'prueba', now() - interval '2 years');
-  raise notice 'FALLA  22. Se puede antedatar un consentimiento';
+  raise notice 'FALLA  32. Se puede antedatar un consentimiento';
 exception when insufficient_privilege then
-  raise notice 'OK     22. No se puede antedatar un consentimiento';
+  raise notice 'OK     32. No se puede antedatar un consentimiento';
 end $$;
 
 -- ---------------------------------------------------------------- eliminar cuenta
 do $$ begin
   perform public.eliminar_mi_cuenta();
-  raise notice 'OK     23. Se puede eliminar la propia cuenta';
+  raise notice 'OK     33. Se puede eliminar la propia cuenta';
 exception when others then
-  raise notice 'FALLA  23. No se pudo eliminar la propia cuenta: %', sqlerrm;
+  raise notice 'FALLA  33. No se pudo eliminar la propia cuenta: %', sqlerrm;
 end $$;
 
 reset role;
@@ -299,19 +419,20 @@ reset role;
 do $$ begin
   if not exists (select 1 from auth.users where id = '00000000-0000-4000-8000-00000000000a')
      and not exists (select 1 from public.perfiles where id = '00000000-0000-4000-8000-00000000000a')
+     and not exists (select 1 from public.materias_cursadas where usuario_id = '00000000-0000-4000-8000-00000000000a')
      and not exists (select 1 from public.publicaciones_bolsa where usuario_id = '00000000-0000-4000-8000-00000000000a')
      and not exists (select 1 from public.consentimientos where usuario_id = '00000000-0000-4000-8000-00000000000a')
      and exists (select 1 from auth.users where id = '00000000-0000-4000-8000-00000000000b')
-     and exists (select 1 from public.notas_academicas where usuario_id = '00000000-0000-4000-8000-00000000000b')
+     and exists (select 1 from public.materias_cursadas where usuario_id = '00000000-0000-4000-8000-00000000000b')
   then
-    raise notice 'OK     24. Eliminar la cuenta borra todo lo suyo y nada de nadie más';
+    raise notice 'OK     34. Eliminar la cuenta borra todo lo suyo y nada de nadie más';
   else
-    raise notice 'FALLA  24. La eliminación dejó datos propios o tocó datos ajenos';
+    raise notice 'FALLA  34. La eliminación dejó datos propios o tocó datos ajenos';
   end if;
 end $$;
 
 rollback;
 
 \echo
-\echo 'Pruebas terminadas (00 a 24). Todo se deshizo con ROLLBACK: no quedó nada en la base.'
-\echo 'Si alguna línea dice FALLA, no habilites las cuentas en el sitio.'
+\echo 'Pruebas terminadas (00 a 34). Todo se deshizo con ROLLBACK: no quedó nada en la base.'
+\echo 'Si alguna línea dice FALLA, no publiques el cambio en el sitio.'

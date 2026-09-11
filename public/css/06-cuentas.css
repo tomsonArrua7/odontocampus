@@ -1,6 +1,6 @@
 /* ==========================================================================
    ODONTOCAMPUS — 06 · CUENTAS
-   Acceso, panel de cuenta y sincronización de notas.
+   Acceso, panel de cuenta y la entrada a Mi promedio.
    Sigue los mismos tokens que el resto: ningún color ni tamaño suelto.
    ========================================================================== */
 
@@ -48,20 +48,128 @@
 }
 
 /* ==========================================================================
-   MODALES DE ACCESO
+   DIÁLOGO DE ACCESO
    ========================================================================== */
 .modal-angosto { max-width: 460px; }
 
-/* Campo del código: monoespaciado y espaciado para que se lea de un vistazo
-   mientras se copia del correo. */
-.campo-codigo {
-  font-family: var(--font-mono);
-  font-size: var(--fs-2xl);
-  letter-spacing: 0.4em;
-  text-align: center;
-  padding-inline: var(--sp-3);
+/* Los errores van arriba del formulario, en un aviso fijo y no en un toast:
+   un toast se va a los cuatro segundos, justo mientras la persona está
+   corrigiendo lo que decía. */
+.aviso-acceso { margin-bottom: var(--sp-5); }
+.aviso-acceso > i { font-size: var(--fs-lg); }
+.aviso-acceso p { font-size: var(--fs-sm); color: var(--text); }
+
+/* Contraseña con botón para verla. En el celular es la diferencia entre
+   escribirla bien a la primera y equivocarse tres veces sin saber dónde. */
+.campo-clave { position: relative; }
+.campo-clave .form-control { padding-right: calc(var(--tap-target) + var(--sp-1)); }
+
+.btn-ver-clave {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap-target);
+  height: 100%;
+  background: none;
+  border: 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--text-muted);
+  font-size: var(--fs-md);
+  cursor: pointer;
 }
-.campo-codigo::placeholder { letter-spacing: 0.3em; }
+.btn-ver-clave:hover { color: var(--text-strong); }
+.btn-ver-clave:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* Acción secundaria con aspecto de enlace, pero con área táctil de botón. */
+.btn-enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: var(--tap-target);
+  padding: 0 var(--sp-2);
+  background: none;
+  border: 0;
+  color: var(--accent-text);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semi);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.btn-enlace:hover { text-decoration-thickness: 2px; }
+
+.acceso-enlaces { margin-top: var(--sp-2); text-align: center; }
+
+.acceso-alternativa {
+  display: grid;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+/* Casilla de aceptación: grande, con el texto como parte del área táctil. */
+.casilla {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-base);
+  color: var(--text);
+  cursor: pointer;
+}
+.casilla input {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* Qué se guarda: una línea siempre visible y el detalle a un toque. */
+.resumen-terminos {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+.resumen-terminos summary {
+  margin-top: var(--sp-2);
+  color: var(--accent-text);
+  font-weight: var(--fw-semi);
+  cursor: pointer;
+}
+.resumen-terminos details[open] summary { margin-bottom: var(--sp-3); }
+
+.lista-terminos li { font-size: var(--fs-sm); color: var(--text); }
+.lista-terminos li i { margin-top: 3px; }
+
+/* "Revisá tu correo" */
+.correo-enviado { text-align: center; }
+.correo-enviado p + p { margin-top: var(--sp-2); color: var(--text-muted); }
+.correo-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: var(--sp-3);
+  border-radius: 50%;
+  background: var(--success-bg);
+  color: var(--success);
+  font-size: var(--fs-2xl);
+}
+.correo-consejos { margin: var(--sp-5) 0 var(--sp-3); }
+.correo-consejos li { font-size: var(--fs-sm); }
 
 .acciones-secundarias {
   display: flex;
@@ -105,9 +213,9 @@
 .acciones-cuenta .btn { flex: 1; min-width: 190px; }
 
 /* ==========================================================================
-   FUERZA DE LA CLAVE
-   Informa, no bloquea: bloquear claves débiles frustra y empuja a la gente a
-   anotarlas en cualquier lado.
+   FUERZA DE LA CONTRASEÑA
+   Informa, no bloquea: bloquear contraseñas "débiles" frustra y empuja a la
+   gente a anotarlas en cualquier lado.
    ========================================================================== */
 .clave-fuerza {
   font-size: var(--fs-xs);
@@ -122,52 +230,119 @@
 .clave-fuerte { background: var(--success-bg); color: var(--success); }
 
 /* ==========================================================================
-   PANEL DE SINCRONIZACIÓN
-   Va dentro de la sección del promedio, en contexto. Nunca como modal al
-   entrar al sitio: quien viene a ver a qué hora rinde no tiene por qué
-   toparse con un ofrecimiento de cuenta.
+   ENTRADA A MI PROMEDIO
+   Va dentro de la sección, en contexto. Nunca como modal al entrar al sitio:
+   quien viene a ver a qué hora rinde no tiene por qué toparse con un pedido
+   de cuenta.
    ========================================================================== */
-.sync-panel {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-4);
-  padding: var(--sp-4) var(--sp-5);
-  margin-bottom: var(--sp-5);
+.carrera-acceso { margin-bottom: var(--sp-6); }
+
+.puerta-carrera {
+  max-width: 640px;
+  margin-inline: auto;
+  padding: var(--sp-8) var(--sp-6);
   background: var(--surface);
   border: 1px solid var(--border);
-  border-left: 4px solid var(--accent);
+  border-top: 4px solid var(--accent);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  flex-wrap: wrap;
+  text-align: center;
 }
-.sync-panel > i {
-  font-size: var(--fs-xl);
-  color: var(--accent-text);
-  flex-shrink: 0;
-}
-.sync-panel > div { flex: 1; min-width: 220px; }
-.sync-panel strong {
-  display: block;
-  font-size: var(--fs-base);
+.puerta-carrera h3 {
+  font-size: var(--fs-2xl);
+  line-height: var(--lh-tight);
   color: var(--text-strong);
+  margin-bottom: var(--sp-3);
 }
-.sync-panel p {
+
+.puerta-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: var(--sp-4);
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-soft-text);
+  font-size: var(--fs-2xl);
+}
+
+.puerta-lead {
+  max-width: 48ch;
+  margin-inline: auto;
+  font-size: var(--fs-md);
+  color: var(--text-muted);
+}
+
+.puerta-carrera .check-list {
+  max-width: 460px;
+  margin: var(--sp-6) auto 0;
+  text-align: left;
+}
+
+.puerta-acciones {
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  margin-top: var(--sp-6);
+}
+
+.puerta-nota {
+  margin-top: var(--sp-5);
   font-size: var(--fs-sm);
   color: var(--text-muted);
-  margin-top: 2px;
 }
 
-.sync-activa { border-left-color: var(--success); }
-.sync-activa > i { color: var(--success); }
+.puerta-cargando {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  border-top-color: var(--border);
+  color: var(--text-muted);
+}
+.puerta-cargando > i { font-size: var(--fs-2xl); color: var(--accent-text); }
 
-.sync-error { border-left-color: var(--warning); }
-.sync-error > i { color: var(--warning); }
+/* Materias de antes de las cuentas */
+.carrera-anteriores { margin-bottom: var(--sp-5); }
+
+.acciones-inline {
+  display: flex;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  margin-top: var(--sp-3);
+}
+
+/* ==========================================================================
+   ESTADO DEL GUARDADO
+   Discreto cuando todo va bien; visible cuando algo no se guardó. Sin él,
+   quien carga notas sin señal no tiene forma de saber si quedaron.
+   ========================================================================== */
+.estado-guardado {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+}
+.estado-guardado:empty { display: none; }
+
+.es-guardado     { background: var(--success-bg); color: var(--success); border-color: transparent; }
+.es-sin-conexion { background: var(--warning-bg); color: var(--warning); border-color: transparent; }
+.es-error        { background: var(--danger-bg);  color: var(--danger);  border-color: transparent; }
 
 /* ==========================================================================
    RESPONSIVE
    ========================================================================== */
 @media (max-width: 1180px) {
-  /* En pantallas angostas el botón queda sólo con la inicial: el correo
+  /* En pantallas angostas el botón queda sólo con la inicial: el nombre
      completo empujaba el resto del encabezado fuera de la pantalla. */
   .btn-cuenta span { display: none; }
   .btn-cuenta { width: 40px; padding: 0; justify-content: center; }
@@ -178,7 +353,10 @@
   .acciones-cuenta { flex-direction: column; }
   .acciones-cuenta .btn { width: 100%; min-width: 0; }
   .acciones-secundarias { flex-direction: column; align-items: stretch; }
-  .campo-codigo { font-size: var(--fs-xl); letter-spacing: 0.3em; }
-  .sync-panel { flex-direction: column; align-items: stretch; }
-  .sync-panel .btn { width: 100%; }
+
+  .puerta-carrera { padding: var(--sp-6) var(--sp-4); }
+  .puerta-carrera h3 { font-size: var(--fs-xl); }
+  .puerta-acciones { flex-direction: column; }
+  .puerta-acciones .btn { width: 100%; }
+  .acciones-inline .btn { flex: 1; }
 }

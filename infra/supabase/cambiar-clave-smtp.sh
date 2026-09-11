@@ -22,7 +22,7 @@
 #   · Editar el .env escribiendo la clave dentro de un comando la deja en el
 #     historial de la terminal.
 #   · Guardar una clave sin probarla repite el problema: el error aparece
-#     recién cuando alguien no recibe su código.
+#     recién cuando alguien no recibe su correo de confirmación.
 #
 #   Este script comprueba la clave contra la API de Resend ANTES de guardarla
 #   (sin enviar ningún correo), no la muestra, no la pasa como argumento de un
@@ -215,4 +215,4 @@ echo "Aplicándola al contenedor de Auth (up -d, no restart: restart no relee el
 docker compose up -d auth
 
 echo
-verde "Listo. Volvé a pedir el código para comprobar que llega el correo."
+verde "Listo. Pedí \"¿Olvidaste tu contraseña?\" desde el sitio para comprobar que llega el correo."

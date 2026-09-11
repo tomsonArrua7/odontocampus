@@ -1,8 +1,8 @@
 /* ==========================================================================
    ODONTOCAMPUS — PROMEDIO Y AVANCE DE CARRERA
-   Las notas viven únicamente en el navegador de quien las carga. No hay
-   servidor, no hay cuenta y no se comparten: es información sensible y
-   emocionalmente cargada, y esa promesa está escrita en la propia pantalla.
+   Calcula y dibuja. Las materias viven en la cuenta de cada estudiante:
+   quién entra a la sección y cómo viajan los datos lo resuelve js/carrera.js.
+   Este archivo no sabe nada de servidores ni de sesiones.
 
    Cambios respecto de la primera versión:
    · Cambiar el estado de una materia ya no vuelve a dibujar toda la tabla.
@@ -25,40 +25,25 @@
     { valor: "aprobada", texto: "Aprobada" }
   ];
 
+  // El mismo tope que acepta la base (003_cuentas_con_contrasena.sql).
+  var MAX_APLAZOS = 30;
+
+  function limitarAplazos(valor) {
+    return Math.min(MAX_APLAZOS, Math.max(0, parseInt(valor, 10) || 0));
+  }
+
   var OdontoCalculator = {
-    storageKey: "odontocampus_calificaciones_v1",
     filtroAnio: "todos",
 
     /* ====================================================================
-       ALMACENAMIENTO
+       ALMACENAMIENTO (delegado en js/carrera.js)
        ==================================================================== */
     getNotas: function () {
-      try {
-        var data = localStorage.getItem(this.storageKey);
-        return data ? JSON.parse(data) : {};
-      } catch (e) {
-        console.error("[OdontoCampus] No se pudieron leer las notas guardadas:", e);
-        return {};
-      }
+      return global.OdontoCarrera ? global.OdontoCarrera.leerCopia() : {};
     },
 
-    /**
-     * @param {object}  notas
-     * @param {boolean} vieneDelServidor  true cuando la escritura la origina
-     *        la sincronización al bajar datos. Evita el rebote de volver a
-     *        subir lo que se acaba de recibir.
-     */
-    guardarNotas: function (notas, vieneDelServidor) {
-      try {
-        localStorage.setItem(this.storageKey, JSON.stringify(notas));
-      } catch (e) {
-        UI.toast("No pudimos guardar la nota. Si navegás en modo privado, los datos no persisten.", "warning");
-      }
-
-      // localStorage es la fuente de verdad; el servidor es un espejo.
-      if (!vieneDelServidor && global.OdontoSync) {
-        global.OdontoSync.notificarCambio();
-      }
+    guardarNotas: function (notas) {
+      if (global.OdontoCarrera) global.OdontoCarrera.escribirCopia(notas);
     },
 
     getTodasLasMaterias: function () {
@@ -86,12 +71,14 @@
         notas[materiaId] = {
           estado: estado,
           nota: estado === "aprobada" ? (parseFloat(notaFinal) || null) : null,
-          aplazos: parseInt(aplazos, 10) || 0,
+          aplazos: limitarAplazos(aplazos),
           fechaActualizacion: new Date().toISOString()
         };
       }
 
       this.guardarNotas(notas);
+      // Queda pendiente hasta que la cuenta confirme que lo guardó.
+      if (global.OdontoCarrera) global.OdontoCarrera.marcarCambio(materiaId);
       this.renderResumen();
       return notas[materiaId];
     },
@@ -169,11 +156,9 @@
 
           if (el.classList.contains("status-select")) self.alCambiarEstado(id, el.value, fila);
           else if (el.classList.contains("nota-input")) self.alCambiarNota(id, el.value, fila);
-          else if (el.classList.contains("aplazos-input")) self.alCambiarAplazos(id, el.value);
+          else if (el.classList.contains("aplazos-input")) self.alCambiarAplazos(id, el.value, el);
         });
       }
-
-      this.renderTabla();
     },
 
     renderTabla: function (filtroAnio) {
@@ -254,7 +239,7 @@
           "</td>" +
           "<td>" +
             '<label class="visually-hidden" for="aplazos-' + escAttr(mat.id) + '">Aplazos en ' + nombreSeguro + "</label>" +
-            '<input type="number" inputmode="numeric" min="0" max="10" ' +
+            '<input type="number" inputmode="numeric" min="0" max="' + MAX_APLAZOS + '" ' +
                    'class="form-control aplazos-input" id="aplazos-' + escAttr(mat.id) + '" ' +
                    'value="' + escAttr(registro.aplazos || 0) + '">' +
           "</td>" +
@@ -311,10 +296,11 @@
       if (input) input.classList.add("active");
     },
 
-    alCambiarAplazos: function (id, valor) {
+    alCambiarAplazos: function (id, valor, input) {
       var notas = this.getNotas();
       var actual = notas[id] || { estado: "pendiente", nota: null };
-      var aplazos = Math.max(0, parseInt(valor, 10) || 0);
+      var aplazos = limitarAplazos(valor);
+      if (input && String(aplazos) !== String(valor)) input.value = aplazos;
 
       /* Un aplazo cuenta aunque la materia siga pendiente: es justamente el
          caso de quien rindió, no aprobó y todavía la debe. */
@@ -328,18 +314,15 @@
       var metricas = this.calcularMetricas();
       var cargadas = metricas.aprobadasCount + metricas.regularesCount + metricas.cursandoCount;
 
-      if (cargadas === 0) {
-        UI.toast("Todavía no cargaste ninguna nota", "info");
+      if (cargadas === 0 && !Object.keys(this.getNotas()).length) {
+        UI.toast("Todavía no cargaste ninguna materia", "info");
         return;
       }
-      var mensaje = "Vas a borrar " + UI.plural(cargadas, "materia") +
-                    " cargada" + (cargadas === 1 ? "" : "s") +
-                    ". Esta acción no se puede deshacer.\n\n¿Seguís adelante?";
+      var mensaje = "Vas a borrar todas las materias de tu cuenta, en todos tus dispositivos. " +
+                    "No se puede deshacer.\n\n¿Seguís adelante?";
       if (!global.confirm(mensaje)) return;
 
-      try { localStorage.removeItem(this.storageKey); } catch (e) { /* nada que hacer */ }
-      this.renderTabla();
-      UI.toast("Listo: se borraron todas tus notas", "success");
+      if (global.OdontoCarrera) global.OdontoCarrera.borrarTodo();
     },
 
     renderResumen: function () {

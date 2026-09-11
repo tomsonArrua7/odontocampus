@@ -32,9 +32,9 @@
 #   · No se protegen contra una segunda ejecución. Correrlos de nuevo con la
 #     base ya creada cambia POSTGRES_PASSWORD y la deja inaccesible.
 #   · El .env.example trae COMPOSE_FILE=docker-compose.yml, y con eso Docker
-#     Compose IGNORA docker-compose.override.yml sin avisar: ni el correo con
-#     código ni el atado de puertos se aplicarían. Acá se corrige y se
-#     comprueba.
+#     Compose IGNORA docker-compose.override.yml sin avisar: ni la
+#     configuración del correo ni el atado de puertos se aplicarían. Acá se
+#     corrige y se comprueba.
 # ==========================================================================
 set -Eeuo pipefail
 umask 077
@@ -136,7 +136,7 @@ echo
 read -rsp "Pegala acá (no se ve mientras escribís) y apretá Enter: " SMTP_PASS
 echo
 
-[[ -n "$SMTP_PASS" ]] || fallar "Sin clave de Resend no se pueden enviar códigos y nadie podría ingresar."
+[[ -n "$SMTP_PASS" ]] || fallar "Sin clave de Resend no salen los correos de confirmación y nadie podría crear su cuenta."
 [[ "$SMTP_PASS" == re_* ]] || amarillo "Aviso: las claves de Resend empiezan con 're_'. Revisá que sea la correcta."
 
 # --------------------------------------------------------------------------
@@ -263,8 +263,8 @@ done
 #     La configuración resuelta incluye secretos: sólo se busca en ella, no
 #     se imprime.
 if configuracion=$(docker compose config 2>/dev/null); then
-  grep -q "GOTRUE_MAILER_TEMPLATES_MAGIC_LINK" <<<"$configuracion" \
-    || problemas+=("el override no se aplica: falta la configuración del correo con código")
+  grep -q "GOTRUE_MAILER_TEMPLATES_RECOVERY" <<<"$configuracion" \
+    || problemas+=("el override no se aplica: falta la configuración de los correos de la cuenta")
   grep -q "host_ip: 127.0.0.1" <<<"$configuracion" \
     || problemas+=("el override no se aplica: los puertos no quedan atados a 127.0.0.1")
 else

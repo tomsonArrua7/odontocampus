@@ -23,7 +23,7 @@ supone que el anterior está cerrado.
 | Script de backup | Instalarlo |
 | Repositorio en `github.com/tomsonArrua7/odontocampus` | — |
 | Dominio + registros en Cloudflare | Delegación en nic.ar |
-| Frontend de cuentas completo (acceso, cifrado, sincronización) | Enchufarlo al servidor |
+| Cuentas con contraseña; Mi promedio guardado en la cuenta | Aplicarlo en el servidor (Bloque E) |
 | Permutas dadas de baja | — |
 | — | Servidor, SMTP, aplicar el esquema |
 
@@ -79,10 +79,9 @@ por acá.
 - [ ] **Bitwarden compartido** con FOE. Ahí van: dominio, VPS, Postgres,
       `SERVICE_ROLE_KEY`, SMTP, B2, y la frase del backup.
 
-> **El SMTP es el que más se subestima.** El acceso es por código enviado por
-> email: sin correo saliente andando, el sistema entero queda inutilizable. Y
-> sin SPF/DKIM los códigos caen en spam, que desde afuera es indistinguible de
-> un sistema roto.
+> **El SMTP es el que más se subestima.** Sin correo saliente nadie puede
+> confirmar su cuenta ni recuperar la contraseña. Y sin SPF/DKIM los correos
+> caen en spam, que desde afuera es indistinguible de un sistema roto.
 
 ---
 
@@ -111,7 +110,7 @@ Guía completa: [`despliegue-cloudpanel.md`](despliegue-cloudpanel.md).
 - [x] Vhost de la API: sólo `/auth`, `/rest`, `/storage`, `/realtime` y `/functions`
 - [x] Supabase levantado, puertos 8000, 5432 y 6543 sólo en 127.0.0.1
 - [x] Verificado desde afuera: puertos cerrados, panel y `/pg/` en 404, Auth responde con la clave publicable
-- [x] **Correo con código funcionando** (el primer intento dio `535`: clave de Resend rechazada; se corrige con `cambiar-clave-smtp.sh`)
+- [x] **Correo saliente funcionando** (el primer intento dio `535`: clave de Resend rechazada; se corrige con `cambiar-clave-smtp.sh`)
 Actualizar el sitio, de ahí en adelante:
 
 ```bash
@@ -127,8 +126,9 @@ cd ~/htdocs/odontocampus.com.ar && git pull --ff-only
 
 - [x] Cargar [`001_esquema.sql`](../infra/supabase/sql/001_esquema.sql)
 - [x] Cargar [`002_bolsa_y_privacidad.sql`](../infra/supabase/sql/002_bolsa_y_privacidad.sql)
+- [ ] Cargar [`003_cuentas_con_contrasena.sql`](../infra/supabase/sql/003_cuentas_con_contrasena.sql)
 - [ ] Correr las dos consultas de verificación del final del archivo
-- [x] **`pruebas_rls.sql`: todas las pruebas en OK** (25 de 25)
+- [ ] **`pruebas_rls.sql`: todas las pruebas en OK** (35, de 00 a 34, después de cargar 003)
 - [ ] **Advisor de Studio sin alertas críticas**
 - [ ] Prueba con `curl` y la clave publicable desde incógnito: no debe devolver nada
 
@@ -140,19 +140,29 @@ Acá vuelve el trabajo mío. Archivos nuevos en `public/js/`:
 
 - [x] `config.js` — URL de la API y `ANON_KEY`, con apagado automático
 - [x] `api.js` — cliente propio: sesión, renovación de token, REST
-- [x] `cripto.js` — PBKDF2 + AES-GCM, probado de punta a punta
-- [x] `auth.js` — ingreso en dos pasos y panel de cuenta
-- [x] `sync.js` — consentimiento, cifrado, mezcla local/remoto
-- [x] `calculator.js` — avisa a la sincronización en cada cambio
+- [x] `auth.js` — registro, ingreso con contraseña, confirmación y recuperación por correo, Mi cuenta
+- [x] `carrera.js` — Mi promedio pide cuenta; materias en la cuenta, con copia local y cambios pendientes sin conexión
+- [x] `calculator.js` — avisa a `carrera.js` en cada cambio
 - [x] Exportar mis datos (Ley 25.326)
 - [x] 🙋 Pegar la `SUPABASE_PUBLISHABLE_KEY` en `config.js` cuando arranque Supabase
-- [x] Plantillas de correo con código (`public/email/`)
+- [x] Plantillas de correo con botón: confirmación y recuperación (`public/email/`)
 - [x] Borrado de cuenta real: función `eliminar_mi_cuenta`, con confirmación escrita
 - [ ] CSP estricta en el vhost del sitio
 
+### Cambio a cuentas con contraseña (septiembre 2026) 🙋 aplicar en el servidor
+
+- [ ] `git pull` en el sitio
+- [ ] Copiar el override a `/opt/supabase/` y `docker compose up -d auth`
+- [ ] Vhost de la API: cerrar `/auth/v1/otp` y `/auth/v1/magiclink`
+- [ ] Cargar `003_cuentas_con_contrasena.sql` y correr `pruebas_rls.sql` (35 en OK)
+- [ ] Probar: crear cuenta, confirmar, ingresar, cargar una materia y verla desde otro dispositivo
+- [ ] Probar: "¿Olvidaste tu contraseña?" de punta a punta
+- [ ] Probar que se rechaza la contraseña `12345678`
+- [ ] Log de Auth sin "rate limiting is not applied"
+
 **Principio que no se negocia:** el login suma, no tapa. Mesas, reválidas,
-historias clínicas, instrumental y biblioteca siguen abiertas sin cuenta. Si
-alguien no inicia sesión nunca, el sitio le funciona igual que hoy.
+historias clínicas, instrumental y biblioteca siguen abiertas sin cuenta. Lo
+único que la pide es Mi promedio, porque guarda datos de la persona.
 
 ---
 
@@ -164,7 +174,7 @@ guardar.
 - [ ] **¿Quién es el responsable de datos ante la Ley 25.326?**
       Definirlo **antes** de guardar la primera nota.
 - [ ] Redactar términos y política de privacidad, en castellano llano
-- [ ] Redactar el texto de consentimiento para sincronizar notas
+- [ ] Revisar el texto de "qué se guarda" que se acepta al crear la cuenta (`htmlTerminos` en `public/js/carrera.js`)
 - [ ] **¿Quién mira la cola de reportes, y cada cuánto?** Con registro abierto
       no es opcional.
 - [ ] ¿Qué hacemos si la facultad pide bajar algo? Conviene tener posición
@@ -212,5 +222,4 @@ Add domain** con SPF y DKIM.
 La guía completa está en
 [`despliegue-cloudpanel.md`](despliegue-cloudpanel.md).
 
-Del lado del código, lo que queda depende de que exista el servidor: pegar la
-`ANON_KEY` en `config.js`, la CSP en el vhost y el borrado de cuenta.
+Del lado del código, lo que queda es la CSP en el vhost del sitio.

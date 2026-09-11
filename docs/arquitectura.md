@@ -15,7 +15,7 @@ construir y por qué.
 > ### Qué cambió después de elegir CloudPanel + Supabase
 >
 > Este documento se escribió antes de saber que el servidor ya tenía
-> CloudPanel y que íbamos a autoalojar Supabase. **Tres secciones quedaron
+> CloudPanel y que íbamos a autoalojar Supabase. **Varias secciones quedaron
 > desactualizadas.** El procedimiento real está en
 > [`despliegue-cloudpanel.md`](despliegue-cloudpanel.md); acá queda anotado
 > qué se reemplazó y por qué, para que nadie siga la versión vieja.
@@ -26,12 +26,16 @@ construir y por qué.
 > | API propia en Node + Fastify (§7) | **Supabase autoalojado** | Auth con enlace por email, Postgres, RLS, Storage y REST ya resueltos. Menos código propio que mantener con un equipo que rota. |
 > | Sesión en cookie `httpOnly` (§3) | **Token en `localStorage`** | El sitio es estático y las cookies `httpOnly` requieren una capa de servidor que renderice. Es un compromiso real, detallado en §7 del documento de despliegue. |
 > | Permutas de comisión (§4, §10 fase 2) | **Dadas de baja** | Decisión del equipo: no van a la web. La tabla se quitó del esquema y el módulo del sitio. Queda en el historial de git por si alguna vez se retoma. |
+> | Enlace por email, sin contraseña (§3) | **Correo y contraseña** | Decisión del equipo, septiembre de 2026. El correo confirma la cuenta una vez y sirve para recuperar la contraseña. |
+> | Notas cifradas en el navegador (§5) | **Materias en la cuenta, protegidas por RLS** | La segunda clave era un paso más y, si se olvidaba, las notas se perdían. Quien administra el servidor puede leerlas, y se dice al crear la cuenta. Migración 003. |
+> | El login suma, no tapa (§1) | **Mi promedio pide cuenta** | Es lo único que la pide, porque guarda datos de la persona. Todo lo demás sigue abierto. |
 >
-> **Lo que NO cambió, y es lo más importante:** las notas se cifran en el
-> navegador y la base no tiene columna `nota`, `promedio` ni `materia`
-> (§5 de este documento). Con Supabase esa decisión se vuelve más necesaria,
-> no menos: `SERVICE_ROLE_KEY` y el acceso directo a Postgres saltean RLS
-> por completo.
+> **Lo que cambió en la protección de las notas:** §5 proponía cifrarlas en
+> el navegador para que ni FOE pudiera leerlas. En septiembre de 2026 el
+> equipo eligió guardarlas en la cuenta. RLS impide que un estudiante vea las
+> de otro, pero `SERVICE_ROLE_KEY` y el acceso directo a Postgres saltean RLS:
+> quien administra el servidor puede leerlas. Usarlas para algo más que
+> mostrárselas a cada quien requiere un consentimiento nuevo.
 >
 > El cambio grande de mentalidad: **ya no hay una API nuestra que valide
 > permisos.** El navegador habla directo con PostgREST usando una clave

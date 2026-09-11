@@ -87,6 +87,21 @@
   .brand-subtitle { font-size: 0.7rem; }
   .brand-logo-img { width: 38px; height: 38px; }
 
+  /* Con el botón de cuenta, el encabezado lleva cuatro botones: en 375 px
+     empujaban el menú fuera de la pantalla y la página se corría de costado.
+     Cede la marca; los botones conservan su área táctil. */
+  .navbar { gap: var(--sp-2); }
+  .nav-utils { gap: var(--sp-1); }
+  .brand-container { flex-shrink: 1; min-width: 0; gap: var(--sp-2); }
+  .brand-text { min-width: 0; }
+  .brand-title,
+  .brand-subtitle { overflow: hidden; text-overflow: ellipsis; }
+}
+
+@media (max-width: 400px) {
+  .brand-subtitle { display: none; }
+  .brand-title { font-size: var(--fs-base); }
+
   .calc-stats-grid { grid-template-columns: 1fr; }
   .news-footer { flex-direction: column; align-items: stretch; }
   .news-footer .btn { width: 100%; }
