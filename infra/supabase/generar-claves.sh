@@ -97,6 +97,35 @@ if [[ -d volumes/db/data ]] && [[ -n "$(ls -A volumes/db/data 2>/dev/null)" ]]; 
 fi
 
 # --------------------------------------------------------------------------
+# Node para el generador de claves asimétricas
+#
+# add-new-auth-keys.sh necesita Node 16 o superior: el del sistema o, si no
+# hay, la imagen node:22-alpine de Docker Hub. Se resuelve ACÁ, antes de pedir
+# nada y de tocar el .env.
+#
+# En la instalación real esta descarga falló con "429 Too Many Requests":
+# Docker Hub limita las descargas anónimas por dirección IP, y la IP de un VPS
+# suele ser compartida. Mejor enterarse ahora que a mitad de camino.
+# --------------------------------------------------------------------------
+node_local_sirve() {
+  command -v node >/dev/null 2>&1 || return 1
+  local mayor
+  mayor=$(node -v 2>/dev/null | sed 's/^v//' | cut -d. -f1)
+  [[ "$mayor" =~ ^[0-9]+$ ]] && (( mayor >= 16 ))
+}
+
+if ! node_local_sirve && ! docker image inspect node:22-alpine >/dev/null 2>&1; then
+  echo "Descargando la imagen de Node que usa el generador oficial…"
+  if ! docker pull node:22-alpine >/dev/null; then
+    fallar "No se pudo descargar node:22-alpine desde Docker Hub." \
+      "Si el error dice '429 Too Many Requests', Docker Hub limita las descargas" \
+      "anónimas por IP. Iniciá sesión con un token de solo lectura (docker login)" \
+      "y descargá las imágenes antes: ver 'Docker Hub' en docs/despliegue-cloudpanel.md." \
+      "No se modificó nada."
+  fi
+fi
+
+# --------------------------------------------------------------------------
 # La clave de Resend se pide ANTES de escribir nada
 # --------------------------------------------------------------------------
 echo

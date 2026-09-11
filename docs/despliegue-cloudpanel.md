@@ -366,6 +366,46 @@ Docker no arranca y ahí se nota enseguida.
 > ser root en el servidor: cualquiera que pueda hablar con Docker puede montar
 > el disco entero dentro de un contenedor. Docker se maneja sólo como root.
 
+#### Docker Hub: iniciar sesión antes de descargar
+
+Docker Hub limita las descargas **anónimas por dirección IP**. En un VPS esa IP
+suele ser compartida, o la usaron otros clientes antes, así que el límite puede
+estar agotado sin que hayas descargado nada. Supabase son once imágenes, más la
+de Node que usa el generador de claves. **En la instalación real, la primera
+descarga ya falló con `429 Too Many Requests`.**
+
+Con sesión iniciada, el límite pasa a ser por cuenta y no por IP.
+
+1. Crear una cuenta gratuita en [Docker Hub](https://hub.docker.com), **a nombre
+   de FOE** y no de una persona, por la misma razón que el dominio.
+2. *Account settings → Personal access tokens → Generate new token*, con
+   permiso **Public Repo Read-only**. Nunca la contraseña de la cuenta.
+3. Como root:
+
+   ```bash
+   docker login -u USUARIO_DE_DOCKERHUB
+   ```
+
+   Cuando pida la contraseña, pegar el **token**.
+
+El token queda guardado en `/root/.docker/config.json` codificado en base64,
+que **no es cifrado**: cualquiera que lea ese archivo lo recupera. Por eso tiene
+que ser de solo lectura. Si se filtra, sólo sirve para descargar imágenes
+públicas: no se puede publicar ni borrar nada con él. Guardalo también en el
+gestor de contraseñas.
+
+Después, descargar todo de una vez, **antes** de generar las claves:
+
+```bash
+cd /opt/supabase
+docker pull node:22-alpine
+docker compose pull
+```
+
+Descargar imágenes no levanta ningún contenedor, así que no expone nada. Si
+`docker compose pull` también falla con 429, el token no se está usando:
+revisá que `docker login` haya respondido `Login Succeeded`.
+
 #### Docker saltea el firewall
 
 **Esto es lo más importante de toda la instalación.** Cuando un contenedor
