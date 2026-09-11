@@ -255,7 +255,7 @@ El primero confirma la distribución (CloudPanel corre sobre Debian o Ubuntu y
 el script oficial de Docker detecta cuál). El último tiene que mostrar Compose
 **v2.20 o superior**: es lo que necesita el override de puertos.
 
-#### Rotación de logs, antes de levantar nada
+#### Configuración de Docker, antes de levantar nada
 
 Docker guarda los logs de cada contenedor **sin límite de tamaño**. Supabase son
 unos diez contenedores escribiendo todo el día: en algunos meses llenan el disco
@@ -266,6 +266,7 @@ los servidores chicos, y la más difícil de diagnosticar.
 mkdir -p /etc/docker
 cat > /etc/docker/daemon.json <<'EOF'
 {
+  "ip": "127.0.0.1",
   "log-driver": "json-file",
   "log-opts": { "max-size": "10m", "max-file": "3" }
 }
@@ -274,9 +275,15 @@ systemctl restart docker
 systemctl is-active docker
 ```
 
-Limita cada contenedor a tres archivos de 10 MB. El contenido es el mismo que
-`infra/docker/daemon.json` del repositorio; se escribe directamente para no
-depender de haber clonado antes.
+Hace dos cosas:
+
+- **`"ip": "127.0.0.1"`** — todo puerto que un contenedor publique sin indicar
+  dirección queda atado a la máquina local, no a internet. Ver *Docker saltea
+  el firewall*, más abajo.
+- **`log-opts`** — limita los logs de cada contenedor a tres archivos de 10 MB.
+
+El contenido es el mismo que `infra/docker/daemon.json` del repositorio; se
+escribe directamente para no depender de haber clonado antes.
 
 El último comando tiene que responder `active`. Si el JSON quedó mal escrito,
 Docker no arranca y ahí se nota enseguida.
@@ -297,9 +304,18 @@ evalúan **antes** que las del firewall del sistema. Un puerto publicado en
 `0.0.0.0` queda abierto a internet **aunque el firewall de CloudPanel diga que
 está cerrado.**
 
-Por eso `docker-compose.override.yml` no es una buena práctica opcional: **es
-lo único que mantiene cerrados el 8000 y el 5432.** Y por eso la verificación
-desde afuera de §3.4 no se puede reemplazar mirando el panel del firewall.
+Por eso la protección va en tres capas, y ninguna reemplaza a las otras:
+
+1. **`"ip": "127.0.0.1"` en `daemon.json`.** Es la red de seguridad general: no
+   depende de los nombres de los servicios. Supabase los cambia entre versiones
+   (en una instalación de 2026 el gateway ya no se llama `kong` sino `api-gw`,
+   y `analytics` no existe), así que una defensa atada a nombres fijos puede
+   quedar desactualizada sin que nadie lo note.
+2. **`docker-compose.override.yml`.** Ata explícitamente los puertos que sí
+   conocemos. Si alguien quitara la línea de `daemon.json`, esto sigue en pie.
+3. **La verificación desde afuera** (§3.4). Es lo único que confirma que las
+   dos anteriores funcionan de verdad. No se reemplaza mirando el panel del
+   firewall, porque el firewall no ve estas reglas.
 
 ### Descargar Supabase
 
