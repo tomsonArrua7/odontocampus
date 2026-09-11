@@ -84,7 +84,9 @@ run_server.py         Servidor de desarrollo (sirve public/)
 **Por qué `public/` está separado:** es la única carpeta que se sube al
 servidor. Así `docs/` e `infra/` —que incluyen el esquema de la base y los
 procedimientos— no pueden quedar expuestos al navegador por un error de
-configuración. El despliegue es un `rsync` de una sola carpeta.
+configuración. El servidor clona el repositorio entero, pero la raíz web
+apunta a `public/`: `.git/`, `docs/` e `infra/` quedan fuera del alcance
+del navegador.
 
 El orden de los `<script>` importa: `config.js` y `core.js` primero,
 `app.js` último.

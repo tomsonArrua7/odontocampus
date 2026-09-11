@@ -68,6 +68,104 @@ Let's Encrypt Certificate**. Agregá también `www.odontocampus.com.ar`.
 
 Certificado Let's Encrypt igual que el anterior.
 
+### Publicar el sitio clonando el repositorio
+
+El sitio se despliega con `git`, no copiando archivos a mano. Actualizar pasa a
+ser un `git pull`, y lo que está en producción es siempre un commit concreto y
+rastreable.
+
+> **Nunca apuntes la raíz web a la raíz del repositorio.** Quedarían publicados
+> `.git/`, `infra/` y `docs/`. Con `https://odontocampus.com.ar/.git/config`
+> accesible, cualquiera descarga el historial completo del proyecto. Por eso el
+> sitio vive en `public/`: la raíz web apunta ahí y todo lo demás queda fuera
+> del alcance del navegador.
+
+#### 1. Cambiar la raíz del sitio
+
+CloudPanel → *Sites → odontocampus.com.ar → Settings → Root Directory*.
+Agregale `/public` al final de lo que ya dice —queda algo como
+`htdocs/odontocampus.com.ar/public`— y guardá.
+
+#### 2. Clonar, como el usuario del sitio
+
+Entrá por SSH **con el usuario que CloudPanel creó para el sitio**, no como
+root. Si clonás como root, los archivos quedan con dueño root y después el
+propio usuario del sitio no puede actualizarlos.
+
+```bash
+ssh USUARIO_DEL_SITIO@179.43.126.185
+cd ~/htdocs
+mv odontocampus.com.ar odontocampus.com.ar.placeholder
+git clone https://github.com/tomsonArrua7/odontocampus.git odontocampus.com.ar
+```
+
+La carpeta que crea CloudPanel trae solo una página de ejemplo. Se renombra en
+vez de borrarse; cuando el sitio ande, se elimina con
+`rm -rf odontocampus.com.ar.placeholder`.
+
+El repositorio es público y no contiene secretos, así que el clon por HTTPS no
+necesita credenciales. Si algún día pasa a privado, ver *Repositorio privado*.
+
+#### 3. Verificar desde tu computadora
+
+Funciona antes de que propague el DNS y antes de tener certificado: `--resolve`
+fuerza la IP y `-k` tolera el certificado provisorio.
+
+```bash
+curl.exe -skI --resolve odontocampus.com.ar:443:179.43.126.185 https://odontocampus.com.ar/
+curl.exe -skI --resolve odontocampus.com.ar:443:179.43.126.185 https://odontocampus.com.ar/.git/config
+curl.exe -skI --resolve odontocampus.com.ar:443:179.43.126.185 https://odontocampus.com.ar/infra/supabase/sql/001_esquema.sql
+```
+
+La primera tiene que dar `200`. **Las otras dos, `404`.** Si cualquiera de esas
+dos da `200`, la raíz del sitio no quedó en `public/`: corregilo antes de
+seguir con cualquier otra cosa.
+
+> En PowerShell, `curl` a secas es un alias de `Invoke-WebRequest` y no entiende
+> estas opciones. Usá `curl.exe`.
+
+#### Actualizar
+
+```bash
+cd ~/htdocs/odontocampus.com.ar && git pull --ff-only
+```
+
+`--ff-only` es a propósito: si alguien editó un archivo directamente en el
+servidor, el pull se niega en lugar de mezclar en silencio. **En el servidor no
+se edita nada.** Los cambios se hacen en el repositorio y se bajan.
+
+#### Repositorio privado
+
+Si el repositorio pasa a privado, el servidor necesita una *deploy key*: una
+clave SSH de solo lectura, válida para este repositorio y ningún otro. Si el
+servidor se ve comprometido, con esa clave no se puede escribir en el repo ni
+tocar otros proyectos de la cuenta.
+
+```bash
+ssh-keygen -t ed25519 -C "deploy odontocampus" -f ~/.ssh/odontocampus_deploy -N ""
+cat ~/.ssh/odontocampus_deploy.pub
+```
+
+GitHub → repositorio → *Settings → Deploy keys → Add deploy key*: pegar la
+clave pública y **no** marcar *Allow write access*. Después agregar a
+`~/.ssh/config`:
+
+```
+Host github-odontocampus
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/odontocampus_deploy
+  IdentitiesOnly yes
+```
+
+Y apuntar el repositorio a ese alias:
+
+```bash
+chmod 600 ~/.ssh/config
+cd ~/htdocs/odontocampus.com.ar
+git remote set-url origin github-odontocampus:tomsonArrua7/odontocampus.git
+```
+
 ### DNS: delegar nic.ar a Cloudflare
 
 Un `.com.ar` se registra en **nic.ar**, que por defecto queda con los
@@ -143,7 +241,50 @@ FOE, la agrupación pierde el dominio.
 
 ## 3. Instalar Supabase
 
-Como usuario con sudo, **fuera** del directorio de los sitios:
+### 3.0 Docker
+
+CloudPanel no trae Docker. Como root:
+
+```bash
+cat /etc/os-release
+curl -fsSL https://get.docker.com | sh
+docker compose version
+```
+
+El primero confirma la distribución (CloudPanel corre sobre Debian o Ubuntu y
+el script oficial de Docker detecta cuál). El último tiene que mostrar Compose
+**v2.20 o superior**: es lo que necesita el override de puertos.
+
+#### Rotación de logs, antes de levantar nada
+
+Docker guarda los logs de cada contenedor **sin límite de tamaño**. Supabase son
+unos diez contenedores escribiendo todo el día: en algunos meses llenan el disco
+y el servidor se cae sin ningún aviso previo. Es la forma lenta en que mueren
+los servidores chicos, y la más difícil de diagnosticar.
+
+```bash
+cp /home/USUARIO_DEL_SITIO/htdocs/odontocampus.com.ar/infra/docker/daemon.json /etc/docker/daemon.json
+systemctl restart docker
+```
+
+Limita cada contenedor a tres archivos de 10 MB. El archivo está versionado en
+`infra/docker/daemon.json`.
+
+#### Docker saltea el firewall
+
+**Esto es lo más importante de toda la instalación.** Cuando un contenedor
+publica un puerto, Docker escribe sus propias reglas de iptables, que se
+evalúan **antes** que las del firewall del sistema. Un puerto publicado en
+`0.0.0.0` queda abierto a internet **aunque el firewall de CloudPanel diga que
+está cerrado.**
+
+Por eso `docker-compose.override.yml` no es una buena práctica opcional: **es
+lo único que mantiene cerrados el 8000 y el 5432.** Y por eso la verificación
+desde afuera de §3.4 no se puede reemplazar mirando el panel del firewall.
+
+### Descargar Supabase
+
+Como root, **fuera** del directorio de los sitios:
 
 ```bash
 sudo mkdir -p /opt/supabase && cd /opt/supabase
@@ -490,8 +631,11 @@ Sumale que CloudPanel ya tiene su propio Nginx y sus servicios corriendo.
 
 1. [ ] DNS apuntando (`@`, `www`, `api`)
 2. [ ] Sitio estático creado + Let's Encrypt
+   - [ ] Raíz del sitio en `public/` y repositorio clonado
+   - [ ] `.git/config` e `infra/` responden 404 desde afuera
 3. [ ] Reverse proxy creado + Let's Encrypt
 4. [ ] Supabase instalado en `/opt/supabase`
+   - [ ] Docker instalado, con rotación de logs (`infra/docker/daemon.json`)
 5. [ ] Claves generadas, `.env` completo, `chmod 600`
 6. [ ] Override de puertos aplicado
 7. [ ] `docker compose up -d` y verificación **desde afuera** de que 5432 y 8000 están cerrados

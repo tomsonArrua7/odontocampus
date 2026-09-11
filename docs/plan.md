@@ -22,7 +22,7 @@ supone que el anterior está cerrado.
 | Esquema SQL con RLS | Aplicarlo |
 | Script de backup | Instalarlo |
 | Repositorio en `github.com/tomsonArrua7/odontocampus` | — |
-| Dominio `odontocampus.com.ar` | Apuntar el DNS |
+| Dominio + registros en Cloudflare | Delegación en nic.ar |
 | Frontend de cuentas completo (acceso, cifrado, sincronización) | Enchufarlo al servidor |
 | Permutas dadas de baja | — |
 | — | Servidor, SMTP, aplicar el esquema |
@@ -56,9 +56,10 @@ El frontend de cuentas ya está escrito y probado. **Lo único que le falta es l
 - [x] 🙋 Repositorio remoto creado: `github.com/tomsonArrua7/odontocampus`
 - [x] 💻 Primer push
 
-> **Revisar que el repositorio sea privado.** En `public/js/data.js` todavía
-> hay un WhatsApp y un email de ejemplo, y conviene reemplazarlos por los
-> reales antes de abrirlo.
+> **El repositorio es público, y está bien que lo sea:** no contiene ningún
+> secreto. La `ANON_KEY` es pública por diseño y la seguridad descansa en las
+> políticas RLS, no en ocultar el esquema. La regla que no se rompe: **nunca
+> se commitea un `.env`, una clave privada ni datos personales reales.**
 
 ---
 
@@ -90,21 +91,26 @@ por acá.
 Guía completa: [`despliegue-cloudpanel.md`](despliegue-cloudpanel.md).
 
 - [x] DNS: `@`, `www` y `api` apuntando a `179.43.126.185`, en **DNS only**
-- [ ] CloudPanel → **Create a Static HTML Site** para `odontocampus.com.ar`,
-      y después agregarle `www.odontocampus.com.ar` en *Domains*
-- [ ] CloudPanel → **Create a Reverse Proxy** para `api.odontocampus.com.ar`
+- [ ] Delegar el dominio en nic.ar a los nameservers de Cloudflare
+- [x] CloudPanel → **Create a Static HTML Site** para `odontocampus.com.ar`
+- [ ] Agregarle `www.odontocampus.com.ar` en *Domains*
+- [x] CloudPanel → **Create a Reverse Proxy** para `api.odontocampus.com.ar`
       → `http://127.0.0.1:8000`
+- [ ] Raíz del sitio apuntando a `public/`
+- [ ] Repositorio clonado como el usuario del sitio
+- [ ] **Verificar que `.git/config` e `infra/` den 404 desde afuera**
 - [ ] Certificados Let's Encrypt en ambos (después de que el DNS resuelva)
+- [ ] Docker instalado, con rotación de logs
 - [ ] Supabase en `/opt/supabase`
 - [ ] Claves generadas de cero. **Las del `.env.example` son públicas.**
 - [ ] `docker-compose.override.yml` copiado (cierra los puertos)
 - [ ] Firewall: solo 22, 80, 443 y el panel
 - [ ] **Verificar desde afuera** que 5432 y 8000 estén cerrados
 - [ ] Ajustes del vhost de la API (websockets, `client_max_body_size`)
-- [ ] Primer despliegue del sitio
+Actualizar el sitio, de ahí en adelante:
 
 ```bash
-rsync -avz --delete public/ usuario@servidor:/home/USUARIO/htdocs/odontocampus.com.ar/
+cd ~/htdocs/odontocampus.com.ar && git pull --ff-only
 ```
 
 > La verificación desde afuera no es opcional. Si el 5432 quedó abierto, hay
@@ -185,13 +191,15 @@ Menores, pero anotados para que no se pierdan:
 
 ## Empezá por acá
 
-Con el dominio y el repositorio listos, quedan tres pasos tuyos:
+Con los dos sitios creados, en este orden:
 
-1. **Resend → Add domain** `odontocampus.com.ar` y cargar SPF y DKIM. Los
-   registros tardan en propagar: conviene largarlo ya aunque falte el resto.
-2. **Los dos sitios en CloudPanel** (Static HTML Site + Reverse Proxy) y sus
-   certificados.
+1. **Raíz del sitio en `public/` y clonar el repositorio** como el usuario del
+   sitio. Verificar que `.git/config` dé 404.
+2. **Docker** como root, con la rotación de logs antes de levantar nada.
 3. **Supabase** en `/opt/supabase`, con el override de puertos.
+
+En paralelo, porque tardan en propagar: **delegación en nic.ar** y **Resend →
+Add domain** con SPF y DKIM.
 
 La guía completa está en
 [`despliegue-cloudpanel.md`](despliegue-cloudpanel.md).
