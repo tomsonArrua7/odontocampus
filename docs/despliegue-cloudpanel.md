@@ -90,19 +90,25 @@ en *Settings* (solo lo muestran los sitios PHP). La raíz se cambia directamente
 en la configuración de Nginx:
 
 CloudPanel → *Sites → odontocampus.com.ar → **Vhost*** (el editor web, no la
-consola). Buscá la línea:
+consola).
+
+En el editor la raíz **no aparece como una línea `root`**, sino como la marca
+`{{root}}`, que CloudPanel reemplaza al guardar con la carpeta del sitio. Como
+los sitios estáticos no permiten cambiar esa carpeta, se reemplaza la marca por
+la directiva escrita a mano. Buscá:
 
 ```nginx
-root /home/odontocampus/htdocs/odontocampus.com.ar;
+{{root}}
 ```
 
-y dejala así:
+y cambiala por:
 
 ```nginx
 root /home/odontocampus/htdocs/odontocampus.com.ar/public;
 ```
 
-Guardá.
+Guardá. El archivo que Nginx usa de verdad es el que CloudPanel genera en
+`/etc/nginx/sites-enabled/`, y ese es el que se revisa con el `grep` de abajo.
 
 Para confirmar que se aplicó, como root en el servidor:
 
