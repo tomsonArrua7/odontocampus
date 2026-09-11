@@ -99,15 +99,16 @@ Guía completa: [`despliegue-cloudpanel.md`](despliegue-cloudpanel.md).
 - [x] Raíz del sitio apuntando a `public/` (reemplazando la marca `{{root}}` en el Vhost)
 - [x] Regla de Nginx que devuelve 404 para archivos ocultos
 - [x] Repositorio clonado como el usuario del sitio
-- [ ] **Verificar que `.git/config` e `infra/` den 404 desde afuera**
+- [x] **Verificar que `.git/config` e `infra/` den 404 desde afuera**
 - [x] Certificados Let's Encrypt en ambos (después de que el DNS resuelva)
 - [x] Docker instalado, con rotación de logs
 - [ ] Supabase en `/opt/supabase`
-- [ ] Claves con `infra/supabase/generar-claves.sh` (**una sola vez**, antes del primer arranque)
-- [ ] `docker-compose.override.yml` copiado (cierra los puertos)
+- [x] Docker Hub con token de solo lectura (evita el límite de descargas por IP)
+- [x] Claves con `infra/supabase/generar-claves.sh` (**una sola vez**, antes del primer arranque)
+- [x] `docker-compose.override.yml` copiado (cierra los puertos)
 - [ ] Firewall: solo 5469 (SSH), 80, 443 y el panel. **No cierres el 5469**
 - [ ] **Verificar desde afuera** que 5432 y 8000 estén cerrados
-- [ ] Ajustes del vhost de la API (websockets, `client_max_body_size`)
+- [ ] Vhost de la API: sólo `/auth`, `/rest`, `/storage`, `/realtime` y `/functions`
 Actualizar el sitio, de ahí en adelante:
 
 ```bash

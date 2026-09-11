@@ -592,31 +592,75 @@ Nada de 8000, 5432, 3000, 4000.
 
 ---
 
-## 4. Ajustes del proxy inverso
+## 4. Vhost de la API: sólo las rutas de la API
 
-CloudPanel genera un vhost estándar. Para la API hacen falta dos cosas más:
-websockets (Realtime) y cuerpos de subida más grandes (Storage).
+El gateway de Supabase no sirve solamente la API. En la misma dirección también
+responde:
 
-En **Sites → api.odontocampus.com.ar → Vhost**, dentro del `location /`:
+| Ruta | Qué es |
+|---|---|
+| `/` | El panel de Supabase (Studio), protegido sólo con usuario y contraseña |
+| `/pg/` | postgres-meta: ejecuta SQL sobre la base (pide la clave de servicio) |
+| `/mcp`, `/api/mcp` | Servidor MCP para agentes de inteligencia artificial |
+| `/graphql/v1` | GraphQL sobre la base |
+
+Nada de eso tiene que ser alcanzable desde internet. El Vhost que genera
+CloudPanel para un *Reverse Proxy* manda **todo** al gateway, así que se cambia
+para que pasen sólo las cinco rutas que usa, o va a usar, el sitio.
+
+En CloudPanel → *Sites → api.odontocampus.com.ar → Vhost*, reemplazar los dos
+últimos bloques:
 
 ```nginx
-client_max_body_size 50m;
+  location ^~ /.well-known {
+    auth_basic off;
+    allow all;
+    try_files $uri @reverse_proxy;
+  }
 
-proxy_http_version 1.1;
-proxy_set_header Host              $host;
-proxy_set_header X-Real-IP         $remote_addr;
-proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-proxy_set_header X-Forwarded-Proto $scheme;
-
-proxy_read_timeout    300s;
-proxy_connect_timeout 60s;
-proxy_buffering       off;   # necesario para Realtime
+  location / {
+    try_files $uri @reverse_proxy;
+  }
 ```
 
-**No agregues cabeceras CORS en Nginx.** Kong ya las emite; duplicarlas produce
-un `Access-Control-Allow-Origin` doble y el navegador rechaza *todas* las
-respuestas. Es un error difícil de diagnosticar porque el error del navegador no
-dice que el problema es la duplicación.
+por:
+
+```nginx
+  # Let's Encrypt: sólo archivos locales. No se reenvía nada al gateway.
+  location ^~ /.well-known {
+    auth_basic off;
+    allow all;
+    try_files $uri =404;
+  }
+
+  # Las únicas rutas que llegan a Supabase.
+  location ~ ^/(auth|rest|storage|realtime|functions)/v1/ {
+    client_max_body_size 50m;
+    try_files $uri @reverse_proxy;
+  }
+
+  # Todo lo demás (panel, SQL, MCP, GraphQL) no existe desde afuera.
+  location / {
+    return 404;
+  }
+```
+
+No se toca `location @reverse_proxy` ni ninguna marca `{{...}}`.
+
+**No agregues cabeceras CORS en Nginx.** El gateway ya las emite para cualquier
+origen. Duplicarlas produce un `Access-Control-Allow-Origin` doble y el
+navegador rechaza *todas* las respuestas, con un error que no menciona la
+duplicación.
+
+### Verificación, con Supabase levantado
+
+```bash
+curl.exe -skI https://api.odontocampus.com.ar/
+curl.exe -skI https://api.odontocampus.com.ar/pg/
+curl.exe -sk https://api.odontocampus.com.ar/auth/v1/health -H "apikey: TU_CLAVE_PUBLICABLE"
+```
+
+Las dos primeras, `404`. La tercera tiene que devolver un JSON de GoTrue.
 
 ### Studio, por túnel SSH
 
