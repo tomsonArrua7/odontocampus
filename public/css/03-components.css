@@ -349,7 +349,7 @@
    ========================================================================== */
 .card,
 .news-card, .hc-card, .biblio-card, .bolsa-card,
-.guia-card, .mesa-card, .revalida-card {
+.guia-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -363,7 +363,7 @@
 
 .card:hover,
 .news-card:hover, .hc-card:hover, .biblio-card:hover, .bolsa-card:hover,
-.guia-card:hover, .mesa-card:hover, .revalida-card:hover {
+.guia-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-lg);
   border-color: var(--accent);

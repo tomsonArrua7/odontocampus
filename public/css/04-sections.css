@@ -601,33 +601,45 @@
 }
 
 /* --- Agrupación por día ---
-   83 tarjetas en una sola lista es una pared. Agrupadas por jornada, cada
-   bloque es una unidad que se puede recorrer o saltear. --- */
-.day-group { margin-bottom: var(--sp-8); }
-.day-group-header {
+   83 llamados en una sola lista son una pared. Agrupados por jornada, cada
+   bloque es una unidad que se puede recorrer o saltear. La banda imita el
+   encabezado de jornada de un programa impreso: día, cuánto falta y cuántos
+   llamados hay. --- */
+.day-group { margin-bottom: var(--sp-10); }
+
+.banda-dia {
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  margin-bottom: var(--sp-4);
-  padding-bottom: var(--sp-2);
-  border-bottom: 2px solid var(--border);
+  margin-bottom: var(--sp-1);
   flex-wrap: wrap;
 }
-.day-group-header h3 {
-  font-size: var(--fs-xl);
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
+.banda-dia h3 {
+  font-family: var(--font-heading);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-black);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-titulo);
 }
-.day-group-header h3 i { color: var(--accent-text); }
-.day-group-count {
+.banda-regla {
+  flex: 1;
+  min-width: 24px;
+  height: 2px;
+  background: var(--text);
+  opacity: 0.16;
+}
+.banda-cuando {
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
-  background: var(--surface-3);
-  color: var(--text-muted);
-  padding: 2px 10px;
-  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  background: var(--accent);
+  color: var(--accent-on);
+  padding: 4px 9px;
+  border-radius: var(--radius-xs);
 }
+.banda-cuando.es-pasado { background: var(--neutral-bg); color: var(--neutral-text); }
+.banda-cuenta { font-size: var(--fs-xs); font-weight: var(--fw-semi); color: var(--text-soft); }
 
 /* Jornadas ya cumplidas: se conservan, pero atenuadas y sin competir por la
    atención con las que todavía importan. Recuperan opacidad al pasar el mouse
@@ -635,58 +647,86 @@
 .day-group-pasado { opacity: 0.55; }
 .day-group-pasado:hover,
 .day-group-pasado:focus-within { opacity: 1; }
-.day-group-pasado .day-group-header h3 { color: var(--text-muted); }
-.day-group-pasado .day-group-header h3 i { color: var(--text-soft); }
+.day-group-pasado .banda-dia h3 { color: var(--text-muted); }
 
-/* --- Tarjeta de mesa / reválida --- */
-.mesa-card, .revalida-card { padding-top: var(--sp-5); }
-.mesa-card::before, .revalida-card::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 4px;
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  background: var(--accent);
-}
-.mesa-card-zoom::before { background: var(--info); }
-.mesa-card-presencial::before { background: var(--accent); }
-.card-revalida::before { background: var(--accent); }
-.card-actualizacion::before { background: #F59E0B; }
+/* --- Filas de llamados ---
+   Una lista es una lista: una regla gruesa arriba y reglas finas entre filas,
+   en lugar de una tarjeta con borde y sombra por cada mesa. Dentro de una
+   jornada la fecha ya la dijo la banda, así que la fila arranca con la hora,
+   que es lo que se busca cuando el día ya se sabe. --- */
+.lista-llamados { border-top: 2px solid var(--text); }
 
-.mesa-card-header, .revalida-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--sp-3);
-  gap: var(--sp-2);
-  flex-wrap: wrap;
+.fila-llamado {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr) auto;
+  gap: var(--sp-4);
+  align-items: start;
+  padding: var(--sp-4) var(--sp-3) var(--sp-4) 0;
+  border-bottom: 1px solid var(--border);
+  transition: background-color var(--dur) var(--ease);
 }
-.mesa-title, .revalida-materia {
-  font-size: var(--fs-lg);
-  margin-bottom: var(--sp-3);
-  line-height: var(--lh-snug);
-}
-.mesa-time-row {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-  font-size: var(--fs-base);
+.fila-llamado:hover { background: var(--surface-2); }
+
+.llamado-hora {
+  font-family: var(--font-mono);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-medium);
   color: var(--text-strong);
-  margin-bottom: var(--sp-4);
-  background: var(--surface-2);
-  padding: var(--sp-2) var(--sp-3);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  flex-wrap: wrap;
+  background: var(--surface-3);
+  border-radius: var(--radius-xs);
+  padding: var(--sp-2) var(--sp-1);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
 }
-.mesa-time-row i { color: var(--accent-text); }
+/* Sin hora confirmada: se dice, no se deja en blanco ni se inventa. */
+.llamado-hora.hora-incierta {
+  font-family: var(--font-body);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  background: var(--warning-bg);
+  color: var(--warning);
+}
 
+.llamado-tipo {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-etiqueta);
+  color: var(--accent-text);
+  margin-bottom: 2px;
+}
+.llamado-tipo.es-actualizacion { color: var(--warning); }
+
+.llamado-materia { font-size: var(--fs-lg); line-height: var(--lh-snug); }
+.llamado-meta { font-size: var(--fs-sm); color: var(--text-muted); margin-top: var(--sp-1); }
+
+.etiqueta-modalidad {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  padding: 5px 10px;
+  border-radius: var(--radius-xs);
+  white-space: nowrap;
+}
+.etiqueta-modalidad.es-aula { background: var(--success-bg); color: var(--success); }
+.etiqueta-modalidad.es-zoom { background: var(--info-bg); color: var(--info); }
+
+/* Los datos de Zoom viven dentro de la fila, con una barra azul al costado:
+   son un apartado técnico, no el contenido principal de la fila. */
 .zoom-box {
   background: var(--surface-2);
-  border: 1px solid var(--info-border);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--info);
+  border-radius: var(--radius-sm);
   padding: var(--sp-3);
-  margin-top: auto;
+  margin-top: var(--sp-3);
+  max-width: 460px;
 }
 .zoom-box-header {
   font-size: var(--fs-xs);
@@ -744,20 +784,6 @@
   transition: var(--transition);
 }
 .btn-zoom-join:hover { background: #1D4ED8; color: #fff; text-decoration: none; }
-
-.presencial-box {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: var(--sp-3);
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  font-size: var(--fs-base);
-  color: var(--text-strong);
-  margin-top: auto;
-}
-.presencial-box i { color: var(--accent-text); flex-shrink: 0; }
 
 /* ==========================================================================
    CURSADA · historias clínicas, instrumental, bolsa

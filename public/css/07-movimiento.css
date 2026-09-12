@@ -41,8 +41,7 @@
   .next-item,
   .fecha-item,
   .news-card,
-  .mesa-card,
-  .revalida-card,
+  .fila-llamado,
   .hc-card,
   .biblio-card,
   .bolsa-card,
@@ -54,22 +53,22 @@
   /* El escalonado se corta en la octava: más allá, la última ficha tardaría
      en aparecer y parecería que la página se colgó. */
   .next-item:nth-child(2),  .fecha-item:nth-child(2),  .news-card:nth-child(2),
-  .mesa-card:nth-child(2),  .revalida-card:nth-child(2), .hc-card:nth-child(2),
+  .fila-llamado:nth-child(2), .hc-card:nth-child(2),
   .biblio-card:nth-child(2), .bolsa-card:nth-child(2), .guia-card:nth-child(2),
   .search-result-item:nth-child(2) { animation-delay: 30ms; }
 
   .next-item:nth-child(3),  .fecha-item:nth-child(3),  .news-card:nth-child(3),
-  .mesa-card:nth-child(3),  .revalida-card:nth-child(3), .hc-card:nth-child(3),
+  .fila-llamado:nth-child(3), .hc-card:nth-child(3),
   .biblio-card:nth-child(3), .bolsa-card:nth-child(3), .guia-card:nth-child(3),
   .search-result-item:nth-child(3) { animation-delay: 60ms; }
 
   .next-item:nth-child(4),  .fecha-item:nth-child(4),  .news-card:nth-child(4),
-  .mesa-card:nth-child(4),  .revalida-card:nth-child(4), .hc-card:nth-child(4),
+  .fila-llamado:nth-child(4), .hc-card:nth-child(4),
   .biblio-card:nth-child(4), .bolsa-card:nth-child(4), .guia-card:nth-child(4),
   .search-result-item:nth-child(4) { animation-delay: 90ms; }
 
   .next-item:nth-child(n+5),  .fecha-item:nth-child(n+5),  .news-card:nth-child(n+5),
-  .mesa-card:nth-child(n+5),  .revalida-card:nth-child(n+5), .hc-card:nth-child(n+5),
+  .fila-llamado:nth-child(n+5), .hc-card:nth-child(n+5),
   .biblio-card:nth-child(n+5), .bolsa-card:nth-child(n+5), .guia-card:nth-child(n+5),
   .search-result-item:nth-child(n+5) { animation-delay: 120ms; }
 
@@ -87,10 +86,11 @@
   .btn:hover:not([disabled]) { transform: translateY(-1px); }
   .btn:active:not([disabled]) { transform: translateY(0) scale(0.985); transition-duration: var(--dur-fast); }
 
+  /* Las filas de llamados no se levantan: cambian de fondo. Levantar una
+     fila dentro de una lista con reglas rompe la alineación con las de al
+     lado. */
   .next-item:hover,
   .news-card:hover,
-  .mesa-card:hover,
-  .revalida-card:hover,
   .hc-card:hover,
   .biblio-card:hover,
   .bolsa-card:hover,

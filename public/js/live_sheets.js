@@ -528,12 +528,13 @@
 
         return (
           '<section class="day-group' + (yaPaso ? " day-group-pasado" : "") + '">' +
-            '<div class="day-group-header">' +
-              '<h3><i class="fa-solid fa-calendar-day" aria-hidden="true"></i> ' + esc(entrada.dia) + "</h3>" +
+            '<div class="banda-dia">' +
+              "<h3>" + esc(entrada.dia) + "</h3>" +
               (cuando
-                ? '<span class="' + (yaPaso ? "day-group-count" : "badge-materia-anio") + '">' + esc(cuando) + "</span>"
+                ? '<span class="banda-cuando' + (yaPaso ? " es-pasado" : "") + '">' + esc(cuando) + "</span>"
                 : "") +
-              '<span class="day-group-count">' + esc(UI.plural(items.length, "llamado")) + "</span>" +
+              '<span class="banda-regla" aria-hidden="true"></span>' +
+              '<span class="banda-cuenta">' + esc(UI.plural(items.length, "llamado")) + "</span>" +
             "</div>" +
             (yaPaso && hayFuturos && entrada === pasados[0]
               ? '<p class="filter-note" style="margin-bottom:var(--sp-4)">' +
@@ -541,7 +542,7 @@
                   "<span>De acá para abajo son jornadas que ya pasaron. Quedan por si necesitás consultarlas.</span>" +
                 "</p>"
               : "") +
-            '<div class="grid-cards">' +
+            '<div class="lista-llamados">' +
               items.map(function (item) { return plantilla.call(ctx, item); }).join("") +
             "</div>" +
           "</section>"
@@ -549,24 +550,58 @@
       }).join("");
     },
 
+    /* La hora manda en la fila: es el dato que se busca cuando ya se sabe el
+       día. Va en monoespaciada para que las columnas no bailen. */
+    bloqueHora: function (hora) {
+      var limpio = String(hora || "").trim();
+      var tieneHora = /\d/.test(limpio);
+      return '<p class="llamado-hora' + (tieneHora ? "" : " hora-incierta") + '">' +
+        esc(tieneHora ? limpio : "A confirmar") + "</p>";
+    },
+
+    /* Modalidad y lugar en una sola línea. Antes el aula vivía en un recuadro
+       aparte que repetía la palabra "Presencial", ya dicha en la etiqueta.
+
+       Con Zoom se omite: la etiqueta de la derecha ya lo dice y los datos de
+       la sala están abajo. Repetir "Zoom" tres veces en la misma fila es
+       ruido, no información. */
+    metaLlamado: function (item, esZoom) {
+      var partes = [];
+      var modalidad = String(item.modalidad || "").trim();
+      var lugar = String(item.acceso || item.modalidadRaw || "").trim();
+      var soloZoom = esZoom && UI.normalizar(modalidad) === "zoom";
+
+      if (modalidad && !soloZoom) partes.push(modalidad);
+      if (!esZoom && lugar && UI.normalizar(lugar) !== UI.normalizar(modalidad)) {
+        partes.push(lugar);
+      }
+      if (!partes.length && !esZoom) partes.push("Presencial en la cátedra");
+      return partes.join(" · ");
+    },
+
+    /* Una línea vacía no se dibuja: dejaría un hueco en la fila. */
+    lineaMeta: function (item, esZoom) {
+      var meta = this.metaLlamado(item, esZoom);
+      return meta ? '<p class="llamado-meta">' + esc(meta) + "</p>" : "";
+    },
+
+    etiquetaModalidad: function (esZoom) {
+      return '<span class="etiqueta-modalidad ' + (esZoom ? "es-zoom" : "es-aula") + '">' +
+        (esZoom ? "Zoom" : "Presencial") + "</span>";
+    },
+
     tarjetaMesa: function (mesa) {
       var esZoom = UI.normalizar(mesa.modalidad).indexOf("zoom") !== -1;
 
       return (
-        '<article class="mesa-card ' + (esZoom ? "mesa-card-zoom" : "mesa-card-presencial") + '">' +
-          '<div class="mesa-card-header">' +
-            '<span class="mesa-day-badge"><i class="fa-solid fa-calendar-day" aria-hidden="true"></i> ' + esc(mesa.dia) + "</span>" +
-            '<span class="badge-modalidad ' + (esZoom ? "mod-zoom" : "mod-presencial") + '">' +
-              '<i class="fa-solid ' + (esZoom ? "fa-video" : "fa-building-columns") + '" aria-hidden="true"></i> ' +
-              esc(mesa.modalidad) +
-            "</span>" +
+        '<article class="fila-llamado">' +
+          this.bloqueHora(mesa.hora) +
+          '<div class="llamado-que">' +
+            '<h4 class="llamado-materia">' + esc(mesa.materiaOriginal) + "</h4>" +
+            this.lineaMeta(mesa, esZoom) +
+            (esZoom ? this.bloqueZoom(mesa, "Datos de acceso") : "") +
           "</div>" +
-          '<h4 class="mesa-title">' + esc(mesa.materiaOriginal) + "</h4>" +
-          '<p class="mesa-time-row">' +
-            '<i class="fa-solid fa-clock" aria-hidden="true"></i>' +
-            "<strong>Horario:</strong> <span>" + esc(mesa.hora) + "</span>" +
-          "</p>" +
-          (esZoom ? this.bloqueZoom(mesa, "Datos de acceso") : this.bloquePresencial(mesa)) +
+          this.etiquetaModalidad(esZoom) +
         "</article>"
       );
     },
@@ -576,23 +611,17 @@
       var esActualizacion = item.tipo === "actualizacion";
 
       return (
-        '<article class="revalida-card ' + (esActualizacion ? "card-actualizacion" : "card-revalida") + '">' +
-          '<div class="revalida-card-header">' +
-            '<span class="badge-tipo-tramite ' + (esActualizacion ? "tipo-actualizacion" : "tipo-revalida") + '">' +
-              '<i class="fa-solid ' + (esActualizacion ? "fa-arrows-rotate" : "fa-certificate") + '" aria-hidden="true"></i> ' +
+        '<article class="fila-llamado">' +
+          this.bloqueHora(item.hora) +
+          '<div class="llamado-que">' +
+            '<p class="llamado-tipo' + (esActualizacion ? " es-actualizacion" : "") + '">' +
               (esActualizacion ? "Actualización" : "Reválida") +
-            "</span>" +
-            '<span class="badge-modalidad ' + (esZoom ? "mod-zoom" : "mod-presencial") + '">' +
-              '<i class="fa-solid ' + (esZoom ? "fa-video" : "fa-building-columns") + '" aria-hidden="true"></i> ' +
-              esc(item.modalidad) +
-            "</span>" +
+            "</p>" +
+            '<h4 class="llamado-materia">' + esc(item.materiaOriginal) + "</h4>" +
+            this.lineaMeta(item, esZoom) +
+            (esZoom ? this.bloqueZoom(item, "Sala de la evaluación") : "") +
           "</div>" +
-          '<h4 class="revalida-materia">' + esc(item.materiaOriginal) + "</h4>" +
-          '<p class="mesa-time-row">' +
-            '<i class="fa-solid fa-clock" aria-hidden="true"></i>' +
-            "<strong>Horario:</strong> <span>" + esc(item.hora) + "</span>" +
-          "</p>" +
-          (esZoom ? this.bloqueZoom(item, "Sala de la evaluación") : this.bloquePresencial(item)) +
+          this.etiquetaModalidad(esZoom) +
         "</article>"
       );
     },
@@ -629,16 +658,6 @@
               "</a>"
             : "") +
         "</div>"
-      );
-    },
-
-    bloquePresencial: function (item) {
-      var lugar = item.acceso || item.modalidadRaw || "Presencial en la cátedra";
-      return (
-        '<p class="presencial-box">' +
-          '<i class="fa-solid fa-location-dot" aria-hidden="true"></i>' +
-          "<span><strong>Dónde:</strong> " + esc(lugar) + "</span>" +
-        "</p>"
       );
     },
 

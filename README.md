@@ -344,6 +344,12 @@ El filtro de días se arma solo con los días que la planilla realmente trae.
   de antibióticos a estudiantes que atienden pacientes reales.
 - **Las jornadas ya pasadas van al final y atenuadas**, no arriba. Se conservan
   para consulta, pero no compiten con lo que todavía importa.
+- **Las mesas y reválidas son filas, no tarjetas.** Una lista de 83 llamados en
+  tarjetas con borde y sombra es un mosaico donde todo pesa igual. En filas, la
+  banda del día ordena y la hora —en monoespaciada, alineada— es lo primero que
+  se lee, que es lo que se busca cuando el día ya se sabe. Cada dato aparece
+  **una sola vez** por fila: si la etiqueta dice "Zoom", la línea de abajo no lo
+  repite.
 - **El promedio no inventa notas.** Al marcar una materia como aprobada, la
   versión anterior le asignaba un 7 por defecto. Ahora se pide la nota real.
 - **El pie de página aclara que ante una diferencia vale lo que publica la

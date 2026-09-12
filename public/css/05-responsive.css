@@ -32,8 +32,6 @@
   .hero-banner { padding: var(--sp-8) 0; }
   .hero-cta-group .btn { flex: 1 1 100%; }
 
-  .quick-hub-grid { grid-template-columns: 1fr; }
-
   .section-header { margin: var(--sp-8) 0 var(--sp-5); }
 
   .calc-stats-grid { grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
@@ -52,6 +50,19 @@
   .grid-cards, .skeleton-grid {
     grid-template-columns: 1fr;
   }
+
+  /* La fila de un llamado pasa a dos columnas: la hora al costado y, debajo
+     del texto, la etiqueta de modalidad. En 375 px, con tres columnas el
+     nombre de la materia quedaba partido en cuatro líneas. */
+  .fila-llamado {
+    grid-template-columns: 76px minmax(0, 1fr);
+    grid-template-areas: "hora texto" ".    etiqueta";
+    gap: var(--sp-3);
+    row-gap: var(--sp-2);
+  }
+  .llamado-hora { grid-area: hora; }
+  .llamado-que { grid-area: texto; }
+  .etiqueta-modalidad { grid-area: etiqueta; justify-self: start; }
 
   .fecha-item { flex-direction: column; align-items: stretch; gap: var(--sp-3); }
   .fecha-date-badge { width: 100%; min-width: 0; justify-content: center; }
@@ -106,9 +117,8 @@
   .news-footer { flex-direction: column; align-items: stretch; }
   .news-footer .btn { width: 100%; }
 
-  .day-group-header { gap: var(--sp-2); }
-  .mesa-card, .revalida-card, .card,
-  .news-card, .hc-card, .biblio-card, .bolsa-card,
+  .banda-dia { gap: var(--sp-2); }
+  .card, .news-card, .hc-card, .biblio-card, .bolsa-card,
   .guia-card { padding: var(--sp-4); }
 }
 
@@ -125,5 +135,6 @@
     --text-muted: var(--gray-700);
   }
   .card, .news-card, .hc-card, .biblio-card, .bolsa-card,
-  .guia-card, .mesa-card, .revalida-card { border-width: 2px; }
+  .guia-card { border-width: 2px; }
+  .fila-llamado { border-bottom-width: 2px; }
 }
