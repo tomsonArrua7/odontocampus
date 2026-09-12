@@ -1,0 +1,163 @@
+/* ==========================================================================
+   ODONTOCAMPUS — 07 · MOVIMIENTO
+   --------------------------------------------------------------------------
+   Tres reglas, y no hay una cuarta:
+
+   1. El movimiento explica, no decora. Entra lo que acaba de aparecer, se
+      hunde lo que se acaba de apretar, se desliza lo que cambió de lugar.
+   2. Corto: entre 120 y 420 ms. Arriba de medio segundo, en un pasillo y con
+      mala señal, deja de sentirse "cuidado" y empieza a sentirse lento.
+   3. Todo este archivo vive dentro de `prefers-reduced-motion: no-preference`.
+      Quien pidió menos animación —por mareo, por migraña, por batería— ve el
+      sitio exactamente igual, quieto. No es una concesión: para algunas
+      personas el movimiento es un síntoma, no un adorno.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+
+  /* ------------------------------------------------------------------------
+     ENTRADAS
+     --------------------------------------------------------------------- */
+  @keyframes oc-subir {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  @keyframes oc-aparecer {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* Cambio de sección: la portada y el contenido entran juntos, apenas
+     desfasados. Sin esto, navegar se siente como un corte de película. */
+  .app-section.active > .hero-banner,
+  .app-section.active > .container {
+    animation: oc-subir var(--dur-entrada) var(--ease-entrada) both;
+  }
+  .app-section.active > .container { animation-delay: 60ms; }
+
+  /* Listas y grillas: cada ficha entra escalonada. Se dispara también al
+     filtrar, así el filtro se siente aplicado y no "pestañeado". */
+  .next-item,
+  .fecha-item,
+  .news-card,
+  .mesa-card,
+  .revalida-card,
+  .hc-card,
+  .biblio-card,
+  .bolsa-card,
+  .guia-card,
+  .calculator-year-card,
+  .search-result-item {
+    animation: oc-subir var(--dur) var(--ease-entrada) both;
+  }
+  /* El escalonado se corta en la octava: más allá, la última ficha tardaría
+     en aparecer y parecería que la página se colgó. */
+  .next-item:nth-child(2),  .fecha-item:nth-child(2),  .news-card:nth-child(2),
+  .mesa-card:nth-child(2),  .revalida-card:nth-child(2), .hc-card:nth-child(2),
+  .biblio-card:nth-child(2), .bolsa-card:nth-child(2), .guia-card:nth-child(2),
+  .search-result-item:nth-child(2) { animation-delay: 30ms; }
+
+  .next-item:nth-child(3),  .fecha-item:nth-child(3),  .news-card:nth-child(3),
+  .mesa-card:nth-child(3),  .revalida-card:nth-child(3), .hc-card:nth-child(3),
+  .biblio-card:nth-child(3), .bolsa-card:nth-child(3), .guia-card:nth-child(3),
+  .search-result-item:nth-child(3) { animation-delay: 60ms; }
+
+  .next-item:nth-child(4),  .fecha-item:nth-child(4),  .news-card:nth-child(4),
+  .mesa-card:nth-child(4),  .revalida-card:nth-child(4), .hc-card:nth-child(4),
+  .biblio-card:nth-child(4), .bolsa-card:nth-child(4), .guia-card:nth-child(4),
+  .search-result-item:nth-child(4) { animation-delay: 90ms; }
+
+  .next-item:nth-child(n+5),  .fecha-item:nth-child(n+5),  .news-card:nth-child(n+5),
+  .mesa-card:nth-child(n+5),  .revalida-card:nth-child(n+5), .hc-card:nth-child(n+5),
+  .biblio-card:nth-child(n+5), .bolsa-card:nth-child(n+5), .guia-card:nth-child(n+5),
+  .search-result-item:nth-child(n+5) { animation-delay: 120ms; }
+
+  /* ------------------------------------------------------------------------
+     RESPUESTA AL TOQUE
+     El detalle que más "profesional" hace sentir una interfaz no es una
+     animación vistosa: es que cada cosa que se aprieta responda al instante.
+     --------------------------------------------------------------------- */
+  .btn,
+  .btn-cuenta,
+  .sugg-chip,
+  .theme-toggle,
+  .btn-search-trigger { will-change: transform; }
+
+  .btn:hover:not([disabled]) { transform: translateY(-1px); }
+  .btn:active:not([disabled]) { transform: translateY(0) scale(0.985); transition-duration: var(--dur-fast); }
+
+  .next-item:hover,
+  .news-card:hover,
+  .mesa-card:hover,
+  .revalida-card:hover,
+  .hc-card:hover,
+  .biblio-card:hover,
+  .bolsa-card:hover,
+  .guia-card:hover {
+    transform: translateY(-2px);
+  }
+
+  /* ------------------------------------------------------------------------
+     ENCABEZADO AL DESPLAZAR
+     Al bajar, el encabezado se compacta y despega una sombra: da la pista de
+     que hay contenido arriba sin ocupar lugar. La clase la pone js/app.js.
+     --------------------------------------------------------------------- */
+  .main-header {
+    transition: box-shadow var(--dur) var(--ease), background-color var(--dur) var(--ease);
+  }
+  .main-header .navbar { transition: min-height var(--dur-slow) var(--ease); }
+  .main-header.desplazado { box-shadow: var(--shadow-lg); }
+  .main-header.desplazado .navbar { min-height: 62px; }
+
+  /* ------------------------------------------------------------------------
+     MODALES Y AVISOS
+     --------------------------------------------------------------------- */
+  @keyframes oc-modal {
+    from { opacity: 0; transform: translateY(14px) scale(0.985); }
+    to   { opacity: 1; transform: none; }
+  }
+  .modal-overlay.active { animation: oc-aparecer var(--dur-fast) var(--ease) both; }
+  .modal-overlay.active .modal-card {
+    animation: oc-modal 280ms var(--ease-resorte) both;
+  }
+
+  /* ------------------------------------------------------------------------
+     BARRAS Y NÚMEROS
+     --------------------------------------------------------------------- */
+  .progress-bar { transition: width var(--dur-slow) var(--ease-entrada); }
+
+  /* Cuenta regresiva del promedio: el valor lo anima js/calculator.js.
+     Acá sólo se evita que el número "salte" de tamaño mientras cambia. */
+  .stat-value,
+  .promedio-cifra { font-variant-numeric: tabular-nums; }
+
+  /* Carga: el esqueleto respira en lugar de parpadear. */
+  @keyframes oc-latido {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.55; }
+  }
+  .skeleton-card,
+  .skeleton-line { animation: oc-latido 1.4s var(--ease) infinite; }
+
+  /* ------------------------------------------------------------------------
+     PESTAÑAS
+     La pestaña activa arrastra su subrayado en lugar de aparecer de golpe.
+     --------------------------------------------------------------------- */
+  .tab-btn { transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease); }
+  .tab-btn::after { transition: transform var(--dur) var(--ease-entrada), opacity var(--dur) var(--ease); }
+}
+
+/* --------------------------------------------------------------------------
+   Sin excepciones: si el sistema pide menos movimiento, nada se mueve.
+   (02-base.css ya anula transiciones; esto cubre también las animaciones de
+   los elementos que se insertan por JavaScript.)
+   ----------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

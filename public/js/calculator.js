@@ -32,6 +32,51 @@
     return Math.min(MAX_APLAZOS, Math.max(0, parseInt(valor, 10) || 0));
   }
 
+  /* En castellano el separador decimal es la coma. Un promedio "7.84" delata
+     que el número salió de un programa y no de una libreta. */
+  function formatear(numero, decimales) {
+    return numero.toFixed(decimales).replace(".", ",");
+  }
+
+  /**
+   * Los números del promedio no saltan: cuentan hasta el valor nuevo.
+   *
+   * Es el detalle que convierte "cargué una nota" en "pasó algo". Dura menos
+   * de medio segundo y se apaga por completo si el sistema pide menos
+   * movimiento, donde el número se escribe directo.
+   */
+  var animaciones = {};
+
+  function animarNumero(id, valor, decimales, sufijo) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    sufijo = sufijo || "";
+
+    var destino = parseFloat(valor) || 0;
+    var desde = parseFloat(String(el.textContent).replace("%", "").replace(",", ".")) || 0;
+    var quieto = global.matchMedia &&
+                 global.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (quieto || desde === destino) {
+      el.textContent = formatear(destino, decimales) + sufijo;
+      return;
+    }
+
+    global.cancelAnimationFrame(animaciones[id]);
+    var inicio = null;
+    var duracion = 420;
+
+    function paso(ahora) {
+      if (inicio === null) inicio = ahora;
+      var avance = Math.min(1, (ahora - inicio) / duracion);
+      var suave = 1 - Math.pow(1 - avance, 3);
+      el.textContent = formatear(desde + (destino - desde) * suave, decimales) + sufijo;
+      if (avance < 1) animaciones[id] = global.requestAnimationFrame(paso);
+    }
+
+    animaciones[id] = global.requestAnimationFrame(paso);
+  }
+
   var OdontoCalculator = {
     filtroAnio: "todos",
 
@@ -333,11 +378,11 @@
         if (el) el.textContent = texto;
       }
 
-      set("calc-promedio-sin-aplazos", m.promedioSinAplazos);
-      set("calc-promedio-con-aplazos", m.promedioConAplazos);
+      animarNumero("calc-promedio-sin-aplazos", m.promedioSinAplazos, 2);
+      animarNumero("calc-promedio-con-aplazos", m.promedioConAplazos, 2);
+      animarNumero("calc-avance-porcentaje", m.porcentajeAvance, 0, "%");
       set("calc-materias-aprobadas", m.aprobadasCount + " / " + m.totalMaterias);
       set("calc-materias-regulares", String(m.regularesCount));
-      set("calc-avance-porcentaje", m.porcentajeAvance + "%");
 
       var barra = document.getElementById("calc-barra-progreso");
       if (barra) barra.style.width = m.porcentajeAvance + "%";

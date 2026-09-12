@@ -60,6 +60,7 @@ public/               EL SITIO. Es exactamente lo que se copia a htdocs/
     04-sections.css   Encabezado, hero, y cada sección de la aplicación
     05-responsive.css Puntos de corte, alto contraste
     06-cuentas.css    Acceso, panel de cuenta, entrada a Mi promedio
+    07-movimiento.css Animaciones, todas dentro de prefers-reduced-motion
   js/
     config.js         URL de la API y clave pública. Lo único que cambia por entorno
     core.js           Núcleo: escapado, DOM, acciones, modales, pestañas, tema, fechas
@@ -114,21 +115,41 @@ Si necesitás un valor nuevo, agregá un token; no escribas un `#hex` suelto en
 otro archivo. Es la única forma de que el tema oscuro siga funcionando y de que
 el conjunto no se desarme con el tiempo.
 
+La dirección visual es **"cartel de facultad"**: el lenguaje del hall —tinta
+plana, fotocopia, tipografía condensada— puesto en un sistema.
+
 ### Color
 
-- `--accent` (#E6007E) para superficies y fondos.
-- `--accent-text` (#C4006B) para **texto y enlaces**: el magenta institucional
-  sobre blanco da 4.5:1, justo en el límite de AA. La variante oscura da 5.9:1 y
-  se lee cómoda en párrafo largo.
-- `--brand-surface` para las superficies oscuras de marca (encabezado, hero,
-  pie, panel del promedio). Siguen oscuras en ambos temas: son la firma visual.
-- Estados: `--success`, `--warning`, `--danger`, `--info`, cada uno con su `-bg`.
+- El fondo es **papel** (`--papel-100`, un crema tibio), no blanco de
+  aplicación. Baja el brillo en la lectura nocturna y saca la sensación de
+  plantilla.
+- El magenta tiene **dos valores y no se mezclan**: `--accent` (#E6007E) sólo
+  como **fondo** con texto blanco encima (4,6:1), y `--accent-text` (#B8005F)
+  sólo para **texto** sobre papel (5,8:1). Sobre azul va
+  `--on-brand-accent` (#FF8FC5, 8:1). El magenta pleno como texto sobre blanco
+  no alcanza el mínimo de contraste: era el error de la versión anterior.
+- `--brand-surface` para las superficies oscuras de marca (encabezado,
+  portada, pie, panel del promedio). Siguen oscuras en ambos temas: son la
+  firma visual.
+- Estados apagados a propósito: `--success`, `--warning`, `--danger`, `--info`,
+  cada uno con su `-bg`. **Un aplazo no se pinta de rojo**: es información, no
+  una emergencia. El rojo queda para lo irreversible.
+- Las esquinas son casi rectas (`--radius-sm` = 3px) y las sombras casi planas:
+  el afiche separa con bloques y reglas, no con relieve.
 
 ### Tipografía
+
+**Archivo** (Omnibus-Type, Buenos Aires) para títulos: está hecha para
+impresos institucionales y aguanta el peso 800 en mayúsculas. **Inter** para
+leer. **IBM Plex Mono** para códigos de materia y numeración.
 
 Escala de `--fs-xs` (13px) a `--fs-5xl`. **El piso es 13px.** La versión
 anterior bajaba a 11px en insignias y metadatos: ilegible en un celular, en un
 pasillo, con poca luz.
+
+**Mayúsculas: sólo en títulos de hasta seis palabras, etiquetas y botones.**
+Nunca en un párrafo ni en el nombre de una materia: en texto corrido las
+mayúsculas bajan la velocidad de lectura.
 
 ### Tema oscuro
 
@@ -138,7 +159,17 @@ aplica el tema antes del primer pintado para que no haya destello blanco.
 
 ### Movimiento
 
-Todas las animaciones se anulan bajo `prefers-reduced-motion: reduce`.
+Todo vive en `css/07-movimiento.css`, dentro de
+`prefers-reduced-motion: no-preference`: quien pidió menos animación ve el
+sitio igual, quieto. El movimiento explica (entra lo que apareció, se hunde lo
+que se apretó) y dura entre 120 y 420 ms.
+
+**Dos cosas que no se usan sobre las bandas de marca:** `mix-blend-mode` y
+`mask-image`. Las dos crean una capa compuesta aparte y, dentro de un elemento
+`position: sticky`, Chromium termina pintando el encabezado corrido al
+desplazar. El grano va como capa de `background-image` (con la opacidad dentro
+del SVG) y el difuminado de la trama se pinta con un radial del color de la
+banda.
 
 ---
 

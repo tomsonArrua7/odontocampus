@@ -7,14 +7,26 @@
 
   <title>OdontoCampus · Mesas, reválidas y herramientas — FOE Odontología UNLP</title>
   <meta name="description" content="Consultá cuándo y dónde rendís, descargá historias clínicas, calculá tu promedio y accedé a apuntes. Plataforma estudiantil de la Facultad de Odontología UNLP, impulsada por FOE.">
-  <link rel="icon" type="image/jpeg" href="FOE.jpg">
-  <link rel="canonical" href="./index.html">
+  <link rel="canonical" href="https://odontocampus.com.ar/">
+
+  <!-- Marca: un diente geométrico en blanco sobre el magenta de FOE. Se lee a
+       16 px en una pestaña, que es la única prueba que importa para un ícono. -->
+  <link rel="icon" href="favicon.ico" sizes="32x32">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260912b">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260912b">
 
   <meta property="og:title" content="OdontoCampus · FOE Odontología UNLP">
   <meta property="og:description" content="Mesas de examen y reválidas en vivo, historias clínicas, promedio y apuntes. Todo en un solo lugar.">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="FOE.jpg">
+  <meta property="og:url" content="https://odontocampus.com.ar/">
   <meta property="og:locale" content="es_AR">
+  <!-- Imagen del enlace (WhatsApp, Instagram, Twitter). Tiene que ser una URL
+       absoluta y un archivo rasterizado: ninguna de esas apps lee SVG. -->
+  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260912b">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="OdontoCampus · FOE Odontología UNLP">
+  <meta name="twitter:card" content="summary_large_image">
 
   <!--
     Tema guardado: se aplica antes del primer pintado. Sin esto, quien eligió
@@ -32,7 +44,9 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Archivo (Omnibus-Type, Buenos Aires) para títulos: hecha para impresos
+       institucionales. Inter para leer. Plex Mono para códigos y numeración. -->
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
 
@@ -44,12 +58,13 @@
        LÍNEAS (y en las plantillas de correo del override de Supabase).
        Pasó de verdad: el sitio nuevo quedó cargando el config.js viejo, con la
        clave en PENDIENTE, y las cuentas no aparecían por ningún lado. -->
-  <link rel="stylesheet" href="css/01-tokens.css?v=20260912">
-  <link rel="stylesheet" href="css/02-base.css?v=20260912">
-  <link rel="stylesheet" href="css/03-components.css?v=20260912">
-  <link rel="stylesheet" href="css/04-sections.css?v=20260912">
-  <link rel="stylesheet" href="css/05-responsive.css?v=20260912">
-  <link rel="stylesheet" href="css/06-cuentas.css?v=20260912">
+  <link rel="stylesheet" href="css/01-tokens.css?v=20260912b">
+  <link rel="stylesheet" href="css/02-base.css?v=20260912b">
+  <link rel="stylesheet" href="css/03-components.css?v=20260912b">
+  <link rel="stylesheet" href="css/04-sections.css?v=20260912b">
+  <link rel="stylesheet" href="css/05-responsive.css?v=20260912b">
+  <link rel="stylesheet" href="css/06-cuentas.css?v=20260912b">
+  <link rel="stylesheet" href="css/07-movimiento.css?v=20260912b">
 </head>
 <body>
 
@@ -136,11 +151,11 @@
       <div class="container">
         <div class="hero-grid">
           <div>
-            <p class="hero-tag"><i class="fa-solid fa-tooth" aria-hidden="true"></i> Plataforma estudiantil de FOE</p>
-            <p class="hero-title">Sabé <span>cuándo rendís</span> sin dar veinte vueltas.</p>
+            <p class="hero-tag">Hecho por estudiantes de la facultad</p>
+            <p class="hero-title">Sabé <span>cuándo rendís</span> sin dar veinte vueltas</p>
             <p class="hero-subtitle">
-              Mesas de finales y reválidas actualizadas al instante, con aula, horario y datos de Zoom.
-              Además: historias clínicas para imprimir, apuntes de cátedra y tu promedio. Todo abierto sin cuenta; solo tu promedio pide una, para guardarlo.
+              Mesas de finales y reválidas sacadas de la planilla oficial de cátedra,
+              con aula, horario y datos de Zoom.
             </p>
             <div class="hero-cta-group">
               <a href="#fechas/mesas" class="btn btn-magenta btn-lg" data-nav="fechas/mesas">
@@ -150,29 +165,20 @@
                 <i class="fa-solid fa-certificate" aria-hidden="true"></i> Ver reválidas
               </a>
             </div>
+            <p class="hero-nota">
+              Historias clínicas, instrumental y apuntes, abiertos y sin cuenta.
+              Sólo Mi promedio pide una, para guardarte las materias.
+            </p>
           </div>
 
-          <div class="quick-hub">
-            <p class="quick-hub-title"><i class="fa-solid fa-bolt" aria-hidden="true"></i> Lo que más se busca</p>
-            <div class="quick-hub-grid">
-              <button type="button" class="quick-btn" data-action="ir" data-destino="fechas/mesas">
-                <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
-                <span>Mesas de finales<small>Actualizadas en vivo</small></span>
-              </button>
-              <button type="button" class="quick-btn" data-action="ir" data-destino="fechas/revalidas">
-                <i class="fa-solid fa-certificate" aria-hidden="true"></i>
-                <span>Reválidas<small>Horarios y Zoom</small></span>
-              </button>
-              <button type="button" class="quick-btn" data-action="ir" data-destino="cursada/historias">
-                <i class="fa-solid fa-file-medical" aria-hidden="true"></i>
-                <span>Historias clínicas<small>Listas para imprimir</small></span>
-              </button>
-              <button type="button" class="quick-btn" data-action="ir" data-destino="carrera">
-                <i class="fa-solid fa-calculator" aria-hidden="true"></i>
-                <span>Mi promedio<small>Con y sin aplazos</small></span>
-              </button>
-            </div>
-          </div>
+          <!-- La próxima mesa, en papel, montada sobre la banda de marca. Es lo
+               único de la portada que cambia con los datos y lo primero que
+               mira quien entra en época de finales. La llena js/app.js con la
+               misma planilla que alimenta la sección de fechas. -->
+          <aside class="ticket" id="ticket-proxima" aria-live="polite" aria-label="Tu próxima mesa">
+            <p class="ticket-tapa"><span>Tu próxima fecha</span></p>
+            <p class="ticket-vacio">Buscando en la planilla oficial…</p>
+          </aside>
         </div>
       </div>
     </div>
@@ -971,15 +977,15 @@
 </footer>
 
 <!-- Scripts: configuración y núcleo primero, módulos después, controlador al final -->
-<script src="js/config.js?v=20260912"></script>
-<script src="js/core.js?v=20260912"></script>
-<script src="js/api.js?v=20260912"></script>
-<script src="js/data.js?v=20260912"></script>
-<script src="js/live_sheets.js?v=20260912"></script>
-<script src="js/calculator.js?v=20260912"></script>
-<script src="js/carrera.js?v=20260912"></script>
-<script src="js/auth.js?v=20260912"></script>
-<script src="js/chatbot.js?v=20260912"></script>
-<script src="js/app.js?v=20260912"></script>
+<script src="js/config.js?v=20260912b"></script>
+<script src="js/core.js?v=20260912b"></script>
+<script src="js/api.js?v=20260912b"></script>
+<script src="js/data.js?v=20260912b"></script>
+<script src="js/live_sheets.js?v=20260912b"></script>
+<script src="js/calculator.js?v=20260912b"></script>
+<script src="js/carrera.js?v=20260912b"></script>
+<script src="js/auth.js?v=20260912b"></script>
+<script src="js/chatbot.js?v=20260912b"></script>
+<script src="js/app.js?v=20260912b"></script>
 </body>
 </html>

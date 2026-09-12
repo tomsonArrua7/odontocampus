@@ -4,6 +4,23 @@
    --------------------------------------------------------------------------
    Regla del equipo: ningún archivo posterior escribe un color, un tamaño de
    texto ni un espaciado "a mano". Todo sale de acá.
+
+   --------------------------------------------------------------------------
+   DIRECCIÓN VISUAL: "CARTEL DE FACULTAD"  (septiembre de 2026)
+
+   El lenguaje de la plataforma es el del hall: carteles de tinta plana,
+   fotocopias, tipografía condensada, papel que amarillea. Tres consecuencias
+   que atraviesan todos los tokens:
+
+   1. El fondo es PAPEL, no blanco de aplicación. Un crema tibio, el de la
+      fotocopia de cátedra. Baja el brillo en la lectura nocturna.
+   2. Las esquinas son casi rectas y las sombras casi planas. El afiche no
+      tiene relieve: separa con bloques, reglas y color, no con elevación.
+   3. El magenta TIENE DOS VALORES y no se mezclan:
+        --accent       sólo como FONDO, con texto blanco encima   (4,6:1)
+        --accent-text  sólo para TEXTO sobre papel                (5,8:1)
+      El magenta pleno como texto sobre blanco no alcanza el mínimo de
+      contraste. Era el error de la versión anterior.
    ========================================================================== */
 
 :root {
@@ -13,17 +30,31 @@
   --brand-magenta-100: #FFF0F7;
   --brand-magenta-200: #FFD9EC;
   --brand-magenta-300: #FFB3D9;
-  --brand-magenta-400: #FF66B2;
-  --brand-magenta-500: #E6007E;   /* magenta institucional */
-  --brand-magenta-600: #C4006B;   /* legible sobre blanco (5.9:1) */
-  --brand-magenta-700: #8F004E;
+  --brand-magenta-400: #FF8FC5;   /* magenta para texto SOBRE azul (8:1) */
+  --brand-magenta-500: #E6007E;   /* magenta institucional, sólo de fondo */
+  --brand-magenta-600: #C4006B;
+  --brand-magenta-700: #B8005F;   /* magenta para texto sobre papel (5,8:1) */
+  --brand-magenta-800: #8F004E;
 
   --brand-navy-900: #060D17;
   --brand-navy-800: #0B192C;      /* azul institucional */
-  --brand-navy-700: #14293F;
+  --brand-navy-700: #132840;
   --brand-navy-600: #1E3E62;
   --brand-navy-500: #254B77;
 
+  /* Papel: la escala neutra del tema claro. Cálida a propósito. */
+  --papel-50:  #FBF9F5;
+  --papel-100: #F4F1E9;
+  --papel-200: #EDE8DE;
+  --papel-300: #D8D2C6;
+  --papel-400: #BDB5A6;
+
+  /* Tinta: casi negro azulado. El negro puro vibra sobre papel cálido. */
+  --tinta-900: #0A1524;
+  --tinta-700: #45525F;
+  --tinta-500: #77838F;
+
+  /* Grises fríos: se conservan para superficies de marca y compatibilidad. */
   --gray-50:  #F8FAFC;
   --gray-100: #F1F5F9;
   --gray-200: #E2E8F0;
@@ -36,65 +67,72 @@
   --gray-900: #0F172A;
 
   /* ---- 2. Tokens semánticos · TEMA CLARO -------------------------------- */
-  --bg:            #F6F8FB;
+  --bg:            var(--papel-100);
   --bg-elevated:   #FFFFFF;
   --surface:       #FFFFFF;
-  --surface-2:     var(--gray-50);
-  --surface-3:     var(--gray-100);
-  --surface-hover: var(--gray-100);
+  --surface-2:     var(--papel-50);
+  --surface-3:     var(--papel-200);
+  --surface-hover: var(--papel-200);
 
-  --border:        var(--gray-200);
-  --border-strong: var(--gray-300);
+  --border:        var(--papel-300);
+  --border-strong: var(--papel-400);
 
-  --text:        var(--gray-900);
-  --text-strong: var(--brand-navy-800);
-  --text-muted:  var(--gray-500);
-  --text-soft:   var(--gray-400);
+  --text:        var(--tinta-900);
+  --text-strong: var(--tinta-900);
+  --text-muted:  var(--tinta-700);
+  --text-soft:   var(--tinta-500);
   --text-invert: #FFFFFF;
 
-  /* Acento: -bg para superficies, -text para tipografía (contraste AA) */
   --accent:       var(--brand-magenta-500);
   --accent-hover: var(--brand-magenta-600);
-  --accent-text:  var(--brand-magenta-600);
+  --accent-text:  var(--brand-magenta-700);
   --accent-soft:  var(--brand-magenta-100);
-  --accent-soft-text: var(--brand-magenta-700);
+  --accent-soft-text: var(--brand-magenta-800);
   --accent-on:    #FFFFFF;
-  --accent-glow:  rgba(230, 0, 126, 0.25);
-  --accent-ring:  rgba(230, 0, 126, 0.35);
+  --accent-glow:  rgba(230, 0, 126, 0.22);
+  --accent-ring:  rgba(230, 0, 126, 0.40);
 
-  /* Superficies oscuras de marca (header, hero, footer, dashboard).
+  /* Superficies oscuras de marca (encabezado, portada, pie, tablero).
      Se mantienen oscuras en ambos temas: son la firma visual de FOE. */
   --brand-surface:      var(--brand-navy-800);
   --brand-surface-2:    var(--brand-navy-900);
   --brand-surface-soft: rgba(255, 255, 255, 0.07);
-  --brand-surface-line: rgba(255, 255, 255, 0.12);
+  --brand-surface-line: rgba(255, 255, 255, 0.14);
   --on-brand:           #FFFFFF;
-  --on-brand-muted:     #CBD5E1;
-  --on-brand-soft:      #94A3B8;
+  --on-brand-muted:     #C3CEDB;
+  --on-brand-soft:      #8FA1B5;
   --on-brand-accent:    var(--brand-magenta-400);
 
-  /* ---- 3. Estados ------------------------------------------------------- */
-  --success:      #15803D;
-  --success-bg:   #DCFCE7;
-  --success-dot:  #10B981;
-  --warning:      #B45309;
-  --warning-bg:   #FEF3C7;
-  --danger:       #B91C1C;
-  --danger-bg:    #FEE2E2;
-  --info:         #1D4ED8;
-  --info-bg:      #EFF6FF;
-  --info-border:  #DBEAFE;
-  --neutral-bg:   var(--gray-100);
-  --neutral-text: var(--gray-600);
+  /* ---- 3. Estados -------------------------------------------------------
+     Apagados a propósito. Un aplazo es información, no una emergencia: el
+     rojo se reserva para lo irreversible (eliminar la cuenta). */
+  --success:      #17604A;
+  --success-bg:   #D7E9E0;
+  --success-dot:  #2F8F6B;
+  --warning:      #8A5A00;
+  --warning-bg:   #F6E7C8;
+  --danger:       #9B2C2C;
+  --danger-bg:    #F6DDDA;
+  --info:         #1E3E62;
+  --info-bg:      #E6ECF4;
+  --info-border:  #CBD8E6;
+  --neutral-bg:   var(--papel-200);
+  --neutral-text: var(--tinta-700);
   --whatsapp:     #1EA855;
   --whatsapp-hover: #17853F;
 
-  /* ---- 4. Tipografía ---------------------------------------------------- */
-  --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  /* ---- 4. Tipografía ----------------------------------------------------
+     Archivo (Omnibus-Type, Buenos Aires) para títulos: diseñada para
+     impresos institucionales, aguanta el peso 800 en mayúsculas.
+     Inter para leer. Plex Mono para códigos de materia y numeración.
 
-  /* Escala. Piso subido a 13px: el diseño anterior bajaba a 11px,
+     MAYÚSCULAS: sólo en títulos de hasta seis palabras, etiquetas y
+     botones. Nunca en un párrafo ni en el nombre de una materia. */
+  --font-heading: Archivo, 'Helvetica Neue', Arial, sans-serif;
+  --font-body: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Escala. Piso en 13px: la versión anterior bajaba a 11px,
      ilegible en móvil y en lectura cansada / nocturna. */
   --fs-xs:   0.8125rem;  /* 13px — metadatos, sólo en línea corta */
   --fs-sm:   0.875rem;   /* 14px — texto secundario */
@@ -105,10 +143,10 @@
   --fs-2xl:  1.5rem;
   --fs-3xl:  clamp(1.5rem, 1.1rem + 1.6vw, 1.875rem);
   --fs-4xl:  clamp(1.75rem, 1.2rem + 2.4vw, 2.5rem);
-  --fs-5xl:  clamp(2rem, 1.2rem + 3.6vw, 3rem);
+  --fs-5xl:  clamp(2.125rem, 1.2rem + 4vw, 3.375rem);
 
-  --lh-tight: 1.2;
-  --lh-snug:  1.35;
+  --lh-tight: 1.08;      /* títulos de afiche: líneas casi pegadas */
+  --lh-snug:  1.3;
   --lh-base:  1.6;
   --lh-loose: 1.75;
 
@@ -118,7 +156,9 @@
   --fw-bold:   700;
   --fw-black:  800;
 
+  --tracking-titulo: -0.02em;   /* títulos grandes, letras juntas */
   --tracking-caps: 0.06em;
+  --tracking-etiqueta: 0.14em;  /* etiquetas chicas en mayúscula */
 
   /* Ancho de línea cómodo para lectura (60–75 caracteres) */
   --measure: 68ch;
@@ -135,34 +175,54 @@
   --sp-12: 3rem;
   --sp-16: 4rem;
 
-  --gap-grid: 1.25rem;
+  --gap-grid: 1rem;
   --page-pad: 1.25rem;
   --container: 1240px;
 
-  /* ---- 6. Forma y elevación --------------------------------------------- */
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 22px;
+  /* ---- 6. Forma y elevación ---------------------------------------------
+     Esquinas casi rectas: es lo que más aporta al carácter de afiche. 3px
+     alcanza para que un botón no se sienta agresivo bajo el pulgar. */
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 10px;
   --radius-full: 9999px;
 
-  --shadow-sm: 0 1px 2px rgba(11, 25, 44, 0.06);
-  --shadow-md: 0 4px 10px -2px rgba(11, 25, 44, 0.10), 0 2px 4px -2px rgba(11, 25, 44, 0.06);
-  --shadow-lg: 0 12px 24px -8px rgba(11, 25, 44, 0.16), 0 4px 8px -4px rgba(11, 25, 44, 0.08);
-  --shadow-xl: 0 24px 48px -12px rgba(11, 25, 44, 0.24);
-  --shadow-accent: 0 6px 16px -4px rgba(230, 0, 126, 0.40);
+  --shadow-sm: 0 1px 0 rgba(10, 21, 36, 0.05);
+  --shadow-md: 0 2px 6px rgba(10, 21, 36, 0.07);
+  --shadow-lg: 0 12px 28px -12px rgba(10, 21, 36, 0.22);
+  --shadow-xl: 0 24px 48px -16px rgba(10, 21, 36, 0.30);
+  --shadow-accent: 0 6px 16px -6px rgba(230, 0, 126, 0.45);
 
-  /* ---- 7. Movimiento ---------------------------------------------------- */
+  /* ---- 7. Movimiento ----------------------------------------------------
+     Corto y con salida suave. Nada rebota por gusto: el único easing con
+     sobrepaso es --ease-resorte, y se usa sólo cuando algo aparece por una
+     acción de la persona (un aviso, un modal). */
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-entrada: cubic-bezier(0.16, 0.84, 0.44, 1);
+  --ease-resorte: cubic-bezier(0.34, 1.42, 0.64, 1);
   --dur-fast: 120ms;
   --dur: 200ms;
   --dur-slow: 320ms;
+  --dur-entrada: 420ms;
   --transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease),
                 border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
                 transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
 
-  /* ---- 8. Capas (z-index nombrado) -------------------------------------- */
+  /* ---- 8. Textura de impreso -------------------------------------------
+     Grano generado por SVG: 400 bytes, sin pedir ninguna imagen. Es lo que
+     separa un bloque de color plano de una tinta impresa.
+
+     La opacidad va adentro del SVG a propósito: así se usa como una capa de
+     `background-image` del propio elemento, sin `opacity` ni
+     `mix-blend-mode`. Las dos cosas crean una capa compuesta aparte y, dentro
+     de un elemento `position: sticky`, Chromium termina pintando el
+     encabezado corrido al desplazar. Pasó en esta misma página. */
+  --grano: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");
+  --rejilla: rgba(255, 143, 197, 0.12);
+
+  /* ---- 9. Capas (z-index nombrado) -------------------------------------- */
   --z-sticky: 100;
   --z-header: 500;
   --z-fab: 900;
@@ -170,63 +230,93 @@
   --z-modal: 2000;
   --z-toast: 3000;
 
-  /* ---- 9. Accesibilidad ------------------------------------------------- */
+  /* ---- 10. Accesibilidad ------------------------------------------------ */
   --tap-target: 44px;          /* mínimo táctil WCAG 2.5.5 */
   --focus-ring: 0 0 0 3px var(--accent-ring);
+
+  /* ---- 11. Alias de la primera versión ---------------------------------
+     Se conservan para que nada quede roto si aparece un archivo viejo. */
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-border: var(--border);
+  --color-text-main: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-white: #FFFFFF;
+  --color-magenta: var(--accent);
+  --color-magenta-hover: var(--accent-hover);
+  --color-magenta-light: var(--brand-magenta-100);
+  --color-magenta-glow: var(--accent-glow);
+  --color-navy: var(--brand-navy-800);
+  --color-navy-dark: var(--brand-navy-900);
+  --color-navy-light: var(--brand-navy-600);
+  --color-navy-soft: var(--brand-navy-700);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-whatsapp: var(--whatsapp);
+  --color-whatsapp-hover: var(--whatsapp-hover);
+  --shadow-magenta: var(--shadow-accent);
 }
 
 /* ==========================================================================
    TEMA OSCURO
    Buena parte del uso real de esta plataforma es nocturno (estudiar, revisar
-   la mesa del día siguiente). El tema oscuro no es decorativo: baja el
-   deslumbramiento y hace usable el sitio a las 2 AM.
+   la mesa del día siguiente). No es el tema claro invertido: el papel se
+   vuelve azul profundo, el magenta pleno queda sólo para bloques y el rosa
+   toma su lugar en el texto.
    Se activa por (a) preferencia del sistema y (b) elección explícita.
+
+   Los dos bloques de abajo son iguales a propósito: CSS no permite compartir
+   un cuerpo de declaraciones entre un @media y un selector de atributo. Si
+   tocás uno, tocá el otro.
    ========================================================================== */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
 
-    --bg:            #0A1220;
-    --bg-elevated:   #101B2D;
-    --surface:       #101B2D;
-    --surface-2:     #16233A;
-    --surface-3:     #1C2C47;
-    --surface-hover: #1C2C47;
+    --bg:            #0E1621;
+    --bg-elevated:   #131E2B;
+    --surface:       #131E2B;
+    --surface-2:     #182433;
+    --surface-3:     #1F2D3F;
+    --surface-hover: #1F2D3F;
 
-    --border:        #22344F;
-    --border-strong: #2E4463;
+    --border:        #2A3848;
+    --border-strong: #3A4B5F;
 
-    --text:        #E8EEF7;
+    --text:        #EDE9E1;
     --text-strong: #FFFFFF;
-    --text-muted:  #9FB0C6;
-    --text-soft:   #7A8CA3;
+    --text-muted:  #A9B6C4;
+    --text-soft:   #7A8796;
 
     --accent-hover: var(--brand-magenta-400);
     --accent-text:  var(--brand-magenta-400);
-    --accent-soft:  rgba(230, 0, 126, 0.16);
+    --accent-soft:  rgba(230, 0, 126, 0.18);
     --accent-soft-text: var(--brand-magenta-300);
 
-    --brand-surface:      #0D1826;
-    --brand-surface-2:    #070E1A;
-    --brand-surface-soft: rgba(255, 255, 255, 0.05);
-    --brand-surface-line: rgba(255, 255, 255, 0.10);
+    --brand-surface:      #0A1524;
+    --brand-surface-2:    #060D17;
+    --brand-surface-soft: rgba(255, 255, 255, 0.06);
+    --brand-surface-line: rgba(255, 255, 255, 0.12);
 
-    --success:     #4ADE80;
-    --success-bg:  rgba(74, 222, 128, 0.14);
-    --warning:     #FBBF24;
-    --warning-bg:  rgba(251, 191, 36, 0.14);
-    --danger:      #F87171;
-    --danger-bg:   rgba(248, 113, 113, 0.14);
-    --info:        #93C5FD;
-    --info-bg:     rgba(147, 197, 253, 0.12);
-    --info-border: rgba(147, 197, 253, 0.28);
-    --neutral-bg:   #1C2C47;
+    --success:     #8FE3C4;
+    --success-bg:  rgba(47, 143, 107, 0.20);
+    --success-dot: #34D399;
+    --warning:     #F2C879;
+    --warning-bg:  rgba(242, 200, 121, 0.16);
+    --danger:      #FCA5A5;
+    --danger-bg:   rgba(252, 165, 165, 0.16);
+    --info:        #AFC6E0;
+    --info-bg:     rgba(175, 198, 224, 0.12);
+    --info-border: rgba(175, 198, 224, 0.26);
+    --neutral-bg:   #1F2D3F;
     --neutral-text: #B6C4D8;
     --whatsapp:     #25D366;
     --whatsapp-hover: #1EA855;
 
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+    --shadow-sm: 0 1px 0 rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.45);
     --shadow-lg: 0 14px 28px rgba(0, 0, 0, 0.5);
     --shadow-xl: 0 28px 56px rgba(0, 0, 0, 0.6);
   }
@@ -235,75 +325,48 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --bg:            #0A1220;
-  --bg-elevated:   #101B2D;
-  --surface:       #101B2D;
-  --surface-2:     #16233A;
-  --surface-3:     #1C2C47;
-  --surface-hover: #1C2C47;
+  --bg:            #0E1621;
+  --bg-elevated:   #131E2B;
+  --surface:       #131E2B;
+  --surface-2:     #182433;
+  --surface-3:     #1F2D3F;
+  --surface-hover: #1F2D3F;
 
-  --border:        #22344F;
-  --border-strong: #2E4463;
+  --border:        #2A3848;
+  --border-strong: #3A4B5F;
 
-  --text:        #E8EEF7;
+  --text:        #EDE9E1;
   --text-strong: #FFFFFF;
-  --text-muted:  #9FB0C6;
-  --text-soft:   #7A8CA3;
+  --text-muted:  #A9B6C4;
+  --text-soft:   #7A8796;
 
   --accent-hover: var(--brand-magenta-400);
   --accent-text:  var(--brand-magenta-400);
-  --accent-soft:  rgba(230, 0, 126, 0.16);
+  --accent-soft:  rgba(230, 0, 126, 0.18);
   --accent-soft-text: var(--brand-magenta-300);
 
-  --brand-surface:      #0D1826;
-  --brand-surface-2:    #070E1A;
-  --brand-surface-soft: rgba(255, 255, 255, 0.05);
-  --brand-surface-line: rgba(255, 255, 255, 0.10);
+  --brand-surface:      #0A1524;
+  --brand-surface-2:    #060D17;
+  --brand-surface-soft: rgba(255, 255, 255, 0.06);
+  --brand-surface-line: rgba(255, 255, 255, 0.12);
 
-  --success:     #4ADE80;
-  --success-bg:  rgba(74, 222, 128, 0.14);
-  --warning:     #FBBF24;
-  --warning-bg:  rgba(251, 191, 36, 0.14);
-  --danger:      #F87171;
-  --danger-bg:   rgba(248, 113, 113, 0.14);
-  --info:        #93C5FD;
-  --info-bg:     rgba(147, 197, 253, 0.12);
-  --info-border: rgba(147, 197, 253, 0.28);
-  --neutral-bg:   #1C2C47;
+  --success:     #8FE3C4;
+  --success-bg:  rgba(47, 143, 107, 0.20);
+  --success-dot: #34D399;
+  --warning:     #F2C879;
+  --warning-bg:  rgba(242, 200, 121, 0.16);
+  --danger:      #FCA5A5;
+  --danger-bg:   rgba(252, 165, 165, 0.16);
+  --info:        #AFC6E0;
+  --info-bg:     rgba(175, 198, 224, 0.12);
+  --info-border: rgba(175, 198, 224, 0.26);
+  --neutral-bg:   #1F2D3F;
   --neutral-text: #B6C4D8;
   --whatsapp:     #25D366;
   --whatsapp-hover: #1EA855;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 1px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.45);
   --shadow-lg: 0 14px 28px rgba(0, 0, 0, 0.5);
   --shadow-xl: 0 28px 56px rgba(0, 0, 0, 0.6);
-}
-
-/* --------------------------------------------------------------------------
-   Alias de compatibilidad con la primera versión del sitio: cualquier estilo
-   o script viejo sigue funcionando y además hereda el modo oscuro.
-   -------------------------------------------------------------------------- */
-:root {
-  --color-magenta: var(--accent);
-  --color-magenta-hover: var(--accent-hover);
-  --color-magenta-light: var(--accent-soft);
-  --color-magenta-glow: var(--accent-glow);
-  --color-navy: var(--brand-surface);
-  --color-navy-dark: var(--brand-surface-2);
-  --color-navy-light: var(--brand-navy-600);
-  --color-navy-soft: var(--brand-navy-500);
-  --color-white: #FFFFFF;
-  --color-bg: var(--bg);
-  --color-surface: var(--surface);
-  --color-surface-hover: var(--surface-hover);
-  --color-text-main: var(--text);
-  --color-text-muted: var(--text-muted);
-  --color-border: var(--border);
-  --color-success: var(--success-dot);
-  --color-warning: #F59E0B;
-  --color-danger: var(--danger);
-  --color-whatsapp: var(--whatsapp);
-  --color-whatsapp-hover: var(--whatsapp-hover);
-  --shadow-magenta: var(--shadow-accent);
 }

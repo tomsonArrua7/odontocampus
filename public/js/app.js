@@ -53,6 +53,7 @@
       this.initTabs();
       this.initNavegacion();
       this.initAtajosTeclado();
+      this.initEncabezadoAlDesplazar();
 
       this.initNoticias();
       this.initFechasClave();
@@ -143,6 +144,33 @@
             : '<i class="fa-solid fa-bars" aria-hidden="true"></i>';
         });
       }
+    },
+
+    /**
+     * El encabezado se compacta y despega una sombra al bajar.
+     *
+     * Da la pista de que hay contenido arriba sin ocupar lugar. El estado se
+     * calcula dentro de requestAnimationFrame: el evento de desplazamiento se
+     * dispara decenas de veces por segundo y tocar el DOM en cada uno traba
+     * el desplazamiento en un celular modesto.
+     */
+    initEncabezadoAlDesplazar: function () {
+      var header = document.querySelector(".main-header");
+      if (!header) return;
+
+      var pendiente = false;
+      function pintar() {
+        pendiente = false;
+        header.classList.toggle("desplazado", (global.scrollY || 0) > 24);
+      }
+
+      on(global, "scroll", function () {
+        if (pendiente) return;
+        pendiente = true;
+        global.requestAnimationFrame(pintar);
+      }, { passive: true });
+
+      pintar();
     },
 
     cerrarMenuMovil: function () {
@@ -288,7 +316,68 @@
        Es lo primero que se ve porque es lo primero que se necesita: no
        "explorar la plataforma", sino saber qué te toca esta semana.
        ====================================================================== */
+    /**
+     * Ticket de la portada: la próxima fecha, con cuántos días faltan.
+     *
+     * Nadie calcula fechas de memoria: calcula días. "Faltan 3 días" es la
+     * información que la persona vino a buscar, y va antes que cualquier
+     * eslogan.
+     */
+    renderTicketProximaMesa: function () {
+      var cont = document.getElementById("ticket-proxima");
+      if (!cont) return;
+
+      var sheets = global.OdontoLiveSheets;
+      var items = sheets && sheets.cachedItems ? sheets.cachedItems : [];
+
+      var proxima = items
+        .map(function (item) {
+          return { item: item, fecha: UI.parseFechaTexto(item.dia) };
+        })
+        .filter(function (entry) {
+          var d = UI.diasHasta(entry.fecha);
+          return d !== null && d >= 0;
+        })
+        .sort(function (a, b) { return a.fecha - b.fecha; })[0];
+
+      if (!proxima) {
+        cont.innerHTML =
+          '<p class="ticket-tapa"><span>Tu próxima fecha</span></p>' +
+          '<p class="ticket-vacio">' + (items.length
+            ? "No hay fechas próximas cargadas en la planilla. Mirá el listado " +
+              "completo: puede haber llamados sin fecha confirmada."
+            : "Estamos trayendo las fechas desde la planilla oficial…") +
+          "</p>";
+        return;
+      }
+
+      var it = proxima.item;
+      var corta = UI.fechaCorta(proxima.fecha);
+      var dias = UI.diasHasta(proxima.fecha);
+      var esRevalida = it.tipo === "revalida" || it.tipo === "actualizacion";
+      var esZoom = String(it.modalidad || "").toLowerCase().indexOf("zoom") !== -1;
+      var destino = esRevalida ? "fechas/revalidas" : "fechas/mesas";
+      var cuando = dias === 0 ? "Es hoy" : (dias === 1 ? "Es mañana" : "Faltan " + dias + " días");
+
+      cont.innerHTML =
+        '<p class="ticket-tapa"><span>Tu próxima fecha</span>' +
+          "<span>" + (esRevalida ? "Reválida" : "Final") + "</span></p>" +
+        '<div class="ticket-cuerpo">' +
+          '<p class="ticket-dia"><b>' + esc(corta.dia) + "</b>" +
+            "<small>" + esc(corta.mes) + "</small></p>" +
+          "<div>" +
+            '<h3 class="ticket-materia">' + esc(it.materiaOriginal || it.materia) + "</h3>" +
+            '<p class="ticket-meta">' + esc(it.hora || "Horario a confirmar") + " · " +
+              esc(esZoom ? "Por Zoom" : (it.modalidad || "Presencial")) + "</p>" +
+          "</div>" +
+        "</div>" +
+        '<p class="ticket-pie"><b>' + esc(cuando) + "</b>" +
+          '<a href="#' + destino + '" data-nav="' + destino + '">Ver todas</a></p>';
+    },
+
     renderProximasFechas: function () {
+      this.renderTicketProximaMesa();
+
       var cont = document.getElementById("proximas-fechas-lista");
       if (!cont) return;
 

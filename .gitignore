@@ -58,3 +58,6 @@ desktop.ini
 # --- Excepción --------------------------------------------------------------
 # El esquema SQL sí se versiona: es código, no datos.
 !infra/supabase/sql/*.sql
+
+# Maquetas de exploración visual: se miran en local, no se publican.
+public/_propuesta*.html

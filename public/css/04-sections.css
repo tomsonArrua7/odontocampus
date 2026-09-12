@@ -14,7 +14,10 @@
   position: sticky;
   top: 0;
   z-index: var(--z-header);
-  background: var(--brand-surface);
+  /* El grano va como capa de fondo del propio encabezado: ver el comentario
+     del token --grano en 01-tokens.css. */
+  background-color: var(--brand-surface);
+  background-image: var(--grano);
   box-shadow: var(--shadow-md);
   border-bottom: 2px solid var(--accent);
 }
@@ -39,7 +42,7 @@
 .brand-logo-img {
   width: 44px;
   height: 44px;
-  border-radius: 50%;
+  border-radius: var(--radius-sm);
   object-fit: cover;
   border: 2px solid var(--accent);
   flex-shrink: 0;
@@ -49,10 +52,11 @@
 
 .brand-title {
   font-family: var(--font-heading);
-  font-size: var(--fs-xl);
+  font-size: var(--fs-lg);
   font-weight: var(--fw-black);
   color: #fff;
-  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-titulo);
   line-height: 1.1;
   white-space: nowrap;
 }
@@ -76,16 +80,23 @@
   justify-content: center;
 }
 
+/* Los iconos de la navegacion se ocultan: el texto ya dice lo mismo y el
+   icono sumaba ruido y ancho. El marcado se limpia cuando se reemplace Font
+   Awesome por el juego de iconos propio. */
+.nav-link i { display: none; }
+
 .nav-link {
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  min-height: 40px;
+  min-height: 38px;
   color: var(--on-brand-muted);
-  padding: var(--sp-2) var(--sp-4);
-  border-radius: var(--radius-md);
-  font-weight: var(--fw-semi);
-  font-size: var(--fs-base);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-sm);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   white-space: nowrap;
   transition: var(--transition);
 }
@@ -184,112 +195,173 @@
    HERO
    ========================================================================== */
 .hero-banner {
-  background: linear-gradient(140deg, var(--brand-navy-800) 0%, var(--brand-navy-600) 100%);
-  color: #fff;
-  padding: var(--sp-12) 0;
   position: relative;
+  /* Grano de impreso sobre el azul de marca, como capa de fondo. */
+  background-color: var(--brand-surface);
+  background-image: var(--grano);
+  color: #fff;
+  padding: var(--sp-12) 0 var(--sp-16);
   overflow: hidden;
-  border-bottom: 1px solid rgba(230, 0, 126, 0.25);
+  border-bottom: 3px solid var(--accent);
 }
+
+/* Trama de cuaderno en lugar del degradado anterior. El difuminado se PINTA
+   con un radial del color de la banda encima de la trama: una máscara haría
+   una capa compuesta aparte y rompería el pintado al desplazar. */
 .hero-banner::before {
   content: "";
   position: absolute;
-  top: -120px;
-  right: -80px;
-  width: 380px;
-  height: 380px;
-  background: var(--accent-glow);
-  border-radius: 50%;
-  filter: blur(90px);
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse 70% 90% at 78% 8%, rgba(11, 25, 44, 0) 0%, var(--brand-surface) 68%),
+    linear-gradient(var(--rejilla) 1px, transparent 1px),
+    linear-gradient(90deg, var(--rejilla) 1px, transparent 1px);
+  background-size: auto, 64px 64px, 64px 64px;
   pointer-events: none;
 }
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 1.25fr 1fr;
+  grid-template-columns: 1.15fr 0.85fr;
   gap: var(--sp-10);
-  align-items: center;
+  align-items: start;
   position: relative;
   z-index: 1;
 }
 
+/* Antetítulo: una regla y una línea en mayúsculas. Reemplaza la píldora con
+   ícono, que era el gesto más "plantilla" de la portada. */
 .hero-tag {
   display: inline-flex;
   align-items: center;
-  gap: var(--sp-2);
-  background: rgba(230, 0, 126, 0.22);
-  border: 1px solid var(--accent);
-  color: var(--brand-magenta-300);
-  padding: var(--sp-1) var(--sp-4);
-  border-radius: var(--radius-full);
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--on-brand-accent);
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
-  margin-bottom: var(--sp-4);
   text-transform: uppercase;
-  letter-spacing: var(--tracking-caps);
+  letter-spacing: var(--tracking-etiqueta);
 }
+.hero-tag::before { content: ""; width: 28px; height: 2px; background: var(--accent); flex-shrink: 0; }
+.hero-tag i { display: none; }
 
 .hero-title {
+  font-family: var(--font-heading);
   font-size: var(--fs-5xl);
   font-weight: var(--fw-black);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-titulo);
+  text-transform: uppercase;
   color: #fff;
-  line-height: 1.08;
-  margin-bottom: var(--sp-4);
-  max-width: 18ch;
+  margin-bottom: var(--sp-5);
+  max-width: 17ch;
+  text-wrap: balance;
 }
-.hero-title span { color: var(--brand-magenta-400); }
+
+/* El bloque magenta detras de las palabras que importan. Va como fondo y no
+   como color de letra: el magenta pleno sobre azul no alcanza el contraste
+   minimo para texto, pero con blanco encima llega a 4,6:1. */
+.hero-title span {
+  color: #fff;
+  background: var(--accent);
+  padding: 0 0.14em;
+  -webkit-box-decoration-break: clone;
+          box-decoration-break: clone;
+}
 
 .hero-subtitle {
   font-size: var(--fs-lg);
   color: var(--on-brand-muted);
   margin-bottom: var(--sp-6);
-  max-width: 52ch;
+  max-width: 46ch;
 }
 
 .hero-cta-group { display: flex; gap: var(--sp-3); flex-wrap: wrap; }
 
-/* --- Accesos rápidos --- */
-.quick-hub {
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: var(--radius-lg);
-  padding: var(--sp-5);
+.hero-nota {
+  margin-top: var(--sp-4);
+  font-size: var(--fs-sm);
+  color: var(--on-brand-soft);
+  max-width: 48ch;
 }
-.quick-hub-title {
-  font-family: var(--font-heading);
-  font-size: var(--fs-md);
-  font-weight: var(--fw-bold);
-  color: #fff;
-  margin-bottom: var(--sp-4);
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-}
-.quick-hub-title i { color: var(--brand-magenta-400); }
 
-.quick-hub-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-2); }
-
-.quick-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  padding: var(--sp-3);
-  min-height: var(--tap-target);
+/* ==========================================================================
+   TICKET DE LA PROXIMA MESA
+   Papel blanco montado sobre la banda de marca. Es lo unico de la portada que
+   cambia con los datos, y lo primero que mira quien entra en epoca de
+   finales: fecha, aula y cuantos dias faltan.
+   ========================================================================== */
+.ticket {
+  background: var(--surface);
+  color: var(--text);
   border-radius: var(--radius-md);
-  color: #fff;
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+}
+
+.ticket-tapa {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--sp-3);
-  cursor: pointer;
-  transition: var(--transition);
-  text-align: left;
+  background: var(--accent);
+  color: var(--accent-on);
+  padding: var(--sp-2) var(--sp-4);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-etiqueta);
 }
-.quick-btn i { font-size: var(--fs-xl); color: var(--brand-magenta-400); flex-shrink: 0; }
-.quick-btn:hover { background: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-accent); }
-.quick-btn:hover i { color: #fff; }
-.quick-btn span { font-size: var(--fs-sm); font-weight: var(--fw-semi); display: block; }
-.quick-btn small { font-size: var(--fs-xs); color: var(--on-brand-muted); display: block; }
-.quick-btn:hover small { color: var(--brand-magenta-100); }
+
+.ticket-cuerpo {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-5) var(--sp-4);
+  border-bottom: 1px dashed var(--border);
+}
+
+.ticket-dia { min-width: 64px; text-align: center; flex-shrink: 0; }
+.ticket-dia b {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  font-weight: var(--fw-black);
+  line-height: 1;
+  letter-spacing: var(--tracking-titulo);
+  font-variant-numeric: tabular-nums;
+}
+.ticket-dia small {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-etiqueta);
+  color: var(--text-soft);
+}
+
+.ticket-materia { font-size: var(--fs-lg); line-height: var(--lh-snug); }
+.ticket-meta { font-size: var(--fs-sm); color: var(--text-muted); margin-top: var(--sp-1); }
+
+.ticket-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+.ticket-pie b { color: var(--accent-text); font-weight: var(--fw-bold); }
+
+.ticket-vacio {
+  padding: var(--sp-8) var(--sp-4);
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
 
 /* ==========================================================================
    ENCABEZADO DE SECCIÓN
@@ -304,13 +376,20 @@
 }
 .app-section > .container > .section-header:first-child { margin-top: var(--sp-8); }
 
+/* Titulo de seccion: mayusculas, regla magenta arriba y sin icono. El icono
+   repetia lo que el titulo ya decia; la regla ordena mejor que un color. */
 .section-title-wrap h2 {
+  font-family: var(--font-heading);
   font-size: var(--fs-3xl);
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
+  font-weight: var(--fw-black);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-titulo);
+  line-height: var(--lh-tight);
+  padding-top: var(--sp-4);
+  border-top: 3px solid var(--accent);
+  display: block;
 }
-.section-title-wrap h2 i { color: var(--accent-text); }
+.section-title-wrap h2 i { display: none; }
 .section-title-wrap p {
   color: var(--text-muted);
   font-size: var(--fs-base);
@@ -325,7 +404,14 @@
   gap: var(--sp-3);
   margin-bottom: var(--sp-4);
 }
-.subsection-title i { color: var(--accent-text); }
+/* Subtitulos: mismo criterio, sin icono decorativo. */
+.subsection-title {
+  font-family: var(--font-heading);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.subsection-title i { display: none; }
 
 /* ==========================================================================
    INICIO · PRÓXIMA FECHA Y AGENDA
@@ -1031,8 +1117,15 @@
   margin-bottom: var(--sp-8);
 }
 .footer-brand-head { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-3); }
-.footer-brand-head img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent); }
-.footer-brand h3 { color: #fff; font-size: var(--fs-xl); }
+.footer-brand-head img { width: 40px; height: 40px; border-radius: var(--radius-sm); border: 2px solid var(--accent); }
+.footer-brand h3 {
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-black);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-titulo);
+}
 .footer-brand h3 span { color: var(--brand-magenta-400); }
 .footer-brand p { font-size: var(--fs-sm); line-height: var(--lh-base); margin-bottom: var(--sp-4); max-width: 46ch; }
 .footer-social { display: flex; gap: var(--sp-2); }
@@ -1045,7 +1138,11 @@
 
 .footer-col h4 {
   color: #fff;
-  font-size: var(--fs-md);
+  font-family: var(--font-heading);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-etiqueta);
   margin-bottom: var(--sp-4);
   position: relative;
   padding-bottom: var(--sp-2);

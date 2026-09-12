@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="OdontoCampus">
+  <title>OdontoCampus</title>
+  <rect width="512" height="512" rx="108" fill="#E6007E"/>
+  <g fill="#FFFFFF">
+    <path d="M146 268V200c0-61.7 49.2-92.5 110-92.5S366 138.3 366 200v68z"/>
+    <path d="M146 268h96.8l-25.2 136.5h-46.4z"/>
+    <path d="M269.2 268H366l-25.2 136.5h-46.4z"/>
+  </g>
+</svg>
