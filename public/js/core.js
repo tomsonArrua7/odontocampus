@@ -93,6 +93,18 @@
      --------------------------------------------------------------------- */
   var liveRegion = null;
 
+  /**
+   * Ícono del juego propio.
+   *
+   * El dibujo vive una sola vez en el sprite embebido en index.html; acá se
+   * elige cuál. El grosor, el color y el redondeo los pone la clase `.ic`:
+   * nunca se escriben en el dibujo.
+   */
+  function icono(id, clases) {
+    return '<svg class="ic' + (clases ? " " + clases : "") + '" aria-hidden="true">' +
+           '<use href="#ic-' + id + '"></use></svg>';
+  }
+
   function announce(message) {
     if (!liveRegion) {
       liveRegion = document.createElement("div");
@@ -110,11 +122,11 @@
   /* ------------------------------------------------------------------------
      4. AVISOS FLOTANTES
      --------------------------------------------------------------------- */
-  var TOAST_ICONS = {
-    info: "fa-circle-info",
-    success: "fa-circle-check",
-    warning: "fa-triangle-exclamation",
-    danger: "fa-circle-exclamation"
+  var TOAST_ICONOS = {
+    info: "info",
+    success: "tilde-circulo",
+    warning: "alerta",
+    danger: "alerta"
   };
 
   function toast(message, type) {
@@ -132,7 +144,7 @@
     var el = document.createElement("div");
     el.className = "toast-message toast-" + type + " animate-slide-up";
     el.innerHTML =
-      '<i class="fa-solid ' + (TOAST_ICONS[type] || TOAST_ICONS.info) + '" aria-hidden="true"></i>' +
+      icono(TOAST_ICONOS[type] || TOAST_ICONOS.info) +
       "<span>" + esc(message) + "</span>";
     container.appendChild(el);
 
@@ -382,7 +394,7 @@
   function emptyState(opts) {
     return (
       '<div class="empty-state">' +
-        '<div class="empty-icon" aria-hidden="true"><i class="fa-solid ' + esc(opts.icon || "fa-circle-question") + '"></i></div>' +
+        '<div class="empty-icon" aria-hidden="true">' + icono(opts.icon || "pregunta") + "</div>" +
         "<h3>" + esc(opts.title) + "</h3>" +
         "<p>" + esc(opts.text || "") + "</p>" +
         (opts.actionLabel
@@ -439,6 +451,7 @@
     registerActions: registerActions,
     initActionDelegation: initActionDelegation,
     announce: announce,
+    icono: icono,
     toast: toast,
     openModal: openModal,
     closeModal: closeModal,

@@ -56,7 +56,7 @@
    un toast se va a los cuatro segundos, justo mientras la persona está
    corrigiendo lo que decía. */
 .aviso-acceso { margin-bottom: var(--sp-5); }
-.aviso-acceso > i { font-size: var(--fs-lg); }
+.aviso-acceso > .ic { font-size: var(--fs-lg); }
 .aviso-acceso p { font-size: var(--fs-sm); color: var(--text); }
 
 /* Contraseña con botón para verla. En el celular es la diferencia entre
@@ -151,7 +151,7 @@
 .resumen-terminos details[open] summary { margin-bottom: var(--sp-3); }
 
 .lista-terminos li { font-size: var(--fs-sm); color: var(--text); }
-.lista-terminos li i { margin-top: 3px; }
+.lista-terminos li .ic { margin-top: 3px; }
 
 /* "Revisá tu correo" */
 .correo-enviado { text-align: center; }
@@ -311,7 +311,7 @@
   border-top-color: var(--border);
   color: var(--text-muted);
 }
-.puerta-cargando > i { font-size: var(--fs-2xl); color: var(--accent-text); }
+.puerta-cargando > .ic { font-size: var(--fs-2xl); color: var(--accent-text); }
 
 /* Materias de antes de las cuentas */
 .carrera-anteriores { margin-bottom: var(--sp-5); }

@@ -73,7 +73,7 @@
     if (!boton) return function () {};
     var original = boton.innerHTML;
     boton.disabled = true;
-    boton.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i> ' + esc(texto);
+    boton.innerHTML = UI.icono("cargando", "ic-gira") + " " + esc(texto);
     return function () {
       boton.disabled = false;
       boton.innerHTML = original;
@@ -201,7 +201,7 @@
       if (!usuario) {
         contenedor.innerHTML =
           '<button type="button" class="btn-cuenta" data-action="abrirAcceso">' +
-            '<i class="fa-regular fa-user" aria-hidden="true"></i>' +
+            '<svg class="ic" aria-hidden="true"><use href="#ic-persona"></use></svg>' +
             "<span>Ingresar</span>" +
           "</button>";
         return;
@@ -291,7 +291,7 @@
       entrada.type = mostrar ? "text" : "password";
       boton.setAttribute("aria-pressed", mostrar ? "true" : "false");
       boton.setAttribute("aria-label", mostrar ? "Ocultar la contraseña" : "Mostrar la contraseña");
-      boton.innerHTML = '<i class="fa-regular ' + (mostrar ? "fa-eye-slash" : "fa-eye") + '" aria-hidden="true"></i>';
+      boton.innerHTML = UI.icono(mostrar ? "ojo-tachado" : "ojo");
     },
 
     /** Al cambiar de vista o cerrar, toda contraseña vuelve a quedar tapada. */
@@ -302,7 +302,7 @@
         if (entrada) entrada.type = "password";
         boton.setAttribute("aria-pressed", "false");
         boton.setAttribute("aria-label", "Mostrar la contraseña");
-        boton.innerHTML = '<i class="fa-regular fa-eye" aria-hidden="true"></i>';
+        boton.innerHTML = UI.icono("ojo");
       });
     },
 
@@ -782,7 +782,7 @@
         "materias y notas, consentimientos y publicaciones. " +
         "<strong>No se puede deshacer.</strong></p>" +
         '<div class="callout callout-info" style="margin-top:1.25rem">' +
-          '<i class="fa-solid fa-download" aria-hidden="true"></i>' +
+          '<svg class="ic" aria-hidden="true"><use href="#ic-descargar"></use></svg>' +
           "<div><h3>¿Querés guardarte una copia antes?</h3>" +
           "<p>Cerrá esto y usá <strong>Descargar mis datos</strong> en Mi cuenta.</p></div>" +
         "</div>" +
@@ -796,7 +796,7 @@
           '<button type="button" class="btn btn-secondary" data-action="cerrarModal">Cancelar</button>' +
           '<button type="button" class="btn btn-danger-soft" id="btn-confirmar-eliminacion" ' +
                   'data-action="confirmarEliminarCuenta">' +
-            '<i class="fa-solid fa-trash-can" aria-hidden="true"></i> Eliminar definitivamente' +
+            '<svg class="ic" aria-hidden="true"><use href="#ic-tacho"></use></svg> Eliminar definitivamente' +
           "</button>" +
         "</div>"
       );

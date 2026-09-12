@@ -446,7 +446,7 @@
 
       if (!lista.length) {
         cont.innerHTML = this.sinResultados(
-          "fa-calendar-xmark",
+          "calendario",
           this.cachedMesas.length ? "No hay mesas con esos filtros" : "Todavía no hay mesas cargadas",
           this.cachedMesas.length
             ? "Probá con otro día, cambiá la modalidad o borrá el texto de búsqueda."
@@ -472,7 +472,7 @@
 
       if (!lista.length) {
         cont.innerHTML = this.sinResultados(
-          "fa-file-circle-xmark",
+          "documento",
           this.cachedRevalidas.length ? "No hay fechas con esos filtros" : "Todavía no hay reválidas cargadas",
           this.cachedRevalidas.length
             ? "Probá cambiando el día o el tipo de evaluación."
@@ -538,7 +538,7 @@
             "</div>" +
             (yaPaso && hayFuturos && entrada === pasados[0]
               ? '<p class="filter-note" style="margin-bottom:var(--sp-4)">' +
-                  '<i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>' +
+                  '<svg class="ic" aria-hidden="true"><use href="#ic-historial"></use></svg>' +
                   "<span>De acá para abajo son jornadas que ya pasaron. Quedan por si necesitás consultarlas.</span>" +
                 "</p>"
               : "") +
@@ -639,7 +639,7 @@
             '<button type="button" class="btn-copy-small" data-action="copiarDato" ' +
                     'data-valor="' + escAttr(valor) + '" data-etiqueta="' + escAttr(nombreCopia) + '" ' +
                     'aria-label="Copiar ' + escAttr(nombreCopia) + '">' +
-              '<i class="fa-solid fa-copy" aria-hidden="true"></i>' +
+              '<svg class="ic" aria-hidden="true"><use href="#ic-copiar"></use></svg>' +
             "</button>" +
           "</div>"
         );
@@ -647,14 +647,14 @@
 
       return (
         '<div class="zoom-box">' +
-          '<p class="zoom-box-header"><i class="fa-solid fa-video" aria-hidden="true"></i> ' + esc(titulo) + "</p>" +
+          '<p class="zoom-box-header"><svg class="ic" aria-hidden="true"><use href="#ic-video"></use></svg> ' + esc(titulo) + "</p>" +
           '<div class="zoom-fields">' +
             campo("ID de reunión", item.idZoom, "ID de Zoom") +
             campo("Código de acceso", item.acceso, "Código de acceso") +
           "</div>" +
           (url
             ? '<a href="' + UI.safeUrl(url) + '" target="_blank" rel="noopener noreferrer" class="btn-zoom-join">' +
-                '<i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> Entrar a la sala' +
+                '<svg class="ic" aria-hidden="true"><use href="#ic-externo"></use></svg> Entrar a la sala' +
               "</a>"
             : "") +
         "</div>"
@@ -685,8 +685,8 @@
         btn.classList.toggle("loading", !!cargando);
         btn.disabled = !!cargando;
         btn.innerHTML = cargando
-          ? '<i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Actualizando…'
-          : '<i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Actualizar ahora';
+          ? '<svg class="ic" aria-hidden="true"><use href="#ic-rotar"></use></svg> Actualizando…'
+          : '<svg class="ic" aria-hidden="true"><use href="#ic-rotar"></use></svg> Actualizar ahora';
       }
 
       var estado = document.getElementById("sync-status-" + clave);

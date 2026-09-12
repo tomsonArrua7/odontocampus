@@ -227,7 +227,7 @@
      Va como capa de `background-image` del propio elemento, nunca con
      `opacity` ni `mix-blend-mode`: las dos crean una capa compuesta aparte y,
      dentro de un `position: sticky`, el encabezado queda pintado corrido. */
-  --grano: url("../textura-grano.png?v=20260912g");
+  --grano: url("../textura-grano.png?v=20260912h");
   --rejilla: rgba(255, 143, 197, 0.12);
 
   /* ---- 9. Capas (z-index nombrado) -------------------------------------- */

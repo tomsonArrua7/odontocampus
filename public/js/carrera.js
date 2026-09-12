@@ -85,7 +85,7 @@
     if (!boton) return nada;
     var original = boton.innerHTML;
     boton.disabled = true;
-    boton.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i> ' + esc(texto);
+    boton.innerHTML = UI.icono("cargando", "ic-gira") + " " + esc(texto);
     return function () {
       boton.disabled = false;
       boton.innerHTML = original;
@@ -95,7 +95,7 @@
   function puerta(icono, titulo, cuerpo) {
     return (
       '<div class="puerta-carrera">' +
-        '<span class="puerta-icono" aria-hidden="true"><i class="fa-solid ' + icono + '"></i></span>' +
+        '<span class="puerta-icono" aria-hidden="true">' + UI.icono(icono) + "</span>" +
         "<h3>" + esc(titulo) + "</h3>" +
         cuerpo +
       "</div>"
@@ -299,16 +299,16 @@
     htmlTerminos: function () {
       return (
         '<ul class="check-list lista-terminos">' +
-          '<li><i class="fa-solid fa-database" aria-hidden="true"></i><span>' +
+          '<li><svg class="ic" aria-hidden="true"><use href="#ic-base-datos"></use></svg><span>' +
             "<strong>Qué se guarda:</strong> tu nombre, tu correo y las materias, notas y " +
             "aplazos que cargues.</span></li>" +
-          '<li><i class="fa-solid fa-bullseye" aria-hidden="true"></i><span>' +
+          '<li><svg class="ic" aria-hidden="true"><use href="#ic-diana"></use></svg><span>' +
             "<strong>Para qué:</strong> sólo para mostrarte tu promedio y tu avance. No se usa " +
             "para estadísticas, rankings ni nada más.</span></li>" +
-          '<li><i class="fa-solid fa-eye-slash" aria-hidden="true"></i><span>' +
+          '<li><svg class="ic" aria-hidden="true"><use href="#ic-ojo-tachado"></use></svg><span>' +
             "<strong>Quién lo ve:</strong> vos. Otros estudiantes no pueden verlo. Quien administra " +
             "el servidor técnicamente puede acceder a la base, como en cualquier sitio.</span></li>" +
-          '<li><i class="fa-solid fa-download" aria-hidden="true"></i><span>' +
+          '<li><svg class="ic" aria-hidden="true"><use href="#ic-descargar"></use></svg><span>' +
             "<strong>Es tuyo:</strong> desde Mi cuenta podés descargar todo o eliminar la cuenta " +
             "cuando quieras (Ley 25.326).</span></li>" +
         "</ul>"
@@ -498,18 +498,19 @@
       if (!el) return;
 
       var textos = {
-        guardado: ["fa-circle-check", "Guardado en tu cuenta"],
-        pendiente: ["fa-pen", "Cambios sin guardar"],
-        guardando: ["fa-circle-notch fa-spin", "Guardando…"],
-        "sin-conexion": ["fa-wifi", "Sin conexión · se guarda cuando vuelva"],
-        error: ["fa-triangle-exclamation", "No se pudo guardar"]
+        guardado: ["tilde-circulo", "Guardado en tu cuenta"],
+        pendiente: ["lapiz", "Cambios sin guardar"],
+        guardando: ["cargando", "Guardando…"],
+        "sin-conexion": ["wifi", "Sin conexión · se guarda cuando vuelva"],
+        error: ["alerta", "No se pudo guardar"]
       };
       var t = textos[estado] || textos.guardado;
       var texto = t[1] + (estado === "error" && detalle ? ": " + detalle : "");
 
       // Prefijo "es-": con "estado-" el estado "guardado" repetiría la clase base.
       el.className = "estado-guardado es-" + estado;
-      el.innerHTML = '<i class="fa-solid ' + t[0] + '" aria-hidden="true"></i><span>' + esc(texto) + "</span>";
+      el.innerHTML = UI.icono(t[0], estado === "guardando" ? "ic-gira" : "") +
+                     "<span>" + esc(texto) + "</span>";
 
       // Sólo se anuncia lo que pide atención; "Guardando…" en cada cambio sería ruido.
       if (estado === "error" || estado === "sin-conexion") UI.announce(texto);
@@ -545,7 +546,7 @@
       cont.hidden = false;
       cont.innerHTML =
         '<div class="callout callout-info">' +
-          '<i class="fa-solid fa-box-archive" aria-hidden="true"></i>' +
+          '<svg class="ic" aria-hidden="true"><use href="#ic-archivo"></use></svg>' +
           "<div>" +
             "<h3>Encontramos " + esc(UI.plural(cantidad, "materia")) +
               (cantidad === 1 ? " cargada" : " cargadas") + " en este navegador</h3>" +
@@ -553,7 +554,7 @@
             "Si una materia ya está en tu cuenta, queda la de tu cuenta.</p>" +
             '<div class="acciones-inline">' +
               '<button type="button" class="btn btn-magenta btn-sm" data-action="importarNotasAnteriores">' +
-                '<i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i> Pasarlas a mi cuenta' +
+                '<svg class="ic" aria-hidden="true"><use href="#ic-subir"></use></svg> Pasarlas a mi cuenta' +
               "</button>" +
               '<button type="button" class="btn btn-secondary btn-sm" data-action="descartarNotasAnteriores">' +
                 "Descartarlas" +
@@ -616,24 +617,24 @@
       var html = "";
 
       if (estado === "sin-backend") {
-        html = puerta("fa-screwdriver-wrench", "Mi promedio todavía no está disponible",
+        html = puerta("herramientas", "Mi promedio todavía no está disponible",
           '<p class="puerta-lead">Estamos terminando de preparar las cuentas. Mientras tanto, ' +
           "mesas, reválidas y el resto del sitio funcionan como siempre.</p>");
       } else if (estado === "sin-sesion") {
-        html = puerta("fa-graduation-cap", "Tu carrera, guardada en tu cuenta",
+        html = puerta("birrete", "Tu carrera, guardada en tu cuenta",
           '<p class="puerta-lead">Cargá tus materias una sola vez y mirá tu promedio desde el ' +
           "celular o la compu, cuando quieras.</p>" +
           '<ul class="check-list">' +
-            '<li><i class="fa-solid fa-calculator" aria-hidden="true"></i>' +
+            '<li><svg class="ic" aria-hidden="true"><use href="#ic-calculadora"></use></svg>' +
               "<span>Promedio con y sin aplazos, calculado como lo hace la UNLP</span></li>" +
-            '<li><i class="fa-solid fa-mobile-screen" aria-hidden="true"></i>' +
+            '<li><svg class="ic" aria-hidden="true"><use href="#ic-celular"></use></svg>' +
               "<span>Tus materias te siguen a cualquier dispositivo</span></li>" +
-            '<li><i class="fa-solid fa-lock" aria-hidden="true"></i>' +
+            '<li><svg class="ic" aria-hidden="true"><use href="#ic-candado"></use></svg>' +
               "<span>Otros estudiantes no pueden ver tus notas</span></li>" +
           "</ul>" +
           '<div class="puerta-acciones">' +
             '<button type="button" class="btn btn-magenta btn-lg" data-action="abrirAcceso" data-vista="registro">' +
-              '<i class="fa-solid fa-user-plus" aria-hidden="true"></i> Crear mi cuenta' +
+              '<svg class="ic" aria-hidden="true"><use href="#ic-persona-mas"></use></svg> Crear mi cuenta' +
             "</button>" +
             '<button type="button" class="btn btn-secondary btn-lg" data-action="abrirAcceso" data-vista="ingresar">' +
               "Ya tengo cuenta" +
@@ -644,11 +645,11 @@
       } else if (estado === "cargando") {
         html =
           '<div class="puerta-carrera puerta-cargando">' +
-            '<i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>' +
+            UI.icono("cargando", "ic-gira") +
             "<p>Trayendo tus materias…</p>" +
           "</div>";
       } else if (estado === "terminos") {
-        html = puerta("fa-shield-halved", "Antes de cargar tus materias",
+        html = puerta("escudo", "Antes de cargar tus materias",
           '<p class="puerta-lead">Queremos que sepas exactamente qué pasa con lo que cargás.</p>' +
           this.htmlTerminos() +
           '<div class="puerta-acciones">' +
@@ -659,11 +660,11 @@
           '<p class="puerta-nota">Si no estás de acuerdo, no pasa nada: el resto del sitio sigue ' +
           "abierto, y podés eliminar tu cuenta desde <strong>Mi cuenta</strong>.</p>");
       } else {
-        html = puerta("fa-plug-circle-exclamation", "No pudimos traer tus materias",
+        html = puerta("enchufe", "No pudimos traer tus materias",
           '<p class="puerta-lead">' + esc(detalle || "Algo salió mal.") + "</p>" +
           '<div class="puerta-acciones">' +
             '<button type="button" class="btn btn-magenta" data-action="reintentarCarrera">' +
-              '<i class="fa-solid fa-rotate-right" aria-hidden="true"></i> Probar de nuevo' +
+              '<svg class="ic" aria-hidden="true"><use href="#ic-rotar"></use></svg> Probar de nuevo' +
             "</button>" +
           "</div>");
       }

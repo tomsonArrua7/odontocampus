@@ -12,8 +12,8 @@
   <!-- Marca: un diente geométrico en blanco sobre el magenta de FOE. Se lee a
        16 px en una pestaña, que es la única prueba que importa para un ícono. -->
   <link rel="icon" href="favicon.ico" sizes="32x32">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260912g">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260912g">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260912h">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260912h">
 
   <meta property="og:title" content="OdontoCampus · FOE Odontología UNLP">
   <meta property="og:description" content="Mesas de examen y reválidas en vivo, historias clínicas, promedio y apuntes. Todo en un solo lugar.">
@@ -22,7 +22,7 @@
   <meta property="og:locale" content="es_AR">
   <!-- Imagen del enlace (WhatsApp, Instagram, Twitter). Tiene que ser una URL
        absoluta y un archivo rasterizado: ninguna de esas apps lee SVG. -->
-  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260912g">
+  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260912h">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="OdontoCampus · FOE Odontología UNLP">
@@ -48,7 +48,6 @@
        institucionales. Inter para leer. Plex Mono para códigos y numeración. -->
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
 
   <!-- Sistema de diseño: tokens → base → componentes → secciones → responsive -->
   <!-- El ?v= de cada CSS y cada JS no es decoración: el Vhost manda diez años
@@ -58,15 +57,107 @@
        LÍNEAS (y en las plantillas de correo del override de Supabase).
        Pasó de verdad: el sitio nuevo quedó cargando el config.js viejo, con la
        clave en PENDIENTE, y las cuentas no aparecían por ningún lado. -->
-  <link rel="stylesheet" href="css/01-tokens.css?v=20260912g">
-  <link rel="stylesheet" href="css/02-base.css?v=20260912g">
-  <link rel="stylesheet" href="css/03-components.css?v=20260912g">
-  <link rel="stylesheet" href="css/04-sections.css?v=20260912g">
-  <link rel="stylesheet" href="css/05-responsive.css?v=20260912g">
-  <link rel="stylesheet" href="css/06-cuentas.css?v=20260912g">
-  <link rel="stylesheet" href="css/07-movimiento.css?v=20260912g">
+  <link rel="stylesheet" href="css/01-tokens.css?v=20260912h">
+  <link rel="stylesheet" href="css/02-base.css?v=20260912h">
+  <link rel="stylesheet" href="css/03-components.css?v=20260912h">
+  <link rel="stylesheet" href="css/04-sections.css?v=20260912h">
+  <link rel="stylesheet" href="css/05-responsive.css?v=20260912h">
+  <link rel="stylesheet" href="css/06-cuentas.css?v=20260912h">
+  <link rel="stylesheet" href="css/07-movimiento.css?v=20260912h">
 </head>
 <body>
+
+<!-- ICONOS: generado por infra/iconos/armar-sprite.py. No editar a mano. -->
+<!--
+  ODONTOCAMPUS · JUEGO DE ÍCONOS
+  --------------------------------------------------------------------------
+  Este archivo se pega dentro de index.html (ver el bloque <svg> oculto al
+  principio del <body>). Está acá aparte para poder regenerarlo.
+
+  Se usa así:   <svg class="ic" aria-hidden="true"><use href="#ic-buscar"></use></svg>
+
+  Los íconos genéricos son de Lucide (https://lucide.dev), licencia ISC:
+    Copyright (c) for portions of Lucide are held by Cole Bemis 2013-2022 as
+    part of Feather (MIT). All other copyright (c) for Lucide are held by
+    Lucide Contributors 2022.
+  Van autoalojados: no hay ninguna llamada a un CDN externo.
+
+  El diente y el espejo bucal están dibujados para este proyecto, en la misma
+  retícula de 24 y con el mismo trazo: ningún set general los tiene.
+
+  El grosor, el color y el redondeo del trazo los pone la clase .ic en
+  css/03-components.css. Acá no va ni color ni stroke-width.
+-->
+
+<svg xmlns="http://www.w3.org/2000/svg" hidden aria-hidden="true">
+  <symbol id="ic-alerta" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /> <path d="M12 9v4" /> <path d="M12 17h.01" /></symbol>
+  <symbol id="ic-archivo" viewBox="0 0 24 24"><rect width="20" height="5" x="2" y="3" rx="1" /> <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" /> <path d="M10 12h4" /></symbol>
+  <symbol id="ic-avion" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" /> <path d="m21.854 2.147-10.94 10.939" /></symbol>
+  <symbol id="ic-balanza" viewBox="0 0 24 24"><path d="M12 3v18" /> <path d="m19 8 3 8a5 5 0 0 1-6 0zV7" /> <path d="M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1" /> <path d="m5 8 3 8a5 5 0 0 1-6 0zV7" /> <path d="M7 21h10" /></symbol>
+  <symbol id="ic-base-datos" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3" /> <path d="M3 5V19A9 3 0 0 0 21 19V5" /> <path d="M3 12A9 3 0 0 0 21 12" /></symbol>
+  <symbol id="ic-birrete" viewBox="0 0 24 24"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z" /> <path d="M22 10v6" /> <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5" /></symbol>
+  <symbol id="ic-buscar" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34" /> <circle cx="11" cy="11" r="8" /></symbol>
+  <symbol id="ic-calculadora" viewBox="0 0 24 24"><rect width="16" height="20" x="4" y="2" rx="2" /> <line x1="8" x2="16" y1="6" y2="6" /> <line x1="16" x2="16" y1="14" y2="18" /> <path d="M16 10h.01" /> <path d="M12 10h.01" /> <path d="M8 10h.01" /> <path d="M12 14h.01" /> <path d="M8 14h.01" /> <path d="M12 18h.01" /> <path d="M8 18h.01" /></symbol>
+  <symbol id="ic-calendario" viewBox="0 0 24 24"><path d="M8 2v3" /> <path d="M16 2v3" /> <rect x="3" y="3" width="18" height="18" rx="2" /> <path d="M3 9h18" /> <path d="m9 15 2 2 4-4" /></symbol>
+  <symbol id="ic-candado" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /> <path d="M7 11V7a5 5 0 0 1 10 0v4" /></symbol>
+  <symbol id="ic-cargando" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></symbol>
+  <symbol id="ic-casa" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /> <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></symbol>
+  <symbol id="ic-celular" viewBox="0 0 24 24"><rect width="14" height="20" x="5" y="2" rx="2" ry="2" /> <path d="M12 18h.01" /></symbol>
+  <symbol id="ic-cerrar" viewBox="0 0 24 24"><path d="M18 6 6 18" /> <path d="m6 6 12 12" /></symbol>
+  <symbol id="ic-certificado" viewBox="0 0 24 24"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526" /> <circle cx="12" cy="8" r="6" /></symbol>
+  <symbol id="ic-chat" viewBox="0 0 24 24"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" /></symbol>
+  <symbol id="ic-columnas" viewBox="0 0 24 24"><path d="M10 18v-7" /> <path d="M11.119 2.205a2 2 0 0 1 1.762 0l7.84 3.846A.5.5 0 0 1 20.5 7h-17a.5.5 0 0 1-.22-.949z" /> <path d="M14 18v-7" /> <path d="M18 18v-7" /> <path d="M3 22h18" /> <path d="M6 18v-7" /></symbol>
+  <symbol id="ic-copiar" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /> <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></symbol>
+  <symbol id="ic-descargar" viewBox="0 0 24 24"><path d="M12 15V3" /> <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /> <path d="m7 10 5 5 5-5" /></symbol>
+  <symbol id="ic-deshacer" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /> <path d="M3 3v5h5" /></symbol>
+  <symbol id="ic-diana" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <circle cx="12" cy="12" r="6" /> <circle cx="12" cy="12" r="2" /></symbol>
+  <symbol id="ic-diente" viewBox="0 0 24 24"><path d="M6.4 8.6C6.4 5.2 8.9 3 12 3s5.6 2.2 5.6 5.6c0 1.9-.6 3-1 4.4-.5 1.9-.5 6.5-2.2 6.5-1.3 0-1.1-4.2-2.4-4.2s-1.1 4.2-2.4 4.2c-1.7 0-1.7-4.6-2.2-6.5-.4-1.4-1-2.5-1-4.4Z"/></symbol>
+  <symbol id="ic-documento" viewBox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" /> <path d="M14 2v5a1 1 0 0 0 1 1h5" /> <path d="M10 9H8" /> <path d="M16 13H8" /> <path d="M16 17H8" /></symbol>
+  <symbol id="ic-enchufe" viewBox="0 0 24 24"><path d="m19 5 3-3" /> <path d="m2 22 3-3" /> <path d="M6.3 20.3a2.4 2.4 0 0 0 3.4 0L12 18l-6-6-2.3 2.3a2.4 2.4 0 0 0 0 3.4Z" /> <path d="M7.5 13.5 10 11" /> <path d="M10.5 16.5 13 14" /> <path d="m12 6 6 6 2.3-2.3a2.4 2.4 0 0 0 0-3.4l-2.6-2.6a2.4 2.4 0 0 0-3.4 0Z" /></symbol>
+  <symbol id="ic-entrar" viewBox="0 0 24 24"><path d="m10 17 5-5-5-5" /> <path d="M15 12H3" /> <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /></symbol>
+  <symbol id="ic-escudo" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /> <path d="m9 12 2 2 4-4" /></symbol>
+  <symbol id="ic-estrella" viewBox="0 0 24 24"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" /></symbol>
+  <symbol id="ic-etiqueta" viewBox="0 0 24 24"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z" /> <circle cx="7.5" cy="7.5" r=".5" fill="currentColor" /></symbol>
+  <symbol id="ic-externo" viewBox="0 0 24 24"><path d="M15 3h6v6" /> <path d="M10 14 21 3" /> <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /></symbol>
+  <symbol id="ic-filtro" viewBox="0 0 24 24"><path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" /></symbol>
+  <symbol id="ic-flecha-der" viewBox="0 0 24 24"><path d="M5 12h14" /> <path d="m12 5 7 7-7 7" /></symbol>
+  <symbol id="ic-flecha-izq" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7" /> <path d="M19 12H5" /></symbol>
+  <symbol id="ic-herramientas" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z" /></symbol>
+  <symbol id="ic-historial" viewBox="0 0 24 24"><path d="M12 6v6l2 1" /> <path d="M12.337 21.994a10 10 0 1 1 9.588-8.767" /> <path d="m14 18 4 4 4-4" /> <path d="M18 14v8" /></symbol>
+  <symbol id="ic-idea" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" /> <path d="M9 18h6" /> <path d="M10 22h4" /></symbol>
+  <symbol id="ic-imprimir" viewBox="0 0 24 24"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" /> <path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6" /> <rect x="6" y="14" width="12" height="8" rx="1" /></symbol>
+  <symbol id="ic-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="M12 16v-4" /> <path d="M12 8h.01" /></symbol>
+  <symbol id="ic-instagram" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M16.9 7.1h.01"/></symbol>
+  <symbol id="ic-lapiz" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /> <path d="m15 5 4 4" /></symbol>
+  <symbol id="ic-libro" viewBox="0 0 24 24"><path d="M12 5v16" /> <path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z" /></symbol>
+  <symbol id="ic-lista" viewBox="0 0 24 24"><path d="M13 5h8" /> <path d="M13 12h8" /> <path d="M13 19h8" /> <path d="m3 17 2 2 4-4" /> <path d="m3 7 2 2 4-4" /></symbol>
+  <symbol id="ic-llave" viewBox="0 0 24 24"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z" /> <circle cx="16.5" cy="7.5" r=".5" fill="currentColor" /></symbol>
+  <symbol id="ic-luna" viewBox="0 0 24 24"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" /></symbol>
+  <symbol id="ic-maletin" viewBox="0 0 24 24"><path d="M12 11v4" /> <path d="M14 13h-4" /> <path d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" /> <path d="M18 6v14" /> <path d="M6 6v14" /> <rect width="20" height="14" x="2" y="6" rx="2" /></symbol>
+  <symbol id="ic-marcador" viewBox="0 0 24 24"><path d="M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z" /></symbol>
+  <symbol id="ic-megafono" viewBox="0 0 24 24"><path d="M11 6a13 13 0 0 0 8.4-2.8A1 1 0 0 1 21 4v12a1 1 0 0 1-1.6.8A13 13 0 0 0 11 14H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" /> <path d="M6 14a12 12 0 0 0 2.4 7.2 2 2 0 0 0 3.2-2.4A8 8 0 0 1 10 14" /> <path d="M8 6v8" /></symbol>
+  <symbol id="ic-menu" viewBox="0 0 24 24"><path d="M4 5h16" /> <path d="M4 12h16" /> <path d="M4 19h16" /></symbol>
+  <symbol id="ic-monitor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2" /> <line x1="8" x2="16" y1="21" y2="21" /> <line x1="12" x2="12" y1="17" y2="21" /></symbol>
+  <symbol id="ic-ojo" viewBox="0 0 24 24"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /> <circle cx="12" cy="12" r="3" /></symbol>
+  <symbol id="ic-ojo-tachado" viewBox="0 0 24 24"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" /> <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" /> <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" /> <path d="m2 2 20 20" /></symbol>
+  <symbol id="ic-persona" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /> <circle cx="12" cy="7" r="4" /></symbol>
+  <symbol id="ic-persona-mas" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /> <circle cx="9" cy="7" r="4" /> <line x1="19" x2="19" y1="8" y2="14" /> <line x1="22" x2="16" y1="11" y2="11" /></symbol>
+  <symbol id="ic-persona-ok" viewBox="0 0 24 24"><path d="m16 11 2 2 4-4" /> <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /> <circle cx="9" cy="7" r="4" /></symbol>
+  <symbol id="ic-pin" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" /> <circle cx="12" cy="10" r="3" /></symbol>
+  <symbol id="ic-pregunta" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /> <path d="M12 17h.01" /></symbol>
+  <symbol id="ic-reloj" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="M12 6v6l4 2" /></symbol>
+  <symbol id="ic-rotar" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /> <path d="M21 3v5h-5" /> <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /> <path d="M8 16H3v5" /></symbol>
+  <symbol id="ic-salir" viewBox="0 0 24 24"><path d="m16 17 5-5-5-5" /> <path d="M21 12H9" /> <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /></symbol>
+  <symbol id="ic-sobre" viewBox="0 0 24 24"><path d="M21.2 8.4c.5.38.8.97.8 1.6v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V10a2 2 0 0 1 .8-1.6l8-6a2 2 0 0 1 2.4 0l8 6Z" /> <path d="m22 10-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 10" /></symbol>
+  <symbol id="ic-sol" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" /> <path d="M12 2v2" /> <path d="M12 20v2" /> <path d="m4.93 4.93 1.41 1.41" /> <path d="m17.66 17.66 1.41 1.41" /> <path d="M2 12h2" /> <path d="M20 12h2" /> <path d="m6.34 17.66-1.41 1.41" /> <path d="m19.07 4.93-1.41 1.41" /></symbol>
+  <symbol id="ic-subir" viewBox="0 0 24 24"><path d="M12 13v8" /> <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" /> <path d="m8 17 4-4 4 4" /></symbol>
+  <symbol id="ic-tacho" viewBox="0 0 24 24"><path d="M10 11v6" /> <path d="M14 11v6" /> <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /> <path d="M3 6h18" /> <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></symbol>
+  <symbol id="ic-tilde" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol>
+  <symbol id="ic-tilde-circulo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="m16 9-5.5 5.5L8 12" /></symbol>
+  <symbol id="ic-video" viewBox="0 0 24 24"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" /> <rect x="2" y="6" width="14" height="12" rx="2" /></symbol>
+  <symbol id="ic-wifi" viewBox="0 0 24 24"><path d="M12 20h.01" /> <path d="M2 8.82a15 15 0 0 1 20 0" /> <path d="M5 12.859a10 10 0 0 1 14 0" /> <path d="M8.5 16.429a5 5 0 0 1 7 0" /></symbol>
+</svg>
+<!-- FIN ICONOS -->
 
 <a class="skip-link" href="#contenido-principal">Saltar al contenido</a>
 
@@ -87,16 +178,16 @@
       </a>
 
       <ul class="nav-menu">
-        <li><a href="#inicio" class="nav-link" data-nav="inicio"><i class="fa-solid fa-house" aria-hidden="true"></i> Inicio</a></li>
-        <li><a href="#fechas" class="nav-link" data-nav="fechas"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i> Cuándo rindo</a></li>
-        <li><a href="#cursada" class="nav-link" data-nav="cursada"><i class="fa-solid fa-tooth" aria-hidden="true"></i> Cursada y clínica</a></li>
-        <li><a href="#biblioteca" class="nav-link" data-nav="biblioteca"><i class="fa-solid fa-book-bookmark" aria-hidden="true"></i> Biblioteca</a></li>
-        <li><a href="#carrera" class="nav-link" data-nav="carrera"><i class="fa-solid fa-calculator" aria-hidden="true"></i> Mi carrera</a></li>
+        <li><a href="#inicio" class="nav-link" data-nav="inicio">Inicio</a></li>
+        <li><a href="#fechas" class="nav-link" data-nav="fechas">Cuándo rindo</a></li>
+        <li><a href="#cursada" class="nav-link" data-nav="cursada">Cursada y clínica</a></li>
+        <li><a href="#biblioteca" class="nav-link" data-nav="biblioteca">Biblioteca</a></li>
+        <li><a href="#carrera" class="nav-link" data-nav="carrera">Mi carrera</a></li>
       </ul>
 
       <div class="nav-utils">
         <button type="button" class="btn-search-trigger" data-action="abrirBusqueda" aria-label="Buscar en toda la plataforma">
-          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <svg class="ic" aria-hidden="true"><use href="#ic-buscar"></use></svg>
           <span>Buscar</span>
           <span class="kbd-shortcut" aria-hidden="true">Ctrl K</span>
         </button>
@@ -108,13 +199,13 @@
 
         <button type="button" class="theme-toggle" id="theme-toggle" data-action="cambiarTema"
                 aria-pressed="false" aria-label="Cambiar a tema oscuro">
-          <i class="fa-solid fa-moon icon-light" aria-hidden="true"></i>
-          <i class="fa-solid fa-sun icon-dark" aria-hidden="true"></i>
+          <svg class="ic icon-light" aria-hidden="true"><use href="#ic-luna"></use></svg>
+          <svg class="ic icon-dark" aria-hidden="true"><use href="#ic-sol"></use></svg>
         </button>
 
         <button type="button" class="mobile-toggle" id="mobile-menu-btn"
                 aria-expanded="false" aria-controls="mobile-nav-menu" aria-label="Abrir menú">
-          <i class="fa-solid fa-bars" aria-hidden="true"></i>
+          <svg class="ic" aria-hidden="true"><use href="#ic-menu"></use></svg>
         </button>
       </div>
     </nav>
@@ -130,17 +221,17 @@
              suelta. -->
         <li class="solo-menu-chico">
           <button type="button" class="nav-link" data-action="abrirBusqueda">
-            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Buscar en el sitio
+            <svg class="ic" aria-hidden="true"><use href="#ic-buscar"></use></svg> Buscar en el sitio
           </button>
         </li>
-        <li><a href="#inicio" class="nav-link" data-nav="inicio"><i class="fa-solid fa-house" aria-hidden="true"></i> Inicio</a></li>
-        <li><a href="#fechas/mesas" class="nav-link" data-nav="fechas/mesas"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i> Mesas de finales</a></li>
-        <li><a href="#fechas/revalidas" class="nav-link" data-nav="fechas/revalidas"><i class="fa-solid fa-certificate" aria-hidden="true"></i> Reválidas y actualizaciones</a></li>
-        <li><a href="#cursada/historias" class="nav-link" data-nav="cursada/historias"><i class="fa-solid fa-file-medical" aria-hidden="true"></i> Historias clínicas</a></li>
-        <li><a href="#cursada/instrumental" class="nav-link" data-nav="cursada/instrumental"><i class="fa-solid fa-toolbox" aria-hidden="true"></i> Instrumental por cátedra</a></li>
-        <li><a href="#cursada/bolsa" class="nav-link" data-nav="cursada/bolsa"><i class="fa-solid fa-tags" aria-hidden="true"></i> Bolsa de compra y venta</a></li>
-        <li><a href="#biblioteca" class="nav-link" data-nav="biblioteca"><i class="fa-solid fa-book-bookmark" aria-hidden="true"></i> Biblioteca de apuntes</a></li>
-        <li><a href="#carrera" class="nav-link" data-nav="carrera"><i class="fa-solid fa-calculator" aria-hidden="true"></i> Mi carrera</a></li>
+        <li><a href="#inicio" class="nav-link" data-nav="inicio">Inicio</a></li>
+        <li><a href="#fechas/mesas" class="nav-link" data-nav="fechas/mesas">Mesas de finales</a></li>
+        <li><a href="#fechas/revalidas" class="nav-link" data-nav="fechas/revalidas">Reválidas y actualizaciones</a></li>
+        <li><a href="#cursada/historias" class="nav-link" data-nav="cursada/historias">Historias clínicas</a></li>
+        <li><a href="#cursada/instrumental" class="nav-link" data-nav="cursada/instrumental">Instrumental por cátedra</a></li>
+        <li><a href="#cursada/bolsa" class="nav-link" data-nav="cursada/bolsa">Bolsa de compra y venta</a></li>
+        <li><a href="#biblioteca" class="nav-link" data-nav="biblioteca">Biblioteca de apuntes</a></li>
+        <li><a href="#carrera" class="nav-link" data-nav="carrera">Mi carrera</a></li>
       </ul>
       </nav>
       <p class="mobile-nav-note">¿Necesitás algo puntual? Usá el buscador: encuentra mesas, materias, apuntes e historias clínicas a la vez.</p>
@@ -171,10 +262,10 @@
             </p>
             <div class="hero-cta-group">
               <a href="#fechas/mesas" class="btn btn-magenta btn-lg" data-nav="fechas/mesas">
-                <i class="fa-solid fa-calendar-check" aria-hidden="true"></i> Ver mesas de finales
+                <svg class="ic" aria-hidden="true"><use href="#ic-calendario"></use></svg> Ver mesas de finales
               </a>
               <a href="#fechas/revalidas" class="btn btn-lg btn-on-brand" data-nav="fechas/revalidas">
-                <i class="fa-solid fa-certificate" aria-hidden="true"></i> Ver reválidas
+                <svg class="ic" aria-hidden="true"><use href="#ic-certificado"></use></svg> Ver reválidas
               </a>
             </div>
             <p class="hero-nota">
@@ -201,7 +292,7 @@
       <div class="home-panel">
         <div class="next-up">
           <div class="next-up-head">
-            <h3><i class="fa-solid fa-clock" aria-hidden="true"></i> Tus próximas fechas</h3>
+            <h3><svg class="ic" aria-hidden="true"><use href="#ic-reloj"></use></svg> Tus próximas fechas</h3>
             <a href="#fechas" class="btn btn-secondary btn-sm" data-nav="fechas">Ver todas</a>
           </div>
           <div class="next-list" id="proximas-fechas-lista">
@@ -211,7 +302,7 @@
 
         <div class="next-up">
           <div class="next-up-head">
-            <h3><i class="fa-solid fa-list-check" aria-hidden="true"></i> Trámites y plazos</h3>
+            <h3><svg class="ic" aria-hidden="true"><use href="#ic-lista"></use></svg> Trámites y plazos</h3>
           </div>
           <div class="fechas-list" id="fechas-clave-lista"></div>
         </div>
@@ -219,7 +310,7 @@
 
       <div class="section-header">
         <div class="section-title-wrap">
-          <h2><i class="fa-solid fa-bullhorn" aria-hidden="true"></i> Novedades de FOE</h2>
+          <h2><svg class="ic" aria-hidden="true"><use href="#ic-megafono"></use></svg> Novedades de FOE</h2>
           <p>Avisos académicos y gremiales, talleres y beneficios estudiantiles.</p>
         </div>
       </div>
@@ -238,7 +329,7 @@
     <div class="container">
       <div class="section-header">
         <div class="section-title-wrap">
-          <h2 id="titulo-fechas"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i> Cuándo rindo</h2>
+          <h2 id="titulo-fechas">Cuándo rindo</h2>
           <p>Fechas oficiales de mesas de finales, reválidas y actualizaciones, sincronizadas en vivo desde la planilla de cátedras.</p>
         </div>
       </div>
@@ -246,13 +337,13 @@
       <div class="tabs" role="tablist" aria-label="Tipo de fecha">
         <button type="button" class="tab" role="tab" id="tab-mesas" data-tab="mesas"
                 aria-controls="panel-mesas" aria-selected="true">
-          <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
+          <svg class="ic" aria-hidden="true"><use href="#ic-calendario"></use></svg>
           Mesas de finales
           <span class="tab-count" id="mesas-count-badge">—</span>
         </button>
         <button type="button" class="tab" role="tab" id="tab-revalidas" data-tab="revalidas"
                 aria-controls="panel-revalidas" aria-selected="false" tabindex="-1">
-          <i class="fa-solid fa-certificate" aria-hidden="true"></i>
+          <svg class="ic" aria-hidden="true"><use href="#ic-certificado"></use></svg>
           Reválidas y actualizaciones
           <span class="tab-count" id="revalidas-count-badge">—</span>
         </button>
@@ -269,7 +360,7 @@
           <div class="live-actions-group">
             <span class="sync-status-time" id="sync-status-mesas">Actualizando…</span>
             <button type="button" class="btn-sync-sheets" id="btn-sync-mesas" data-action="sincronizarMesas">
-              <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Actualizar ahora
+              <svg class="ic" aria-hidden="true"><use href="#ic-rotar"></use></svg> Actualizar ahora
             </button>
           </div>
         </div>
@@ -292,7 +383,7 @@
             </div>
             <div class="field search-field">
               <label class="field-label" for="mesas-search-input">Buscar materia o cátedra</label>
-              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              <svg class="ic" aria-hidden="true"><use href="#ic-buscar"></use></svg>
               <input type="search" id="mesas-search-input" class="form-control" placeholder="Anatomía, Cirugía, Operatoria…">
             </div>
           </div>
@@ -311,7 +402,7 @@
           confunden. Que la diferencia esté acá evita una consulta por WhatsApp.
         -->
         <div class="info-banner-foe">
-          <h3><i class="fa-solid fa-circle-question" aria-hidden="true"></i> ¿Reválida o actualización?</h3>
+          <h3><svg class="ic" aria-hidden="true"><use href="#ic-pregunta"></use></svg> ¿Reválida o actualización?</h3>
           <dl class="def-list">
             <div>
               <dt>Reválida</dt>
@@ -336,7 +427,7 @@
           <div class="live-actions-group">
             <span class="sync-status-time" id="sync-status-revalidas">Actualizando…</span>
             <button type="button" class="btn-sync-sheets" id="btn-sync-revalidas" data-action="sincronizarRevalidas">
-              <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Actualizar ahora
+              <svg class="ic" aria-hidden="true"><use href="#ic-rotar"></use></svg> Actualizar ahora
             </button>
           </div>
         </div>
@@ -359,7 +450,7 @@
             </div>
             <div class="field search-field">
               <label class="field-label" for="revalidas-search-input">Buscar materia</label>
-              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              <svg class="ic" aria-hidden="true"><use href="#ic-buscar"></use></svg>
               <input type="search" id="revalidas-search-input" class="form-control" placeholder="Biología, Fisiología, Biofísica…">
             </div>
           </div>
@@ -380,7 +471,7 @@
     <div class="container">
       <div class="section-header">
         <div class="section-title-wrap">
-          <h2 id="titulo-cursada"><i class="fa-solid fa-tooth" aria-hidden="true"></i> Cursada y clínica</h2>
+          <h2 id="titulo-cursada">Cursada y clínica</h2>
           <p>Lo que necesitás para atender: papelería oficial, instrumental exigido por cada cátedra y equipamiento de segunda mano entre estudiantes.</p>
         </div>
       </div>
@@ -388,15 +479,15 @@
       <div class="tabs" role="tablist" aria-label="Secciones de cursada">
         <button type="button" class="tab" role="tab" id="tab-historias" data-tab="historias"
                 aria-controls="panel-historias" aria-selected="true">
-          <i class="fa-solid fa-file-medical" aria-hidden="true"></i> Historias clínicas
+          <svg class="ic" aria-hidden="true"><use href="#ic-documento"></use></svg> Historias clínicas
         </button>
         <button type="button" class="tab" role="tab" id="tab-instrumental" data-tab="instrumental"
                 aria-controls="panel-instrumental" aria-selected="false" tabindex="-1">
-          <i class="fa-solid fa-toolbox" aria-hidden="true"></i> Instrumental por cátedra
+          <svg class="ic" aria-hidden="true"><use href="#ic-maletin"></use></svg> Instrumental por cátedra
         </button>
         <button type="button" class="tab" role="tab" id="tab-bolsa" data-tab="bolsa"
                 aria-controls="panel-bolsa" aria-selected="false" tabindex="-1">
-          <i class="fa-solid fa-tags" aria-hidden="true"></i> Bolsa de compra y venta
+          <svg class="ic" aria-hidden="true"><use href="#ic-etiqueta"></use></svg> Bolsa de compra y venta
         </button>
       </div>
 
@@ -405,11 +496,11 @@
           <div class="filter-group">
             <div class="field search-field">
               <label class="field-label" for="hc-search-input">Buscar por materia o cátedra</label>
-              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              <svg class="ic" aria-hidden="true"><use href="#ic-buscar"></use></svg>
               <input type="search" id="hc-search-input" class="form-control" placeholder="Operatoria, Cirugía, Endodoncia…">
             </div>
           </div>
-          <p class="filter-note"><i class="fa-solid fa-print" aria-hidden="true"></i> Se abren listas para imprimir o guardar en PDF</p>
+          <p class="filter-note"><svg class="ic" aria-hidden="true"><use href="#ic-imprimir"></use></svg> Se abren listas para imprimir o guardar en PDF</p>
         </div>
         <p class="results-summary" id="historias-summary" role="status" aria-live="polite"></p>
         <div class="hc-grid" id="historias-grid"></div>
@@ -417,7 +508,7 @@
 
       <div class="tab-panel" id="panel-instrumental" role="tabpanel" aria-labelledby="tab-instrumental" tabindex="0" hidden>
         <div class="callout callout-info">
-          <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+          <svg class="ic" aria-hidden="true"><use href="#ic-info"></use></svg>
           <div>
             <h3>Antes de comprar, revisá esta lista</h3>
             <p>Cada cátedra pide su propio equipamiento y hay elementos que sirven para varias materias. Comprar de más es el error más caro de la carrera.</p>
@@ -431,11 +522,11 @@
           <div class="filter-group">
             <div class="field search-field">
               <label class="field-label" for="bolsa-search-input">Buscar artículo</label>
-              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              <svg class="ic" aria-hidden="true"><use href="#ic-buscar"></use></svg>
               <input type="search" id="bolsa-search-input" class="form-control" placeholder="Articulador, turbina, fórceps, curetas…">
             </div>
           </div>
-          <p class="filter-note"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Publicaciones entre estudiantes: coordiná siempre en la facultad</p>
+          <p class="filter-note"><svg class="ic" aria-hidden="true"><use href="#ic-escudo"></use></svg> Publicaciones entre estudiantes: coordiná siempre en la facultad</p>
         </div>
         <p class="results-summary" id="bolsa-summary" role="status" aria-live="polite"></p>
         <div class="bolsa-grid" id="bolsa-grid"></div>
@@ -450,7 +541,7 @@
     <div class="container">
       <div class="section-header">
         <div class="section-title-wrap">
-          <h2 id="titulo-biblioteca"><i class="fa-solid fa-book-bookmark" aria-hidden="true"></i> Biblioteca de apuntes</h2>
+          <h2 id="titulo-biblioteca">Biblioteca de apuntes</h2>
           <p>Resúmenes revisados, guías de trabajos prácticos y pregunteros aportados por estudiantes y la comisión de apuntes.</p>
         </div>
       </div>
@@ -470,7 +561,7 @@
           </div>
           <div class="field search-field">
             <label class="field-label" for="biblio-search-input">Buscar por tema, materia o autor</label>
-            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <svg class="ic" aria-hidden="true"><use href="#ic-buscar"></use></svg>
             <input type="search" id="biblio-search-input" class="form-control" placeholder="Huesos, Farmacología, Resinas…">
           </div>
         </div>
@@ -488,7 +579,7 @@
     <div class="container">
       <div class="section-header">
         <div class="section-title-wrap">
-          <h2 id="titulo-carrera"><i class="fa-solid fa-calculator" aria-hidden="true"></i> Mi carrera</h2>
+          <h2 id="titulo-carrera">Mi carrera</h2>
           <p>Tu promedio con y sin aplazos, como lo calcula la UNLP, y el avance materia por materia.</p>
         </div>
       </div>
@@ -563,12 +654,12 @@
           </div>
           <div class="filter-group" style="flex:0 0 auto; align-items:center;">
             <p class="privacy-note">
-              <i class="fa-solid fa-lock" aria-hidden="true"></i>
+              <svg class="ic" aria-hidden="true"><use href="#ic-candado"></use></svg>
               Se guardan en tu cuenta. Otros estudiantes no pueden verlas.
             </p>
             <span class="estado-guardado" id="estado-guardado"></span>
             <button type="button" class="btn btn-secondary btn-sm" data-action="reiniciarNotas">
-              <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Borrar mis notas
+              <svg class="ic" aria-hidden="true"><use href="#ic-deshacer"></use></svg> Borrar mis notas
             </button>
           </div>
         </div>
@@ -584,20 +675,20 @@
      ========================================================================== -->
 <button type="button" class="odontobot-fab" id="odontobot-toggle-btn" data-action="alternarChat"
         aria-expanded="false" aria-controls="odontobot-window" aria-label="Abrir el asistente OdontoBot">
-  <i class="fa-solid fa-comment-medical" aria-hidden="true"></i>
+  <svg class="ic" aria-hidden="true"><use href="#ic-chat"></use></svg>
 </button>
 
 <div class="odontobot-window" id="odontobot-window" role="dialog" aria-label="Asistente OdontoBot" aria-modal="false">
   <div class="chat-header">
     <div class="chat-header-info">
-      <span class="bot-avatar-header" aria-hidden="true"><i class="fa-solid fa-tooth"></i></span>
+      <span class="bot-avatar-header" aria-hidden="true"><svg class="ic" aria-hidden="true"><use href="#ic-diente"></use></svg></span>
       <span>
         <strong>OdontoBot</strong>
         <small>Respuestas rápidas de FOE</small>
       </span>
     </div>
     <button type="button" class="chat-close-btn" data-action="alternarChat" aria-label="Cerrar el asistente">
-      <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      <svg class="ic" aria-hidden="true"><use href="#ic-cerrar"></use></svg>
     </button>
   </div>
 
@@ -614,7 +705,7 @@
     <label class="visually-hidden" for="odontobot-input">Escribí tu consulta</label>
     <input type="text" id="odontobot-input" placeholder="Preguntá sobre mesas, dosis, instrumental…" autocomplete="off">
     <button type="submit" class="chat-send-btn" aria-label="Enviar consulta">
-      <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+      <svg class="ic" aria-hidden="true"><use href="#ic-avion"></use></svg>
     </button>
   </form>
 </div>
@@ -627,7 +718,7 @@
     <div class="modal-card-header">
       <h2 class="visually-hidden" id="search-modal-title">Buscar en OdontoCampus</h2>
       <div class="search-field" style="flex:1">
-        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <svg class="ic" aria-hidden="true"><use href="#ic-buscar"></use></svg>
         <label class="visually-hidden" for="global-search-input">Buscar mesas, reválidas, materias o apuntes</label>
         <input type="search" id="global-search-input" class="form-control"
                placeholder="Mesas, reválidas, materias, apuntes…"
@@ -635,7 +726,7 @@
                aria-controls="global-search-results" aria-autocomplete="list">
       </div>
       <button type="button" class="btn btn-icon btn-secondary" data-action="cerrarBusqueda" aria-label="Cerrar la búsqueda">
-        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        <svg class="ic" aria-hidden="true"><use href="#ic-cerrar"></use></svg>
       </button>
     </div>
     <div class="modal-card-body">
@@ -651,7 +742,7 @@
     <div class="modal-card-header">
       <div id="modal-generico-header"></div>
       <button type="button" class="btn btn-icon btn-secondary" data-action="cerrarModal" aria-label="Cerrar">
-        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        <svg class="ic" aria-hidden="true"><use href="#ic-cerrar"></use></svg>
       </button>
     </div>
     <div class="modal-card-body" id="modal-generico-body"></div>
@@ -667,13 +758,13 @@
     <div class="modal-card-header">
       <h2 id="acceso-titulo">Ingresar a OdontoCampus</h2>
       <button type="button" class="btn btn-icon btn-secondary" data-action="cerrarAcceso" aria-label="Cerrar">
-        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        <svg class="ic" aria-hidden="true"><use href="#ic-cerrar"></use></svg>
       </button>
     </div>
 
     <div class="modal-card-body">
       <div class="callout callout-warning aviso-acceso" id="acceso-aviso" hidden>
-        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+        <svg class="ic" aria-hidden="true"><use href="#ic-info"></use></svg>
         <div><p id="acceso-aviso-texto"></p></div>
       </div>
 
@@ -692,12 +783,12 @@
                      autocomplete="current-password">
               <button type="button" class="btn-ver-clave" data-action="alternarClave" data-campo="ingresar-clave"
                       aria-label="Mostrar la contraseña" aria-pressed="false">
-                <i class="fa-regular fa-eye" aria-hidden="true"></i>
+                <svg class="ic" aria-hidden="true"><use href="#ic-ojo"></use></svg>
               </button>
             </div>
           </div>
           <button type="submit" class="btn btn-magenta btn-block" id="btn-ingresar">
-            <i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> Ingresar
+            <svg class="ic" aria-hidden="true"><use href="#ic-entrar"></use></svg> Ingresar
           </button>
         </form>
 
@@ -710,7 +801,7 @@
         <div class="acceso-alternativa">
           <span>¿Todavía no tenés cuenta?</span>
           <button type="button" class="btn btn-outline-magenta btn-block" data-action="irAVista" data-vista="registro">
-            <i class="fa-solid fa-user-plus" aria-hidden="true"></i> Crear mi cuenta
+            <svg class="ic" aria-hidden="true"><use href="#ic-persona-mas"></use></svg> Crear mi cuenta
           </button>
         </div>
       </div>
@@ -738,7 +829,7 @@
                      aria-describedby="registro-clave-fuerza registro-clave-ayuda">
               <button type="button" class="btn-ver-clave" data-action="alternarClave" data-campo="registro-clave"
                       aria-label="Mostrar la contraseña" aria-pressed="false">
-                <i class="fa-regular fa-eye" aria-hidden="true"></i>
+                <svg class="ic" aria-hidden="true"><use href="#ic-ojo"></use></svg>
               </button>
             </div>
             <p class="clave-fuerza" id="registro-clave-fuerza" aria-live="polite" hidden></p>
@@ -760,7 +851,7 @@
           </label>
 
           <button type="submit" class="btn btn-magenta btn-block" id="btn-registro">
-            <i class="fa-solid fa-user-plus" aria-hidden="true"></i> Crear mi cuenta
+            <svg class="ic" aria-hidden="true"><use href="#ic-persona-mas"></use></svg> Crear mi cuenta
           </button>
         </form>
 
@@ -783,13 +874,13 @@
                    autocomplete="username" inputmode="email" placeholder="nombre@ejemplo.com">
           </div>
           <button type="submit" class="btn btn-magenta btn-block" id="btn-olvide">
-            <i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Enviarme el correo
+            <svg class="ic" aria-hidden="true"><use href="#ic-avion"></use></svg> Enviarme el correo
           </button>
         </form>
 
         <p class="acceso-enlaces">
           <button type="button" class="btn-enlace" data-action="irAVista" data-vista="ingresar">
-            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Volver a ingresar
+            <svg class="ic" aria-hidden="true"><use href="#ic-flecha-izq"></use></svg> Volver a ingresar
           </button>
         </p>
       </div>
@@ -797,14 +888,14 @@
       <!-- Revisá tu correo -->
       <div id="vista-correo" hidden>
         <div class="correo-enviado">
-          <span class="correo-icono" aria-hidden="true"><i class="fa-solid fa-envelope-open-text"></i></span>
+          <span class="correo-icono" aria-hidden="true"><svg class="ic" aria-hidden="true"><use href="#ic-sobre"></use></svg></span>
           <p class="modal-lead">Te mandamos un correo a <strong id="correo-destino"></strong>.</p>
           <p id="correo-explicacion"></p>
         </div>
 
         <ul class="check-list correo-consejos">
-          <li><i class="fa-solid fa-clock" aria-hidden="true"></i><span>Puede tardar un par de minutos.</span></li>
-          <li><i class="fa-solid fa-filter" aria-hidden="true"></i><span>Si no aparece, buscalo en <strong>Spam</strong> o <strong>Promociones</strong>.</span></li>
+          <li><svg class="ic" aria-hidden="true"><use href="#ic-reloj"></use></svg><span>Puede tardar un par de minutos.</span></li>
+          <li><svg class="ic" aria-hidden="true"><use href="#ic-filtro"></use></svg><span>Si no aparece, buscalo en <strong>Spam</strong> o <strong>Promociones</strong>.</span></li>
         </ul>
         <p class="field-hint" id="correo-nota"></p>
 
@@ -829,7 +920,7 @@
     <div class="modal-card-header">
       <h2 id="cuenta-titulo">Mi cuenta</h2>
       <button type="button" class="btn btn-icon btn-secondary" data-action="cerrarCuenta" aria-label="Cerrar">
-        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        <svg class="ic" aria-hidden="true"><use href="#ic-cerrar"></use></svg>
       </button>
     </div>
 
@@ -846,11 +937,11 @@
       </dl>
 
       <button type="button" class="btn btn-secondary btn-block" data-action="abrirCambioClave">
-        <i class="fa-solid fa-key" aria-hidden="true"></i> Cambiar mi contraseña
+        <svg class="ic" aria-hidden="true"><use href="#ic-llave"></use></svg> Cambiar mi contraseña
       </button>
 
       <div class="callout callout-info">
-        <i class="fa-solid fa-scale-balanced" aria-hidden="true"></i>
+        <svg class="ic" aria-hidden="true"><use href="#ic-balanza"></use></svg>
         <div>
           <h3>Tus datos son tuyos</h3>
           <p>Podés descargar todo lo que guardamos sobre vos, o borrar la cuenta
@@ -860,17 +951,17 @@
 
       <div class="acciones-cuenta">
         <button type="button" class="btn btn-secondary" data-action="exportarDatos">
-          <i class="fa-solid fa-download" aria-hidden="true"></i> Descargar mis datos
+          <svg class="ic" aria-hidden="true"><use href="#ic-descargar"></use></svg> Descargar mis datos
         </button>
         <button type="button" class="btn btn-danger-soft" data-action="eliminarCuenta">
-          <i class="fa-solid fa-trash-can" aria-hidden="true"></i> Eliminar mi cuenta
+          <svg class="ic" aria-hidden="true"><use href="#ic-tacho"></use></svg> Eliminar mi cuenta
         </button>
       </div>
     </div>
 
     <div class="modal-card-footer">
       <button type="button" class="btn btn-secondary" data-action="cerrarSesion">
-        <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i> Cerrar sesión
+        <svg class="ic" aria-hidden="true"><use href="#ic-salir"></use></svg> Cerrar sesión
       </button>
     </div>
   </div>
@@ -885,7 +976,7 @@
       <div class="modal-card-header">
         <h2 id="clave-nueva-titulo">Elegí tu contraseña nueva</h2>
         <button type="button" class="btn btn-icon btn-secondary" data-action="cerrarClaveNueva" aria-label="Cerrar">
-          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          <svg class="ic" aria-hidden="true"><use href="#ic-cerrar"></use></svg>
         </button>
       </div>
 
@@ -893,7 +984,7 @@
         <p id="clave-nueva-ayuda"></p>
 
         <div class="callout callout-warning aviso-acceso" id="clave-nueva-aviso" hidden>
-          <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+          <svg class="ic" aria-hidden="true"><use href="#ic-info"></use></svg>
           <div><p id="clave-nueva-aviso-texto"></p></div>
         </div>
 
@@ -906,7 +997,7 @@
             <input type="password" id="clave-actual" class="form-control" autocomplete="current-password">
             <button type="button" class="btn-ver-clave" data-action="alternarClave" data-campo="clave-actual"
                     aria-label="Mostrar la contraseña" aria-pressed="false">
-              <i class="fa-regular fa-eye" aria-hidden="true"></i>
+              <svg class="ic" aria-hidden="true"><use href="#ic-ojo"></use></svg>
             </button>
           </div>
         </div>
@@ -919,7 +1010,7 @@
                    aria-describedby="clave-nueva-fuerza clave-nueva-pista">
             <button type="button" class="btn-ver-clave" data-action="alternarClave" data-campo="clave-nueva"
                     aria-label="Mostrar la contraseña" aria-pressed="false">
-              <i class="fa-regular fa-eye" aria-hidden="true"></i>
+              <svg class="ic" aria-hidden="true"><use href="#ic-ojo"></use></svg>
             </button>
           </div>
           <p class="clave-fuerza" id="clave-nueva-fuerza" aria-live="polite" hidden></p>
@@ -950,11 +1041,11 @@
         <div class="footer-social">
           <a href="https://instagram.com/foe_odontounlp" target="_blank" rel="noopener noreferrer"
              class="btn btn-icon" aria-label="Instagram de FOE (se abre en una pestaña nueva)">
-            <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+            <svg class="ic" aria-hidden="true"><use href="#ic-instagram"></use></svg>
           </a>
           <a href="https://wa.me/5492215550192" target="_blank" rel="noopener noreferrer"
              class="btn btn-icon" aria-label="WhatsApp de FOE (se abre en una pestaña nueva)">
-            <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+            <svg class="ic" aria-hidden="true"><use href="#ic-chat"></use></svg>
           </a>
         </div>
       </div>
@@ -997,15 +1088,15 @@
 </footer>
 
 <!-- Scripts: configuración y núcleo primero, módulos después, controlador al final -->
-<script src="js/config.js?v=20260912g"></script>
-<script src="js/core.js?v=20260912g"></script>
-<script src="js/api.js?v=20260912g"></script>
-<script src="js/data.js?v=20260912g"></script>
-<script src="js/live_sheets.js?v=20260912g"></script>
-<script src="js/calculator.js?v=20260912g"></script>
-<script src="js/carrera.js?v=20260912g"></script>
-<script src="js/auth.js?v=20260912g"></script>
-<script src="js/chatbot.js?v=20260912g"></script>
-<script src="js/app.js?v=20260912g"></script>
+<script src="js/config.js?v=20260912h"></script>
+<script src="js/core.js?v=20260912h"></script>
+<script src="js/api.js?v=20260912h"></script>
+<script src="js/data.js?v=20260912h"></script>
+<script src="js/live_sheets.js?v=20260912h"></script>
+<script src="js/calculator.js?v=20260912h"></script>
+<script src="js/carrera.js?v=20260912h"></script>
+<script src="js/auth.js?v=20260912h"></script>
+<script src="js/chatbot.js?v=20260912h"></script>
+<script src="js/app.js?v=20260912h"></script>
 </body>
 </html>

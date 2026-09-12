@@ -145,8 +145,8 @@
           btn.setAttribute("aria-expanded", abierto ? "true" : "false");
           btn.setAttribute("aria-label", abierto ? "Cerrar menú" : "Abrir menú");
           btn.innerHTML = abierto
-            ? '<i class="fa-solid fa-xmark" aria-hidden="true"></i>'
-            : '<i class="fa-solid fa-bars" aria-hidden="true"></i>';
+            ? '<svg class="ic" aria-hidden="true"><use href="#ic-cerrar"></use></svg>'
+            : '<svg class="ic" aria-hidden="true"><use href="#ic-menu"></use></svg>';
         });
       }
     },
@@ -186,7 +186,7 @@
       if (btn) {
         btn.setAttribute("aria-expanded", "false");
         btn.setAttribute("aria-label", "Abrir menú");
-        btn.innerHTML = '<i class="fa-solid fa-bars" aria-hidden="true"></i>';
+        btn.innerHTML = '<svg class="ic" aria-hidden="true"><use href="#ic-menu"></use></svg>';
       }
     },
 
@@ -446,14 +446,14 @@
         return (
           '<div class="fecha-item' + (f.urgente ? " fecha-urgente" : "") + '">' +
             '<div class="fecha-date-badge">' +
-              '<i class="fa-solid fa-calendar-day" aria-hidden="true"></i>' +
+              '<svg class="ic" aria-hidden="true"><use href="#ic-calendario"></use></svg>' +
               "<span>" + esc(f.fecha) + "</span>" +
             "</div>" +
             '<div class="fecha-info">' +
               "<h4>" + esc(f.evento) + "</h4>" +
               '<p class="fecha-meta">' +
-                '<span><i class="fa-solid fa-tag" aria-hidden="true"></i> ' + esc(f.tipo) + "</span>" +
-                '<span><i class="fa-solid fa-desktop" aria-hidden="true"></i> ' + esc(f.sistema) + "</span>" +
+                '<span><svg class="ic" aria-hidden="true"><use href="#ic-etiqueta"></use></svg> ' + esc(f.tipo) + "</span>" +
+                '<span><svg class="ic" aria-hidden="true"><use href="#ic-monitor"></use></svg> ' + esc(f.sistema) + "</span>" +
               "</p>" +
             "</div>" +
           "</div>"
@@ -481,11 +481,11 @@
             '<h3 class="news-title">' + esc(n.titulo) + "</h3>" +
             '<p class="news-summary">' + esc(n.resumen) + "</p>" +
             '<div class="news-footer">' +
-              '<span class="author-badge"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> ' + esc(n.autor) + "</span>" +
+              '<span class="author-badge"><svg class="ic" aria-hidden="true"><use href="#ic-escudo"></use></svg> ' + esc(n.autor) + "</span>" +
               '<button type="button" class="btn btn-outline-magenta btn-sm" data-action="verNoticia" data-id="' + esc(n.id) + '">' +
                 "Leer más" +
                 '<span class="visually-hidden"> sobre ' + esc(n.titulo) + "</span>" +
-                '<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>' +
+                '<svg class="ic" aria-hidden="true"><use href="#ic-flecha-der"></use></svg>' +
               "</button>" +
             "</div>" +
             "</div>" +
@@ -503,14 +503,14 @@
         "<h2>" + esc(n.titulo) + "</h2></div>",
         '<p class="modal-lead">' + esc(n.resumen) + "</p>" +
         '<div class="callout" style="margin-top:1.5rem">' +
-          '<i class="fa-solid fa-bullhorn" aria-hidden="true"></i>' +
+          '<svg class="ic" aria-hidden="true"><use href="#ic-megafono"></use></svg>' +
           "<div><h3>Comunicado de FOE</h3>" +
           "<p>Para más detalles o gestiones académicas, acercate a la mesa en el hall de la facultad o escribinos por nuestras redes.</p></div>" +
         "</div>" +
         '<div class="modal-card-footer" style="border:0;background:none;padding-inline:0">' +
-          '<span class="filter-note"><i class="fa-solid fa-user-check" aria-hidden="true"></i> ' + esc(n.autor) + "</span>" +
+          '<span class="filter-note"><svg class="ic" aria-hidden="true"><use href="#ic-persona-ok"></use></svg> ' + esc(n.autor) + "</span>" +
           '<a href="https://instagram.com/foe_odontounlp" target="_blank" rel="noopener noreferrer" class="btn btn-magenta btn-sm">' +
-            '<i class="fa-brands fa-instagram" aria-hidden="true"></i> Instagram de FOE' +
+            '<svg class="ic" aria-hidden="true"><use href="#ic-instagram"></use></svg> Instagram de FOE' +
           "</a>" +
         "</div>"
       );
@@ -547,7 +547,7 @@
 
       if (!lista.length) {
         cont.innerHTML = UI.emptyState({
-          icon: "fa-file-circle-question",
+          icon: "pregunta",
           title: "No encontramos ese modelo",
           text: 'Probá con el área de la cátedra: "Operatoria", "Cirugía", "Endodoncia" o "Periodoncia".',
           action: "limpiarFiltro",
@@ -561,20 +561,20 @@
           '<article class="hc-card">' +
             '<div class="hc-header">' +
               '<span class="badge-materia-anio">' + esc(hc.anio) + "</span>" +
-              '<span class="hc-pages"><i class="fa-regular fa-file-lines" aria-hidden="true"></i> ' + esc(hc.paginas) + " págs</span>" +
+              '<span class="hc-pages"><svg class="ic" aria-hidden="true"><use href="#ic-documento"></use></svg> ' + esc(hc.paginas) + " págs</span>" +
             "</div>" +
             '<h3 class="hc-title">' + esc(hc.titulo) + "</h3>" +
-            '<p class="hc-catedra"><i class="fa-solid fa-building-columns" aria-hidden="true"></i> ' + esc(hc.catedra) + "</p>" +
+            '<p class="hc-catedra"><svg class="ic" aria-hidden="true"><use href="#ic-columnas"></use></svg> ' + esc(hc.catedra) + "</p>" +
             '<p class="hc-desc">' + esc(hc.descripcion) + "</p>" +
             '<div class="hc-tags-container">' +
               hc.tags.map(function (t) { return '<span class="hc-tag">' + esc(t) + "</span>"; }).join("") +
             "</div>" +
             '<div class="hc-actions">' +
               '<button type="button" class="btn btn-secondary btn-sm" data-action="verHC" data-id="' + escAttr(hc.id) + '">' +
-                '<i class="fa-solid fa-eye" aria-hidden="true"></i> Ver qué incluye' +
+                '<svg class="ic" aria-hidden="true"><use href="#ic-ojo"></use></svg> Ver qué incluye' +
               "</button>" +
               '<button type="button" class="btn btn-magenta btn-sm" data-action="imprimirHC" data-id="' + escAttr(hc.id) + '">' +
-                '<i class="fa-solid fa-print" aria-hidden="true"></i> Imprimir' +
+                '<svg class="ic" aria-hidden="true"><use href="#ic-imprimir"></use></svg> Imprimir' +
               "</button>" +
             "</div>" +
           "</article>"
@@ -591,18 +591,18 @@
         "<p>Estructura que pide la cátedra. La versión imprimible trae todos estos campos en blanco, listos para completar a mano.</p>" +
         '<ul class="check-list" style="margin:1.25rem 0">' +
           hc.secciones.map(function (s) {
-            return '<li><i class="fa-solid fa-check" aria-hidden="true"></i><span>' + esc(s) + "</span></li>";
+            return '<li><svg class="ic" aria-hidden="true"><use href="#ic-tilde"></use></svg><span>' + esc(s) + "</span></li>";
           }).join("") +
         "</ul>" +
         '<div class="callout">' +
-          '<i class="fa-solid fa-lightbulb" aria-hidden="true"></i>' +
+          '<svg class="ic" aria-hidden="true"><use href="#ic-idea"></use></svg>' +
           "<div><h3>Antes de anestesiar</h3>" +
           "<p>Presentá la historia firmada por el docente y guardá siempre el consentimiento informado original del paciente.</p></div>" +
         "</div>" +
         '<div class="modal-card-footer" style="border:0;background:none;padding-inline:0">' +
           '<button type="button" class="btn btn-secondary" data-action="cerrarModal">Cerrar</button>' +
           '<button type="button" class="btn btn-magenta" data-action="imprimirHC" data-id="' + escAttr(hc.id) + '">' +
-            '<i class="fa-solid fa-print" aria-hidden="true"></i> Abrir versión imprimible' +
+            '<svg class="ic" aria-hidden="true"><use href="#ic-imprimir"></use></svg> Abrir versión imprimible' +
           "</button>" +
         "</div>"
       );
@@ -715,7 +715,7 @@
 
       if (!lista.length) {
         cont.innerHTML = UI.emptyState({
-          icon: "fa-book-bookmark",
+          icon: "libro",
           title: "Todavía no hay apuntes con esa búsqueda",
           text: "Probá con otra materia o quitá el filtro de año. Si tenés un resumen para compartir, acercalo por la mesa de FOE."
         });
@@ -727,21 +727,21 @@
           '<article class="biblio-card">' +
             '<div class="biblio-header">' +
               '<span class="badge-materia-anio">' + esc(ap.anio) + "</span>" +
-              '<span class="biblio-type"><i class="fa-solid fa-bookmark" aria-hidden="true"></i> ' + esc(ap.tipo) + "</span>" +
+              '<span class="biblio-type"><svg class="ic" aria-hidden="true"><use href="#ic-marcador"></use></svg> ' + esc(ap.tipo) + "</span>" +
             "</div>" +
             '<h3 class="biblio-title">' + esc(ap.titulo) + "</h3>" +
-            '<p class="biblio-materia"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> ' + esc(ap.materia) + "</p>" +
+            '<p class="biblio-materia"><svg class="ic" aria-hidden="true"><use href="#ic-birrete"></use></svg> ' + esc(ap.materia) + "</p>" +
             '<p class="biblio-meta">' +
-              '<span><i class="fa-solid fa-user-pen" aria-hidden="true"></i> ' + esc(ap.autor) + "</span>" +
-              '<span><i class="fa-solid fa-file" aria-hidden="true"></i> ' + esc(ap.paginas) + " págs</span>" +
-              '<span><i class="fa-solid fa-star" aria-hidden="true"></i> ' + esc(ap.valoracion) + "</span>" +
+              '<span><svg class="ic" aria-hidden="true"><use href="#ic-persona"></use></svg> ' + esc(ap.autor) + "</span>" +
+              '<span><svg class="ic" aria-hidden="true"><use href="#ic-documento"></use></svg> ' + esc(ap.paginas) + " págs</span>" +
+              '<span><svg class="ic" aria-hidden="true"><use href="#ic-estrella"></use></svg> ' + esc(ap.valoracion) + "</span>" +
             "</p>" +
             '<div class="hc-tags-container">' +
               ap.tags.map(function (t) { return '<span class="hc-tag">' + esc(t) + "</span>"; }).join("") +
             "</div>" +
             '<div class="biblio-actions">' +
               '<button type="button" class="btn btn-magenta btn-sm btn-block" data-action="descargarApunte" data-titulo="' + escAttr(ap.titulo) + '">' +
-                '<i class="fa-solid fa-cloud-arrow-down" aria-hidden="true"></i> Descargar' +
+                '<svg class="ic" aria-hidden="true"><use href="#ic-descargar"></use></svg> Descargar' +
                 '<span class="visually-hidden"> ' + esc(ap.titulo) + "</span>" +
               "</button>" +
             "</div>" +
@@ -785,7 +785,7 @@
 
       if (!lista.length) {
         cont.innerHTML = UI.emptyState({
-          icon: "fa-toolbox",
+          icon: "maletin",
           title: "No hay artículos con ese criterio",
           text: "Probá con el nombre genérico del instrumento (turbina, fórceps, articulador) en vez de la marca."
         });
@@ -805,13 +805,13 @@
             '<h3 class="bolsa-title">' + esc(art.titulo) + "</h3>" +
             '<p class="bolsa-price">' + esc(art.precio) + "</p>" +
             '<div class="bolsa-details">' +
-              '<span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Estado: ' + esc(art.estadoUso) + "</span>" +
-              '<span><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Entrega: ' + esc(art.ubicacion) + "</span>" +
-              '<span><i class="fa-solid fa-user" aria-hidden="true"></i> ' + esc(art.vendedor) + " · " + esc(art.fecha) + "</span>" +
+              '<span><svg class="ic" aria-hidden="true"><use href="#ic-tilde-circulo"></use></svg> Estado: ' + esc(art.estadoUso) + "</span>" +
+              '<span><svg class="ic" aria-hidden="true"><use href="#ic-pin"></use></svg> Entrega: ' + esc(art.ubicacion) + "</span>" +
+              '<span><svg class="ic" aria-hidden="true"><use href="#ic-persona"></use></svg> ' + esc(art.vendedor) + " · " + esc(art.fecha) + "</span>" +
             "</div>" +
             (enlace
               ? '<a href="' + UI.safeUrl(enlace) + '" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-block">' +
-                  '<i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Escribir a ' + esc(art.vendedor) +
+                  '<svg class="ic" aria-hidden="true"><use href="#ic-chat"></use></svg> Escribir a ' + esc(art.vendedor) +
                 "</a>"
               : '<p class="filter-note">Sin contacto cargado</p>') +
           "</article>"
@@ -829,11 +829,11 @@
       cont.innerHTML = global.ODONTO_DATA.instrumentalGuia.map(function (guia) {
         return (
           '<article class="guia-card">' +
-            '<h3 class="guia-title"><i class="fa-solid fa-briefcase-medical" aria-hidden="true"></i> ' + esc(guia.nombre) + "</h3>" +
+            '<h3 class="guia-title"><svg class="ic" aria-hidden="true"><use href="#ic-maletin"></use></svg> ' + esc(guia.nombre) + "</h3>" +
             '<p class="guia-mats">' + esc(guia.materias.join(" · ")) + "</p>" +
             '<ul class="guia-elements">' +
               guia.elementos.map(function (e) {
-                return '<li><i class="fa-solid fa-tooth" aria-hidden="true"></i><span>' + esc(e) + "</span></li>";
+                return '<li><svg class="ic" aria-hidden="true"><use href="#ic-diente"></use></svg><span>' + esc(e) + "</span></li>";
               }).join("") +
             "</ul>" +
             '<p class="guia-tip"><strong>Tip de FOE:</strong> ' + esc(guia.consejoFOE) + "</p>" +
@@ -885,7 +885,7 @@
             resultados.push({
               tipo: m.anio + "° año · plan de estudios",
               titulo: m.nombre,
-              icono: "fa-solid fa-graduation-cap",
+              icono: "birrete",
               destino: "carrera/promedio"
             });
           }
@@ -900,7 +900,7 @@
           resultados.push({
             tipo: (esRev ? "Reválida" : "Mesa de final") + " · " + item.dia + " · " + item.hora,
             titulo: item.materiaOriginal,
-            icono: esRev ? "fa-solid fa-certificate" : "fa-solid fa-calendar-check",
+            icono: esRev ? "certificado" : "calendario",
             destino: esRev ? "fechas/revalidas" : "fechas/mesas"
           });
         });
@@ -912,7 +912,7 @@
           resultados.push({
             tipo: "Historia clínica · " + hc.catedra,
             titulo: hc.titulo,
-            icono: "fa-solid fa-file-medical",
+            icono: "documento",
             destino: "cursada/historias",
             despues: function () { app.verVistaPreviaHC(hc.id); }
           });
@@ -923,7 +923,7 @@
           resultados.push({
             tipo: "Apunte · " + ap.materia,
             titulo: ap.titulo,
-            icono: "fa-solid fa-book",
+            icono: "libro",
             destino: "biblioteca"
           });
         });
@@ -944,7 +944,7 @@
         return (
           '<button type="button" class="search-result-item" role="option" aria-selected="false" ' +
                   'data-action="resultadoBusqueda" data-idx="' + idx + '">' +
-            '<i class="' + esc(r.icono) + '" aria-hidden="true"></i>' +
+            UI.icono(r.icono) +
             "<span><strong>" + esc(r.titulo) + "</strong><small>" + esc(r.tipo) + "</small></span>" +
           "</button>"
         );

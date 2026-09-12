@@ -80,11 +80,6 @@
   justify-content: center;
 }
 
-/* Los iconos de la navegacion se ocultan: el texto ya dice lo mismo y el
-   icono sumaba ruido y ancho. El marcado se limpia cuando se reemplace Font
-   Awesome por el juego de iconos propio. */
-.nav-link i { display: none; }
-
 .nav-link {
   display: flex;
   align-items: center;
@@ -110,7 +105,6 @@
   color: #fff;
   background: var(--accent);
 }
-.nav-link i { font-size: var(--fs-md); }
 
 .nav-utils { display: flex; align-items: center; gap: var(--sp-2); flex-shrink: 0; }
 
@@ -258,7 +252,6 @@
   letter-spacing: var(--tracking-etiqueta);
 }
 .hero-tag::before { content: ""; width: 28px; height: 2px; background: var(--accent); flex-shrink: 0; }
-.hero-tag i { display: none; }
 
 .hero-title {
   font-family: var(--font-heading);
@@ -401,7 +394,7 @@
   border-top: 3px solid var(--accent);
   display: block;
 }
-.section-title-wrap h2 i { display: none; }
+
 .section-title-wrap p {
   color: var(--text-muted);
   font-size: var(--fs-base);
@@ -416,14 +409,13 @@
   gap: var(--sp-3);
   margin-bottom: var(--sp-4);
 }
-/* Subtitulos: mismo criterio, sin icono decorativo. */
 .subsection-title {
   font-family: var(--font-heading);
   font-weight: var(--fw-bold);
   text-transform: uppercase;
   letter-spacing: 0.01em;
 }
-.subsection-title i { display: none; }
+
 
 /* ==========================================================================
    INICIO · PRÓXIMA FECHA Y AGENDA
@@ -454,7 +446,7 @@
   flex-wrap: wrap;
 }
 .next-up-head h3 { font-size: var(--fs-lg); display: flex; align-items: center; gap: var(--sp-2); }
-.next-up-head h3 i { color: var(--accent-text); }
+.next-up-head h3 .ic { color: var(--accent-text); }
 
 .next-list { display: flex; flex-direction: column; gap: var(--sp-2); }
 .next-item {
@@ -574,7 +566,7 @@
   align-items: center;
   gap: var(--sp-2);
 }
-.author-badge i { color: var(--accent-text); }
+.author-badge .ic { color: var(--accent-text); }
 
 /* ==========================================================================
    FECHAS DE EXAMEN · sincronización en vivo
@@ -629,7 +621,7 @@
   font-weight: var(--fw-semi);
 }
 .btn-sync-sheets:hover { background: var(--accent); box-shadow: var(--shadow-accent); }
-.btn-sync-sheets.loading i { animation: spin 1s infinite linear; }
+.btn-sync-sheets.loading .ic { animation: spin 1s infinite linear; }
 
 .btn-sheet-source {
   font-size: var(--fs-sm);
@@ -898,7 +890,7 @@
   gap: var(--sp-2);
   margin-bottom: var(--sp-4);
 }
-.bolsa-details i { color: var(--accent-text); width: 16px; text-align: center; }
+.bolsa-details .ic { color: var(--accent-text); width: 16px; text-align: center; }
 
 .guia-title {
   font-family: var(--font-heading);
@@ -920,7 +912,7 @@
   color: var(--text);
 }
 .guia-elements li { display: flex; gap: var(--sp-2); }
-.guia-elements i { color: var(--accent-text); font-size: var(--fs-xs); margin-top: 6px; flex-shrink: 0; }
+.guia-elements .ic { color: var(--accent-text); font-size: var(--fs-xs); margin-top: 6px; flex-shrink: 0; }
 .guia-tip {
   background: var(--accent-soft);
   border-left: 3px solid var(--accent);
@@ -1095,7 +1087,7 @@
   font-size: var(--fs-sm);
   color: var(--text-muted);
 }
-.privacy-note i { color: var(--success); }
+.privacy-note .ic { color: var(--success); }
 
 .calculator-year-card {
   background: var(--surface);

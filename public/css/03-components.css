@@ -181,7 +181,7 @@
    El icono se ancla al fondo del campo, no a su centro: así queda alineado
    con el input tanto si el campo lleva etiqueta visible arriba como si no. */
 .search-field { position: relative; flex: 1; min-width: 220px; }
-.search-field > i {
+.search-field > .ic {
   position: absolute;
   left: var(--sp-4);
   bottom: 22px;
@@ -243,6 +243,36 @@
   margin-bottom: var(--sp-4);
 }
 .results-summary b { color: var(--text-strong); }
+
+/* ==========================================================================
+   ÍCONOS
+   Juego propio, en un sprite SVG embebido al principio de index.html. Un solo
+   trazo para todo el sitio: el grosor, el color y el redondeo se deciden acá
+   y no en cada dibujo, así ningún ícono queda con un peso distinto.
+
+   Reemplazó a Font Awesome, que llegaba desde un CDN externo y descargaba
+   unos 300 KB de fuentes de íconos para usar setenta glifos. Ahora son 14 KB
+   embebidos, sin pedidos a otro dominio.
+
+   El tamaño sale del `font-size` de quien lo contiene: 1em. Un ícono al lado
+   de un texto acompaña ese texto, y no hay que ajustarlo a mano.
+   ========================================================================== */
+.ic {
+  width: 1em;
+  height: 1em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+  /* Baja el ícono un poco para que su centro coincida con la altura de x del
+     texto que lo acompaña. Sin esto flota arriba de la línea. */
+  vertical-align: -0.125em;
+}
+
+@keyframes ic-girar { to { transform: rotate(360deg); } }
+.ic-gira { animation: ic-girar 0.9s linear infinite; transform-origin: center; }
 
 /* ==========================================================================
    INSIGNIAS Y ETIQUETAS
@@ -485,13 +515,13 @@
   box-shadow: var(--shadow-sm);
   margin-bottom: var(--sp-6);
 }
-.callout > i { font-size: var(--fs-xl); color: var(--accent-text); flex-shrink: 0; margin-top: 2px; }
+.callout > .ic { font-size: var(--fs-xl); color: var(--accent-text); flex-shrink: 0; margin-top: 2px; }
 .callout h3 { font-size: var(--fs-lg); margin-bottom: var(--sp-2); }
 .callout p { font-size: var(--fs-base); color: var(--text-muted); }
 .callout-info { border-left-color: var(--info); }
-.callout-info > i { color: var(--info); }
+.callout-info > .ic { color: var(--info); }
 .callout-warning { border-left-color: var(--warning); }
-.callout-warning > i { color: var(--warning); }
+.callout-warning > .ic { color: var(--warning); }
 
 /* Lista de definiciones dentro de un aviso ("¿qué es una reválida?") */
 .def-list { display: grid; gap: var(--sp-3); margin-top: var(--sp-3); }
@@ -640,7 +670,7 @@
 
 .check-list { display: flex; flex-direction: column; gap: var(--sp-2); }
 .check-list li { display: flex; gap: var(--sp-3); font-size: var(--fs-base); }
-.check-list li i { color: var(--accent-text); margin-top: 5px; flex-shrink: 0; }
+.check-list li .ic { color: var(--accent-text); margin-top: 5px; flex-shrink: 0; }
 
 /* Resultados del buscador global */
 .search-results-list {
@@ -669,7 +699,7 @@
   background: var(--accent-soft);
   border-color: var(--accent);
 }
-.search-result-item i { color: var(--accent-text); font-size: var(--fs-lg); flex-shrink: 0; width: 22px; text-align: center; }
+.search-result-item .ic { color: var(--accent-text); font-size: var(--fs-lg); flex-shrink: 0; width: 22px; text-align: center; }
 .search-result-item strong { display: block; font-size: var(--fs-base); color: var(--text-strong); }
 .search-result-item small { display: block; color: var(--text-muted); }
 .search-hint { text-align: center; padding: var(--sp-6); color: var(--text-muted); font-size: var(--fs-sm); }
@@ -704,7 +734,7 @@
   border-left: 4px solid var(--accent);
   pointer-events: auto;
 }
-.toast-message i { flex-shrink: 0; }
+.toast-message .ic { flex-shrink: 0; }
 /* El aviso flotante es siempre azul de marca, en los dos temas, así que sus
    colores de estado son los de fondo oscuro. Antes había acá un naranja y un
    rojo escritos a mano, más saturados que el resto del sistema. */

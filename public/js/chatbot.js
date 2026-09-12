@@ -150,7 +150,7 @@
       el.id = "odontobot-typing";
       el.className = "chat-bubble bot-bubble";
       el.innerHTML =
-        '<span class="bubble-avatar" aria-hidden="true"><i class="fa-solid fa-tooth"></i></span>' +
+        '<span class="bubble-avatar" aria-hidden="true">' + UI.icono("diente") + "</span>" +
         '<span class="bubble-content typing-indicator" aria-label="Buscando una respuesta">' +
           "<span></span><span></span><span></span>" +
         "</span>";
@@ -184,7 +184,7 @@
         return (
           '<div class="chat-bubble ' + (esUsuario ? "user-bubble" : "bot-bubble") + '">' +
             '<span class="bubble-avatar" aria-hidden="true">' +
-              '<i class="fa-solid ' + (esUsuario ? "fa-user" : "fa-tooth") + '"></i>' +
+              UI.icono(esUsuario ? "persona" : "diente") +
             "</span>" +
             '<span class="bubble-content">' +
               "<span>" + self.formatear(m.texto) + "</span>" +
@@ -199,7 +199,7 @@
 
       var descargo =
         '<p class="filter-note" style="padding:0 var(--sp-2)">' +
-          '<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>' +
+          '<svg class="ic" aria-hidden="true"><use href="#ic-alerta"></use></svg>' +
           "<span>Material de estudio. No reemplaza la indicación de tu docente ni el prospecto del medicamento.</span>" +
         "</p>";
 

@@ -52,7 +52,9 @@ WhatsApp, no se le rompe.
 
 ```
 public/               EL SITIO. Es exactamente lo que se copia a htdocs/
-  index.html          Marcado único de toda la aplicación
+  index.html          Marcado único de toda la aplicación (con el sprite de íconos embebido)
+  iconos-sprite.svg   Fuente del juego de íconos; lo embebe infra/iconos/armar-sprite.py
+  textura-grano.png   Mosaico de grano de las bandas de marca (2,6 KB)
   css/
     01-tokens.css     Sistema de diseño: color, tipografía, espaciado, tema oscuro
     02-base.css       Reset, tipografía base, foco visible, accesibilidad
@@ -76,6 +78,7 @@ public/               EL SITIO. Es exactamente lo que se copia a htdocs/
 infra/                Todo lo del servidor
   supabase/           Compose de ajustes y esquema SQL con RLS
   backup/             Backup cifrado y su restauración
+  iconos/             Generador del sprite de íconos
 
 docs/                 plan.md, arquitectura.md, despliegue-cloudpanel.md
 run_server.py         Servidor de desarrollo (sirve public/)
@@ -156,6 +159,37 @@ mayúsculas bajan la velocidad de lectura.
 Se activa por preferencia del sistema y por elección explícita (el botón del
 encabezado, que guarda en `localStorage`). Un script mínimo en el `<head>`
 aplica el tema antes del primer pintado para que no haya destello blanco.
+
+### Íconos
+
+Juego propio en un **sprite SVG embebido** al principio de `index.html`. Se usa
+así:
+
+```html
+<svg class="ic" aria-hidden="true"><use href="#ic-buscar"></use></svg>
+```
+
+y desde JavaScript con `OdontoUI.icono("buscar")`. Nunca se escribe el color ni
+el grosor en el dibujo: los pone la clase `.ic`, que además lo mide en `1em`,
+así un ícono acompaña al texto de al lado sin ajustes.
+
+Los genéricos son de [Lucide](https://lucide.dev) (licencia ISC), **autoalojados**.
+El diente está dibujado para este proyecto, y el de Instagram también, porque
+Lucide quitó los íconos de marcas. Para regenerar el sprite después de agregar
+o quitar uno:
+
+```bash
+python infra/iconos/armar-sprite.py
+```
+
+Ese comando baja los SVG que falten, arma `public/iconos-sprite.svg` y lo
+embebe en `index.html` entre las marcas `ICONOS`. Después hay que subir el
+`?v=` de los archivos.
+
+**Por qué se fue Font Awesome:** llegaba desde un CDN externo y descargaba unos
+300 KB de fuentes de íconos para usar setenta glifos. El sprite son 14 KB y no
+pide nada a otro dominio. De paso desaparecieron los íconos decorativos que
+repetían lo que el título de al lado ya decía.
 
 ### Movimiento
 
@@ -326,8 +360,6 @@ El filtro de días se arma solo con los días que la planilla realmente trae.
 
 - **Biblioteca**: las fichas de apuntes existen pero no hay archivos detrás. El
   botón avisa que el material todavía no está subido.
-- **Font Awesome** se carga completo desde un CDN (~300 KB). Cuando el conjunto
-  de íconos esté estable, conviene reemplazarlo por un sprite SVG propio.
 - **Datos de contacto**: el WhatsApp y el email de `js/data.js` y del pie de
   página son de ejemplo. Cambialos antes de publicar.
 - **Fechas de trámites** (`fechasClave` en `js/data.js`) están escritas a mano y
