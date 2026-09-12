@@ -34,7 +34,7 @@ rindo?", "¿qué llevo a la clínica?", "¿cómo vengo?".
 | **Cuándo rindo** | Mesas de finales · Reválidas y actualizaciones | ¿Cuándo y dónde rindo? |
 | **Cursada y clínica** | Historias clínicas · Instrumental · Bolsa de compra y venta | ¿Qué necesito para atender? |
 | **Biblioteca** | — | ¿Con qué estudio? |
-| **Mi promedio** | — | ¿Cómo vengo? |
+| **Mi carrera** | — | ¿Cómo vengo? |
 
 ### Rutas
 

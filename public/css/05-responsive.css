@@ -22,6 +22,7 @@
   .mobile-toggle { display: flex; }
 
   .hero-grid { grid-template-columns: 1fr; gap: var(--sp-8); }
+  .calc-tablero { grid-template-columns: 1fr; }
   .hero-title { max-width: none; }
   .home-panel { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr 1fr; gap: var(--sp-6); }
@@ -34,8 +35,9 @@
 
   .section-header { margin: var(--sp-8) 0 var(--sp-5); }
 
-  .calc-stats-grid { grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
-  .stat-value { font-size: var(--fs-2xl); }
+  /* Seis piezas por fila: con diez, en 375 px cada casillero quedaba de
+     28 px y el número adentro era ilegible. */
+  .odonto-piezas { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 
   .calculator-year-header { flex-direction: column; align-items: flex-start; }
 
@@ -111,9 +113,20 @@
 
 @media (max-width: 400px) {
   .brand-subtitle { display: none; }
-  .brand-title { font-size: var(--fs-base); }
+  /* Archivo en mayúsculas es más ancha que la tipografía anterior. En 375 px,
+     con cuatro botones al lado, "ODONTOCAMPUS" entra recién con este tamaño y
+     con el sello un poco más chico. Cortar el nombre de la marca con puntos
+     suspensivos es peor que bajarle dos puntos de cuerpo. */
+  .brand-title { font-size: var(--fs-sm); letter-spacing: 0; }
+  .brand-logo-img { width: 34px; height: 34px; }
 
-  .calc-stats-grid { grid-template-columns: 1fr; }
+  /* El buscador sale del encabezado y pasa al menú: cuatro botones al lado
+     del nombre no entran, y cortar el nombre de la marca con puntos
+     suspensivos es peor que mover un botón a donde se busca igual. */
+  .btn-search-trigger { display: none; }
+  .solo-menu-chico { display: block; }
+
+  .odonto-piezas { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .news-footer { flex-direction: column; align-items: stretch; }
   .news-footer .btn { width: 100%; }
 

@@ -12,8 +12,8 @@
   <!-- Marca: un diente geométrico en blanco sobre el magenta de FOE. Se lee a
        16 px en una pestaña, que es la única prueba que importa para un ícono. -->
   <link rel="icon" href="favicon.ico" sizes="32x32">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260912d">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260912d">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260912f">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260912f">
 
   <meta property="og:title" content="OdontoCampus · FOE Odontología UNLP">
   <meta property="og:description" content="Mesas de examen y reválidas en vivo, historias clínicas, promedio y apuntes. Todo en un solo lugar.">
@@ -22,7 +22,7 @@
   <meta property="og:locale" content="es_AR">
   <!-- Imagen del enlace (WhatsApp, Instagram, Twitter). Tiene que ser una URL
        absoluta y un archivo rasterizado: ninguna de esas apps lee SVG. -->
-  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260912d">
+  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260912f">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="OdontoCampus · FOE Odontología UNLP">
@@ -58,13 +58,13 @@
        LÍNEAS (y en las plantillas de correo del override de Supabase).
        Pasó de verdad: el sitio nuevo quedó cargando el config.js viejo, con la
        clave en PENDIENTE, y las cuentas no aparecían por ningún lado. -->
-  <link rel="stylesheet" href="css/01-tokens.css?v=20260912d">
-  <link rel="stylesheet" href="css/02-base.css?v=20260912d">
-  <link rel="stylesheet" href="css/03-components.css?v=20260912d">
-  <link rel="stylesheet" href="css/04-sections.css?v=20260912d">
-  <link rel="stylesheet" href="css/05-responsive.css?v=20260912d">
-  <link rel="stylesheet" href="css/06-cuentas.css?v=20260912d">
-  <link rel="stylesheet" href="css/07-movimiento.css?v=20260912d">
+  <link rel="stylesheet" href="css/01-tokens.css?v=20260912f">
+  <link rel="stylesheet" href="css/02-base.css?v=20260912f">
+  <link rel="stylesheet" href="css/03-components.css?v=20260912f">
+  <link rel="stylesheet" href="css/04-sections.css?v=20260912f">
+  <link rel="stylesheet" href="css/05-responsive.css?v=20260912f">
+  <link rel="stylesheet" href="css/06-cuentas.css?v=20260912f">
+  <link rel="stylesheet" href="css/07-movimiento.css?v=20260912f">
 </head>
 <body>
 
@@ -91,7 +91,7 @@
         <li><a href="#fechas" class="nav-link" data-nav="fechas"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i> Cuándo rindo</a></li>
         <li><a href="#cursada" class="nav-link" data-nav="cursada"><i class="fa-solid fa-tooth" aria-hidden="true"></i> Cursada y clínica</a></li>
         <li><a href="#biblioteca" class="nav-link" data-nav="biblioteca"><i class="fa-solid fa-book-bookmark" aria-hidden="true"></i> Biblioteca</a></li>
-        <li><a href="#carrera" class="nav-link" data-nav="carrera"><i class="fa-solid fa-calculator" aria-hidden="true"></i> Mi promedio</a></li>
+        <li><a href="#carrera" class="nav-link" data-nav="carrera"><i class="fa-solid fa-calculator" aria-hidden="true"></i> Mi carrera</a></li>
       </ul>
 
       <div class="nav-utils">
@@ -124,6 +124,15 @@
     <div class="container">
       <nav aria-label="Navegación móvil">
       <ul class="mobile-nav-list">
+        <!-- En pantallas de 400 px o menos el botón de buscar sale del
+             encabezado (no entraba junto al nombre y a los otros tres) y
+             aparece acá, donde además se descubre mejor que como una lupa
+             suelta. -->
+        <li class="solo-menu-chico">
+          <button type="button" class="nav-link" data-action="abrirBusqueda">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Buscar en el sitio
+          </button>
+        </li>
         <li><a href="#inicio" class="nav-link" data-nav="inicio"><i class="fa-solid fa-house" aria-hidden="true"></i> Inicio</a></li>
         <li><a href="#fechas/mesas" class="nav-link" data-nav="fechas/mesas"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i> Mesas de finales</a></li>
         <li><a href="#fechas/revalidas" class="nav-link" data-nav="fechas/revalidas"><i class="fa-solid fa-certificate" aria-hidden="true"></i> Reválidas y actualizaciones</a></li>
@@ -131,7 +140,7 @@
         <li><a href="#cursada/instrumental" class="nav-link" data-nav="cursada/instrumental"><i class="fa-solid fa-toolbox" aria-hidden="true"></i> Instrumental por cátedra</a></li>
         <li><a href="#cursada/bolsa" class="nav-link" data-nav="cursada/bolsa"><i class="fa-solid fa-tags" aria-hidden="true"></i> Bolsa de compra y venta</a></li>
         <li><a href="#biblioteca" class="nav-link" data-nav="biblioteca"><i class="fa-solid fa-book-bookmark" aria-hidden="true"></i> Biblioteca de apuntes</a></li>
-        <li><a href="#carrera" class="nav-link" data-nav="carrera"><i class="fa-solid fa-calculator" aria-hidden="true"></i> Mi promedio</a></li>
+        <li><a href="#carrera" class="nav-link" data-nav="carrera"><i class="fa-solid fa-calculator" aria-hidden="true"></i> Mi carrera</a></li>
       </ul>
       </nav>
       <p class="mobile-nav-note">¿Necesitás algo puntual? Usá el buscador: encuentra mesas, materias, apuntes e historias clínicas a la vez.</p>
@@ -151,11 +160,14 @@
       <div class="container">
         <div class="hero-grid">
           <div>
-            <p class="hero-tag">Hecho por estudiantes de la facultad</p>
-            <p class="hero-title">Sabé <span>cuándo rendís</span> sin dar veinte vueltas</p>
+            <p class="hero-tag">Un servicio de FOE · Odontología UNLP</p>
+            <!-- El nombre como afiche: el bloque magenta cae sobre "Campus".
+                 Un nombre no dice qué es esto, así que el peso de explicarlo
+                 lo lleva la línea de abajo, que es la que se lee después. -->
+            <p class="hero-title">Odonto<span>Campus</span></p>
             <p class="hero-subtitle">
-              Mesas de finales y reválidas sacadas de la planilla oficial de cátedra,
-              con aula, horario y datos de Zoom.
+              Mesas de finales, reválidas, historias clínicas y tu promedio.
+              Todo en un solo lugar, sacado de la planilla oficial de cátedra.
             </p>
             <div class="hero-cta-group">
               <a href="#fechas/mesas" class="btn btn-magenta btn-lg" data-nav="fechas/mesas">
@@ -476,8 +488,8 @@
     <div class="container">
       <div class="section-header">
         <div class="section-title-wrap">
-          <h2 id="titulo-carrera"><i class="fa-solid fa-calculator" aria-hidden="true"></i> Mi promedio</h2>
-          <p>Llevá el control de tus notas y mirá cuánto llevás de la carrera. Con y sin aplazos, como lo calcula la UNLP.</p>
+          <h2 id="titulo-carrera"><i class="fa-solid fa-calculator" aria-hidden="true"></i> Mi carrera</h2>
+          <p>Tu promedio con y sin aplazos, como lo calcula la UNLP, y el avance materia por materia.</p>
         </div>
       </div>
 
@@ -491,39 +503,47 @@
         <!-- Materias cargadas en este navegador antes de que existieran las cuentas -->
         <div id="carrera-anteriores" class="carrera-anteriores" hidden></div>
 
-        <div class="calc-dashboard">
-          <div class="calc-stats-grid">
-            <div class="stat-card">
-              <p class="stat-label">Promedio sin aplazos</p>
-              <p class="stat-value highlight-magenta" id="calc-promedio-sin-aplazos">0.00</p>
-              <small>Solo materias aprobadas</small>
-            </div>
-            <div class="stat-card">
-              <p class="stat-label">Promedio con aplazos</p>
-              <p class="stat-value" id="calc-promedio-con-aplazos">0.00</p>
-              <small>El histórico oficial UNLP</small>
-            </div>
-            <div class="stat-card">
-              <p class="stat-label">Materias aprobadas</p>
-              <p class="stat-value" id="calc-materias-aprobadas">0 / 29</p>
-              <small>Plan de Odontología</small>
-            </div>
-            <div class="stat-card">
-              <p class="stat-label">Materias regulares</p>
-              <p class="stat-value" id="calc-materias-regulares">0</p>
-              <small>Listas para rendir final</small>
-            </div>
+        <div class="calc-tablero">
+          <div class="calc-promedio">
+            <p class="calc-rotulo">Promedio sin aplazos</p>
+            <p class="calc-cifra" id="calc-promedio-sin-aplazos">0,00</p>
+            <p class="calc-aparte">Con aplazos: <b id="calc-promedio-con-aplazos">0,00</b></p>
+            <dl class="calc-datos">
+              <div>
+                <dt>Aprobadas</dt>
+                <dd id="calc-materias-aprobadas">0 / 29</dd>
+              </div>
+              <div>
+                <dt>Regulares</dt>
+                <dd id="calc-materias-regulares">0</dd>
+              </div>
+              <div>
+                <dt>Avance</dt>
+                <dd id="calc-avance-porcentaje">0%</dd>
+              </div>
+            </dl>
           </div>
 
-          <div class="progress-block">
-            <p class="progress-head">
-              <span>Carrera completada</span>
-              <output id="calc-avance-porcentaje" for="calc-barra-progreso">0%</output>
-            </p>
-            <div class="progress-container" role="progressbar" id="calc-barra-progreso-wrap"
-                 aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Avance de la carrera">
-              <div class="progress-bar" id="calc-barra-progreso" style="width:0%"></div>
+          <!-- Odontograma: los 29 casilleros del plan, numerados con el código
+               de cada materia. Reemplaza la barra de progreso porque dice algo
+               que la barra no podía decir: QUÉ falta, no sólo cuánto.
+
+               La grilla va oculta para lectores de pantalla: es un resumen
+               visual. El equivalente accesible es la línea de resumen de
+               arriba y, con todo el detalle, la tabla de más abajo. -->
+          <div class="odontograma">
+            <div class="odonto-cabecera">
+              <h3>Tu avance, materia por materia</h3>
+              <p class="odonto-resumen" id="odonto-resumen" role="status">Todavía no cargaste materias.</p>
             </div>
+            <ol class="odonto-piezas" id="odonto-piezas" aria-hidden="true"></ol>
+            <ul class="odonto-referencias">
+              <li><span class="muestra es-aprobada" aria-hidden="true"></span> Aprobada</li>
+              <li><span class="muestra es-regular" aria-hidden="true"></span> Regular, lista para el final</li>
+              <li><span class="muestra es-cursando" aria-hidden="true"></span> Cursando</li>
+              <li><span class="muestra es-pendiente" aria-hidden="true"></span> Pendiente</li>
+              <li><span class="muestra con-aplazo" aria-hidden="true"></span> Con aplazo</li>
+            </ul>
           </div>
         </div>
 
@@ -946,7 +966,7 @@
           <li><a href="#fechas/revalidas" data-nav="fechas/revalidas">Reválidas</a></li>
           <li><a href="#cursada/historias" data-nav="cursada/historias">Historias clínicas</a></li>
           <li><a href="#cursada/instrumental" data-nav="cursada/instrumental">Instrumental</a></li>
-          <li><a href="#carrera" data-nav="carrera">Mi promedio</a></li>
+          <li><a href="#carrera" data-nav="carrera">Mi carrera</a></li>
         </ul>
       </div>
 
@@ -977,15 +997,15 @@
 </footer>
 
 <!-- Scripts: configuración y núcleo primero, módulos después, controlador al final -->
-<script src="js/config.js?v=20260912d"></script>
-<script src="js/core.js?v=20260912d"></script>
-<script src="js/api.js?v=20260912d"></script>
-<script src="js/data.js?v=20260912d"></script>
-<script src="js/live_sheets.js?v=20260912d"></script>
-<script src="js/calculator.js?v=20260912d"></script>
-<script src="js/carrera.js?v=20260912d"></script>
-<script src="js/auth.js?v=20260912d"></script>
-<script src="js/chatbot.js?v=20260912d"></script>
-<script src="js/app.js?v=20260912d"></script>
+<script src="js/config.js?v=20260912f"></script>
+<script src="js/core.js?v=20260912f"></script>
+<script src="js/api.js?v=20260912f"></script>
+<script src="js/data.js?v=20260912f"></script>
+<script src="js/live_sheets.js?v=20260912f"></script>
+<script src="js/calculator.js?v=20260912f"></script>
+<script src="js/carrera.js?v=20260912f"></script>
+<script src="js/auth.js?v=20260912f"></script>
+<script src="js/chatbot.js?v=20260912f"></script>
+<script src="js/app.js?v=20260912f"></script>
 </body>
 </html>

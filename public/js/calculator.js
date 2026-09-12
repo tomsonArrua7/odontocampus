@@ -28,6 +28,15 @@
   // El mismo tope que acepta la base (003_cuentas_con_contrasena.sql).
   var MAX_APLAZOS = 30;
 
+  /* Cómo se nombra cada estado en el detalle del odontograma. También sirve
+     para validar: lo que no esté acá se dibuja como pendiente. */
+  var NOMBRE_ESTADO = {
+    aprobada: "aprobada",
+    regular: "regular, lista para el final",
+    cursando: "cursando",
+    pendiente: "pendiente"
+  };
+
   function limitarAplazos(valor) {
     return Math.min(MAX_APLAZOS, Math.max(0, parseInt(valor, 10) || 0));
   }
@@ -57,7 +66,11 @@
     var quieto = global.matchMedia &&
                  global.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    if (quieto || desde === destino) {
+    /* Si la pestaña no se está pintando, requestAnimationFrame no corre y el
+       número se quedaría en el valor viejo hasta que alguien la vuelva a
+       mirar. En ese caso se escribe directo: el dato correcto primero, la
+       animación sólo si hay alguien viendo. */
+    if (quieto || document.hidden || desde === destino) {
       el.textContent = formatear(destino, decimales) + sufijo;
       return;
     }
@@ -370,6 +383,51 @@
       if (global.OdontoCarrera) global.OdontoCarrera.borrarTodo();
     },
 
+    /**
+     * Odontograma: una pieza por materia del plan, numerada con su código.
+     *
+     * Reemplaza la barra de progreso. Una barra dice cuánto falta; esto dice
+     * QUÉ falta, que es la pregunta real cuando alguien se pregunta cómo
+     * viene. La grilla está oculta para lectores de pantalla (es un resumen
+     * visual); el equivalente accesible es la línea de resumen y la tabla.
+     */
+    renderOdontograma: function () {
+      var cont = document.getElementById("odonto-piezas");
+      var resumen = document.getElementById("odonto-resumen");
+      if (!cont) return;
+
+      var notas = this.getNotas();
+      var conteo = { aprobada: 0, regular: 0, cursando: 0, pendiente: 0 };
+
+      cont.innerHTML = this.getTodasLasMaterias().map(function (mat) {
+        var registro = notas[mat.id] || {};
+        var estado = NOMBRE_ESTADO[registro.estado] ? registro.estado : "pendiente";
+        conteo[estado]++;
+
+        // "OD-101" se muestra como "101": el prefijo es igual en las 29.
+        var numero = String(mat.codigo || mat.id).replace(/^\D+/, "");
+        var conAplazo = registro.aplazos > 0;
+
+        var detalle = mat.nombre + " — " + NOMBRE_ESTADO[estado];
+        if (estado === "aprobada" && registro.nota) {
+          detalle += " con " + formatear(registro.nota, 2);
+        }
+        if (conAplazo) detalle += " · " + UI.plural(registro.aplazos, "aplazo");
+
+        return '<li class="pieza es-' + estado + (conAplazo ? " con-aplazo" : "") + '" ' +
+               'title="' + escAttr(detalle) + '">' + esc(numero) + "</li>";
+      }).join("");
+
+      if (resumen) {
+        var partes = [];
+        if (conteo.aprobada) partes.push(conteo.aprobada + " aprobadas");
+        if (conteo.regular) partes.push(conteo.regular + " regulares");
+        if (conteo.cursando) partes.push(conteo.cursando + " cursando");
+        partes.push(conteo.pendiente + " pendientes");
+        resumen.textContent = partes.join(" · ");
+      }
+    },
+
     renderResumen: function () {
       var m = this.calcularMetricas();
 
@@ -392,6 +450,8 @@
         wrap.setAttribute("aria-valuenow", String(m.porcentajeAvance));
         wrap.setAttribute("aria-valuetext", m.porcentajeAvance + " por ciento de la carrera");
       }
+
+      this.renderOdontograma();
     },
 
     /* Compatibilidad con la versión anterior */

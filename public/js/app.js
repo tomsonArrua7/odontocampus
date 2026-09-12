@@ -19,7 +19,7 @@
     fechas:     { titulo: "Cuándo rindo", tabs: ["mesas", "revalidas"] },
     cursada:    { titulo: "Cursada y clínica", tabs: ["historias", "instrumental", "bolsa"] },
     biblioteca: { titulo: "Biblioteca de apuntes", tabs: null },
-    carrera:    { titulo: "Mi promedio", tabs: null }
+    carrera:    { titulo: "Mi carrera", tabs: null }
   };
 
   /* Enlaces viejos que la gente pudo haber guardado o compartido por WhatsApp.
@@ -89,7 +89,12 @@
       UI.registerActions({
         ir: function (data) { app.navegarA(data.destino); },
         cambiarTema: function () { UI.theme.toggle(); },
-        abrirBusqueda: function () { app.abrirModalSearch(); },
+        abrirBusqueda: function () {
+          // Si se abrió desde el menú móvil, el menú se cierra: si no, queda
+          // abierto detrás del buscador.
+          app.cerrarMenuMovil();
+          app.abrirModalSearch();
+        },
         cerrarBusqueda: function () { UI.closeModal("modal-search-global"); },
         cerrarModal: function () { UI.closeModal("modal-generico"); },
         verNoticia: function (data) { app.verDetalleNoticia(Number(data.id)); },

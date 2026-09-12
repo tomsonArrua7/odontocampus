@@ -127,14 +127,16 @@
   }
 
   /* ------------------------------------------------------------------------
-     BARRAS Y NÚMEROS
+     NÚMEROS Y ODONTOGRAMA
      --------------------------------------------------------------------- */
-  .progress-bar { transition: width var(--dur-slow) var(--ease-entrada); }
+  /* La cifra del promedio la anima js/calculator.js contando hasta el valor
+     nuevo. Acá sólo se garantiza que no cambie de ancho mientras cuenta. */
+  .calc-cifra,
+  .calc-datos dd { font-variant-numeric: tabular-nums; }
 
-  /* Cuenta regresiva del promedio: el valor lo anima js/calculator.js.
-     Acá sólo se evita que el número "salte" de tamaño mientras cambia. */
-  .stat-value,
-  .promedio-cifra { font-variant-numeric: tabular-nums; }
+  /* Al marcar una materia, su casillero cambia de estado con una transición
+     corta: se ve cuál se movió sin tener que buscarlo. */
+  .pieza { transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease); }
 
   /* Carga: el esqueleto respira en lugar de parpadear. */
   @keyframes oc-latido {
