@@ -102,6 +102,12 @@
   --on-brand-muted:     #C3CEDB;
   --on-brand-soft:      #8FA1B5;
   --on-brand-accent:    var(--brand-magenta-400);
+  /* Estados SOBRE fondo oscuro (avisos flotantes, banda de marca). Los de la
+     sección 3 están calculados para leerse sobre papel: sobre azul quedan
+     demasiado oscuros. */
+  --success-on-brand: #8FE3C4;
+  --warning-on-brand: #F2C879;
+  --danger-on-brand:  #FCA5A5;
 
   /* ---- 3. Estados -------------------------------------------------------
      Apagados a propósito. Un aplazo es información, no una emergencia: el
@@ -221,7 +227,7 @@
      Va como capa de `background-image` del propio elemento, nunca con
      `opacity` ni `mix-blend-mode`: las dos crean una capa compuesta aparte y,
      dentro de un `position: sticky`, el encabezado queda pintado corrido. */
-  --grano: url("../textura-grano.png?v=20260912f");
+  --grano: url("../textura-grano.png?v=20260912g");
   --rejilla: rgba(255, 143, 197, 0.12);
 
   /* ---- 9. Capas (z-index nombrado) -------------------------------------- */

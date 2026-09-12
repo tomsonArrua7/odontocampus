@@ -438,8 +438,10 @@
   gap: var(--sp-2);
   min-height: var(--tap-target);
   padding: var(--sp-3) var(--sp-4);
-  font-size: var(--fs-base);
-  font-weight: var(--fw-semi);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: var(--text-muted);
   background: none;
   border: none;
@@ -460,7 +462,7 @@
   background: var(--surface-3);
   color: var(--text-muted);
   padding: 1px 8px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs);
 }
 .tab[aria-selected="true"] .tab-count {
   background: var(--accent-soft);
@@ -573,8 +575,10 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(6, 13, 23, 0.7);
-  backdrop-filter: blur(4px);
+  /* Fondo plano y un poco más oscuro, sin desenfoque: el desenfoque obliga
+     al navegador a rehacer una capa del tamaño de la pantalla cada vez que
+     algo se mueve detrás, y en un teléfono modesto eso se siente. */
+  background: rgba(6, 13, 23, 0.78);
   z-index: var(--z-modal);
   display: none;
   align-items: flex-start;
@@ -582,12 +586,14 @@
   padding: var(--sp-4);
   overflow-y: auto;
 }
-.modal-overlay.active { display: flex; animation: fadeIn var(--dur) var(--ease); }
+.modal-overlay.active { display: flex; }
 
+/* El diálogo es una hoja con borde de tinta. La entrada la maneja
+   css/07-movimiento.css, que la apaga si el sistema pide menos movimiento. */
 .modal-card {
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border: 2px solid var(--text);
+  border-radius: var(--radius-md);
   max-width: 640px;
   width: 100%;
   max-height: calc(100dvh - var(--sp-8));
@@ -596,7 +602,6 @@
   flex-direction: column;
   box-shadow: var(--shadow-xl);
   overflow: hidden;
-  animation: scaleUp var(--dur) var(--ease);
 }
 
 .modal-card-header {
@@ -608,7 +613,17 @@
   justify-content: space-between;
   gap: var(--sp-4);
 }
-.modal-card-header h3 { font-size: var(--fs-xl); }
+/* Los títulos de diálogo no van en mayúsculas: acá entran nombres largos
+   (una noticia, una historia clínica) y en mayúsculas se leen peor. Alcanza
+   con la tipografía de títulos y el peso. */
+.modal-card-header h2,
+.modal-card-header h3 {
+  font-family: var(--font-heading);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-black);
+  letter-spacing: var(--tracking-titulo);
+  line-height: var(--lh-snug);
+}
 .modal-card-body { padding: var(--sp-5); overflow-y: auto; }
 .modal-card-body p { color: var(--text-muted); }
 .modal-card-footer {
@@ -679,7 +694,7 @@
   background: var(--brand-navy-800);
   color: #fff;
   padding: var(--sp-3) var(--sp-4);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-lg);
   display: flex;
   align-items: center;
@@ -690,9 +705,12 @@
   pointer-events: auto;
 }
 .toast-message i { flex-shrink: 0; }
-.toast-success { border-left-color: var(--success-dot); }
-.toast-warning { border-left-color: #F59E0B; }
-.toast-danger  { border-left-color: #EF4444; }
+/* El aviso flotante es siempre azul de marca, en los dos temas, así que sus
+   colores de estado son los de fondo oscuro. Antes había acá un naranja y un
+   rojo escritos a mano, más saturados que el resto del sistema. */
+.toast-success { border-left-color: var(--success-on-brand); }
+.toast-warning { border-left-color: var(--warning-on-brand); }
+.toast-danger  { border-left-color: var(--danger-on-brand); }
 .toast-message.fade-out { opacity: 0; transform: translateY(8px); transition: all var(--dur-slow) var(--ease); }
 
 /* ==========================================================================

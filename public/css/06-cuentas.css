@@ -15,7 +15,7 @@
   gap: var(--sp-2);
   min-height: 40px;
   padding: var(--sp-2) var(--sp-4);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.10);
   border: 1px solid rgba(255, 255, 255, 0.18);
   color: var(--on-brand-muted);
@@ -39,7 +39,7 @@
   justify-content: center;
   width: 26px;
   height: 26px;
-  border-radius: 50%;
+  border-radius: var(--radius-xs);
   background: var(--accent);
   color: var(--accent-on);
   font-size: var(--fs-xs);
@@ -160,13 +160,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 64px;
+  width: 60px;
+  height: 60px;
   margin-bottom: var(--sp-3);
-  border-radius: 50%;
+  border-radius: var(--radius-sm);
   background: var(--success-bg);
   color: var(--success);
-  font-size: var(--fs-2xl);
+  font-size: var(--fs-xl);
 }
 .correo-consejos { margin: var(--sp-5) 0 var(--sp-3); }
 .correo-consejos li { font-size: var(--fs-sm); }
@@ -221,7 +221,7 @@
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
   padding: 3px 10px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs);
   align-self: flex-start;
 }
 .clave-corta,
@@ -242,14 +242,21 @@
   margin-inline: auto;
   padding: var(--sp-8) var(--sp-6);
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-top: 4px solid var(--accent);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  /* Afiche: borde de tinta y una franja magenta arriba. Es lo primero que ve
+     quien entra a Mi carrera sin cuenta, así que se comporta como un cartel
+     y no como una tarjeta más. */
+  border: 2px solid var(--text);
+  border-top: 6px solid var(--accent);
+  border-radius: var(--radius-md);
+  box-shadow: none;
   text-align: center;
 }
 .puerta-carrera h3 {
+  font-family: var(--font-heading);
   font-size: var(--fs-2xl);
+  font-weight: var(--fw-black);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-titulo);
   line-height: var(--lh-tight);
   color: var(--text-strong);
   margin-bottom: var(--sp-3);
@@ -259,13 +266,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 64px;
+  width: 60px;
+  height: 60px;
   margin-bottom: var(--sp-4);
-  border-radius: 50%;
-  background: var(--accent-soft);
-  color: var(--accent-soft-text);
-  font-size: var(--fs-2xl);
+  /* Un sello, no un globo: cuadrado, magenta pleno y el ícono en blanco. */
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--accent-on);
+  font-size: var(--fs-xl);
 }
 
 .puerta-lead {
@@ -326,7 +334,7 @@
   gap: var(--sp-2);
   padding: 4px 12px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs);
   background: var(--surface-2);
   color: var(--text-muted);
   font-size: var(--fs-xs);
