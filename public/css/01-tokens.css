@@ -211,15 +211,17 @@
                 transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
 
   /* ---- 8. Textura de impreso -------------------------------------------
-     Grano generado por SVG: 400 bytes, sin pedir ninguna imagen. Es lo que
-     separa un bloque de color plano de una tinta impresa.
+     Una tecla de 2,6 KB: un mosaico de 96 px con motas claras y oscuras.
 
-     La opacidad va adentro del SVG a propósito: así se usa como una capa de
-     `background-image` del propio elemento, sin `opacity` ni
-     `mix-blend-mode`. Las dos cosas crean una capa compuesta aparte y, dentro
-     de un elemento `position: sticky`, Chromium termina pintando el
-     encabezado corrido al desplazar. Pasó en esta misma página. */
-  --grano: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");
+     Antes esto era un SVG con un filtro de turbulencia. Se veía igual, pero
+     el filtro se rasteriza sobre toda la superficie de la banda y, repetido
+     en un área grande, es caro: la portada dejaba de pintarse bien al
+     desplazar. Un PNG chico repetido no tiene ese costo.
+
+     Va como capa de `background-image` del propio elemento, nunca con
+     `opacity` ni `mix-blend-mode`: las dos crean una capa compuesta aparte y,
+     dentro de un `position: sticky`, el encabezado queda pintado corrido. */
+  --grano: url("../textura-grano.png?v=20260912d");
   --rejilla: rgba(255, 143, 197, 0.12);
 
   /* ---- 9. Capas (z-index nombrado) -------------------------------------- */

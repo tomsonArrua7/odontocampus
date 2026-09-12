@@ -89,13 +89,17 @@
   /* Las filas de llamados no se levantan: cambian de fondo. Levantar una
      fila dentro de una lista con reglas rompe la alineación con las de al
      lado. */
-  .next-item:hover,
+  .next-item:hover { transform: translateY(-2px); }
+
+  /* Las fichas se corren en diagonal para que aparezca la sombra dura que
+     define 03-components.css. Un papel que se despega, no un vidrio que
+     flota. */
   .news-card:hover,
   .hc-card:hover,
   .biblio-card:hover,
   .bolsa-card:hover,
   .guia-card:hover {
-    transform: translateY(-2px);
+    transform: translate(-2px, -2px);
   }
 
   /* ------------------------------------------------------------------------

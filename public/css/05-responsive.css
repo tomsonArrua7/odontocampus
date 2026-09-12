@@ -123,6 +123,13 @@
 }
 
 /* ---- Pantallas anchas ---------------------------------------------------- */
+@media (min-width: 900px) {
+  /* La novedad destacada ocupa dos columnas. Sin esto, "destacada" era sólo
+     un color distinto: tres fichas del mismo tamaño se leen como tres cosas
+     de igual importancia. */
+  .news-card.news-destacada { grid-column: span 2; }
+}
+
 @media (min-width: 1440px) {
   :root { --page-pad: 2rem; }
 }

@@ -466,10 +466,13 @@
       cont.innerHTML = global.ODONTO_DATA.noticias.map(function (n) {
         return (
           '<article class="news-card' + (n.destacado ? " news-destacada" : "") + '">' +
-            '<div class="news-header">' +
+            /* Cinta a sangre arriba: la categoría y cuándo se publicó. En la
+               destacada la cinta va magenta. */
+            '<p class="news-cinta">' +
               '<span class="news-tag">' + esc(n.tag) + "</span>" +
               '<span class="news-date">' + esc(n.fecha) + "</span>" +
-            "</div>" +
+            "</p>" +
+            '<div class="news-body">' +
             '<h3 class="news-title">' + esc(n.titulo) + "</h3>" +
             '<p class="news-summary">' + esc(n.resumen) + "</p>" +
             '<div class="news-footer">' +
@@ -479,6 +482,7 @@
                 '<span class="visually-hidden"> sobre ' + esc(n.titulo) + "</span>" +
                 '<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>' +
               "</button>" +
+            "</div>" +
             "</div>" +
           "</article>"
         );

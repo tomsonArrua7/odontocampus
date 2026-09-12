@@ -259,15 +259,21 @@
   align-items: center;
   gap: var(--sp-1);
   font-weight: var(--fw-bold);
-  border-radius: var(--radius-full);
+  /* Cuadradas, como un sello: la píldora redondeada es el gesto que más
+     "plantilla" leía en la versión anterior. */
+  border-radius: var(--radius-xs);
   white-space: nowrap;
 }
 
+/* El año de la materia es un sello de tinta: ordena sin pedir atención de
+   color, que queda reservado para el estado y para la acción. */
 .badge-materia-anio {
-  background: var(--info-bg);
-  color: var(--info);
+  background: var(--text);
+  color: var(--surface);
   font-size: var(--fs-xs);
-  padding: 4px 10px;
+  padding: 3px 9px;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
 }
 
 .badge-status { font-size: var(--fs-xs); padding: 4px 10px; }
@@ -289,12 +295,12 @@
 .tipo-actualizacion { background: var(--warning-bg); color: var(--warning); }
 
 .news-tag {
-  background: var(--accent-soft);
-  color: var(--accent-soft-text);
-  padding: 4px 11px;
+  background: none;
+  color: inherit;
+  padding: 0;
   font-size: var(--fs-xs);
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: var(--tracking-etiqueta);
 }
 
 .hc-tag {
@@ -319,6 +325,9 @@
   font-size: var(--fs-xs);
   padding: 3px 10px;
   margin-bottom: var(--sp-2);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  align-self: flex-start;
 }
 
 .code-tag {
@@ -342,19 +351,26 @@
 }
 
 /* ==========================================================================
-   TARJETA GENÉRICA
-   Toda tarjeta del sitio usa la misma base: mismo radio, mismo borde, misma
-   elevación y el mismo gesto al pasar el mouse. Antes había cinco variantes
-   ligeramente distintas y el conjunto se leía desprolijo.
+   FICHAS
+   Toda ficha del sitio usa la misma base. Dos niveles, y la diferencia es
+   deliberada:
+
+   · Las de catálogo (historias clínicas, apuntes, bolsa, instrumental) son
+     papel tranquilo: borde fino, sin sombra. Son muchas y se recorren.
+   · Las novedades son afiches: borde de tinta y cinta de color arriba. Son
+     pocas y avisan algo.
+
+   Al pasar el mouse no se difuminan: se despegan con una sombra DURA, como un
+   papel apoyado sobre otro papel. Es el gesto del afiche, no el del vidrio.
    ========================================================================== */
 .card,
 .news-card, .hc-card, .biblio-card, .bolsa-card,
 .guia-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   padding: var(--sp-5);
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
   display: flex;
   flex-direction: column;
   transition: var(--transition);
@@ -364,9 +380,8 @@
 .card:hover,
 .news-card:hover, .hc-card:hover, .biblio-card:hover, .bolsa-card:hover,
 .guia-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--accent);
+  border-color: var(--text);
+  box-shadow: 4px 4px 0 var(--text);
 }
 
 .card-head {

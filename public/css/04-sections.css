@@ -505,17 +505,44 @@
 /* ==========================================================================
    NOTICIAS
    ========================================================================== */
-.news-card.news-destacada { border-left: 5px solid var(--accent); }
-.news-header {
+/* Un afiche: borde de tinta, cinta de color arriba y el cuerpo en papel.
+   La cinta va a sangre, así que el relleno pasa del borde de la ficha a las
+   dos partes de adentro. */
+.news-card {
+  border: 2px solid var(--text);
+  padding: 0;
+  overflow: hidden;
+}
+
+.news-cinta {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--sp-2);
-  margin-bottom: var(--sp-3);
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-4);
+  background: var(--text);
+  color: #fff;
   flex-wrap: wrap;
 }
-.news-date { font-size: var(--fs-xs); color: var(--text-muted); }
-.news-title { font-size: var(--fs-lg); margin-bottom: var(--sp-2); }
+/* La destacada lleva la cinta magenta. Es la única diferencia de color, y
+   alcanza: no necesita además un borde distinto. */
+.news-card.news-destacada .news-cinta { background: var(--accent); }
+.news-date { font-size: var(--fs-xs); color: rgba(255, 255, 255, 0.75); }
+
+.news-body {
+  padding: var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.news-title {
+  font-family: var(--font-heading);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-lg);
+  line-height: var(--lh-snug);
+  margin-bottom: var(--sp-2);
+}
 .news-summary { font-size: var(--fs-base); color: var(--text-muted); margin-bottom: var(--sp-5); flex-grow: 1; }
 .news-footer {
   display: flex;
@@ -788,16 +815,27 @@
 /* ==========================================================================
    CURSADA · historias clínicas, instrumental, bolsa
    ========================================================================== */
+/* Encabezado de ficha de catálogo: sello del año a un lado, dato al otro, y
+   una regla fina que lo separa del contenido. Igual que la cabecera de una
+   ficha de cátedra. */
 .hc-header, .biblio-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: var(--sp-2);
   margin-bottom: var(--sp-3);
+  padding-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
 }
 .hc-pages, .biblio-type { font-size: var(--fs-xs); color: var(--text-muted); font-weight: var(--fw-semi); }
-.hc-title, .biblio-title, .bolsa-title { font-size: var(--fs-lg); margin-bottom: var(--sp-2); }
+.hc-title, .biblio-title, .bolsa-title {
+  font-family: var(--font-heading);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-lg);
+  line-height: var(--lh-snug);
+  margin-bottom: var(--sp-2);
+}
 .hc-catedra, .biblio-materia {
   font-size: var(--fs-sm);
   color: var(--accent-text);
@@ -827,7 +865,13 @@
   flex-wrap: wrap;
 }
 
+/* El precio es el dato que decide: va grande, con la tipografía de los
+   títulos y números tabulares para que la columna no baile. */
 .bolsa-price {
+  font-family: var(--font-heading);
+  font-weight: var(--fw-black);
+  letter-spacing: var(--tracking-titulo);
+  font-variant-numeric: tabular-nums;
   font-size: var(--fs-2xl);
   font-family: var(--font-heading);
   font-weight: var(--fw-black);
