@@ -37,12 +37,19 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
 
   <!-- Sistema de diseño: tokens → base → componentes → secciones → responsive -->
-  <link rel="stylesheet" href="css/01-tokens.css">
-  <link rel="stylesheet" href="css/02-base.css">
-  <link rel="stylesheet" href="css/03-components.css">
-  <link rel="stylesheet" href="css/04-sections.css">
-  <link rel="stylesheet" href="css/05-responsive.css">
-  <link rel="stylesheet" href="css/06-cuentas.css">
+  <!-- El ?v= de cada CSS y cada JS no es decoración: el Vhost manda diez años
+       de caché para estos archivos, así que Cloudflare y el navegador de cada
+       estudiante se quedan con la copia vieja mientras la dirección no cambie.
+       AL PUBLICAR UN CAMBIO DE CSS O DE JS, SUBÍ ESTA FECHA EN TODAS LAS
+       LÍNEAS (y en las plantillas de correo del override de Supabase).
+       Pasó de verdad: el sitio nuevo quedó cargando el config.js viejo, con la
+       clave en PENDIENTE, y las cuentas no aparecían por ningún lado. -->
+  <link rel="stylesheet" href="css/01-tokens.css?v=20260912">
+  <link rel="stylesheet" href="css/02-base.css?v=20260912">
+  <link rel="stylesheet" href="css/03-components.css?v=20260912">
+  <link rel="stylesheet" href="css/04-sections.css?v=20260912">
+  <link rel="stylesheet" href="css/05-responsive.css?v=20260912">
+  <link rel="stylesheet" href="css/06-cuentas.css?v=20260912">
 </head>
 <body>
 
@@ -964,15 +971,15 @@
 </footer>
 
 <!-- Scripts: configuración y núcleo primero, módulos después, controlador al final -->
-<script src="js/config.js"></script>
-<script src="js/core.js"></script>
-<script src="js/api.js"></script>
-<script src="js/data.js"></script>
-<script src="js/live_sheets.js"></script>
-<script src="js/calculator.js"></script>
-<script src="js/carrera.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/chatbot.js"></script>
-<script src="js/app.js"></script>
+<script src="js/config.js?v=20260912"></script>
+<script src="js/core.js?v=20260912"></script>
+<script src="js/api.js?v=20260912"></script>
+<script src="js/data.js?v=20260912"></script>
+<script src="js/live_sheets.js?v=20260912"></script>
+<script src="js/calculator.js?v=20260912"></script>
+<script src="js/carrera.js?v=20260912"></script>
+<script src="js/auth.js?v=20260912"></script>
+<script src="js/chatbot.js?v=20260912"></script>
+<script src="js/app.js?v=20260912"></script>
 </body>
 </html>

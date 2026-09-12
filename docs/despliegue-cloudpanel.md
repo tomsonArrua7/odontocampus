@@ -194,6 +194,24 @@ Cada una prueba una capa distinta:
 > En PowerShell, `curl` a secas es un alias de `Invoke-WebRequest` y no entiende
 > estas opciones. Usá `curl.exe`.
 
+#### La caché: subí el `?v=` al publicar un cambio de CSS o JS
+
+El Vhost manda `Cache-Control: max-age=315360000` (diez años) para `css/` y
+`js/`. Es correcto para un sitio estático, pero significa que **cambiar un
+archivo no alcanza**: Cloudflare y el navegador de cada persona siguen
+sirviendo la copia vieja mientras la dirección no cambie.
+
+Por eso `index.html` pide cada archivo con `?v=AAAAMMDD`, y ese número se sube
+en todas las líneas al publicar. Las plantillas de correo llevan el suyo en
+`docker-compose.override.yml`.
+
+Para comprobar qué está sirviendo el sitio de verdad, mirá la fecha del
+archivo, no la del repositorio:
+
+```bash
+curl -sI https://odontocampus.com.ar/js/config.js | grep -i -E "last-modified|cf-cache-status"
+```
+
 #### Actualizar
 
 ```bash

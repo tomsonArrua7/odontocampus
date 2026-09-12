@@ -74,8 +74,11 @@ services:
   # queda cerrado en el Vhost de la API, no acá: GoTrue no tiene una opción
   # para apagarlo sin apagar también el registro.
   #
-  # Las plantillas las sirve el propio sitio (public/email/). Después de
-  # cambiarlas: git pull en el sitio y `docker compose restart auth`.
+  # Las plantillas las sirve el propio sitio (public/email/). El ?v= de la
+  # dirección es obligatorio: el Vhost manda diez años de caché, así que
+  # sin cambiar la dirección GoTrue seguiría bajando la plantilla vieja.
+  # Después de cambiar una plantilla: git pull en el sitio, subir el ?v=
+  # acá y `docker compose up -d auth`.
   # Después de cambiar ESTE ARCHIVO: `docker compose up -d auth` (restart
   # no relee la configuración).
   # ------------------------------------------------------------------
@@ -130,5 +133,5 @@ services:
 
       GOTRUE_MAILER_SUBJECTS_CONFIRMATION: "Confirmá tu cuenta de OdontoCampus"
       GOTRUE_MAILER_SUBJECTS_RECOVERY: "Elegí una contraseña nueva para OdontoCampus"
-      GOTRUE_MAILER_TEMPLATES_CONFIRMATION: "https://odontocampus.com.ar/email/confirmacion.html"
-      GOTRUE_MAILER_TEMPLATES_RECOVERY: "https://odontocampus.com.ar/email/recuperar.html"
+      GOTRUE_MAILER_TEMPLATES_CONFIRMATION: "https://odontocampus.com.ar/email/confirmacion.html?v=20260912"
+      GOTRUE_MAILER_TEMPLATES_RECOVERY: "https://odontocampus.com.ar/email/recuperar.html?v=20260912"

@@ -90,6 +90,21 @@ del navegador.
 El orden de los `<script>` importa: `config.js` y `core.js` primero,
 `app.js` último.
 
+### Al cambiar un CSS o un JS, subí el `?v=` de `index.html`
+
+El Vhost del servidor manda **diez años de caché** para `css/` y `js/`. Sin
+cambiar la dirección del archivo, Cloudflare y el navegador de cada estudiante
+siguen usando la copia vieja: el sitio nuevo carga con los archivos anteriores.
+
+Por eso cada `<link>` y cada `<script>` llevan `?v=AAAAMMDD`. Al publicar un
+cambio se sube esa fecha **en todas las líneas**. Lo mismo vale para las
+plantillas de correo, cuyo `?v=` está en
+`infra/supabase/docker-compose.override.yml`.
+
+**Pasó de verdad:** el día que se publicaron las cuentas con contraseña, el
+`index.html` nuevo quedó cargando el `config.js` viejo —con la clave en
+`PENDIENTE`— y el ingreso no aparecía por ningún lado.
+
 ---
 
 ## Sistema de diseño
