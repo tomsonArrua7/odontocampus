@@ -362,8 +362,9 @@ El filtro de días se arma solo con los días que la planilla realmente trae.
   botón avisa que el material todavía no está subido.
 - **Datos de contacto**: el WhatsApp y el email de `js/data.js` y del pie de
   página son de ejemplo. Cambialos antes de publicar.
-- **Fechas de trámites** (`fechasClave` en `js/data.js`) están escritas a mano y
-  hay que actualizarlas cada cuatrimestre.
+- **Novedades** (`noticias` en `js/data.js`) están escritas a mano. La agenda de
+  trámites se sacó de la portada (tenía fechas vencidas); si vuelve, que sea
+  dentro de "Cuándo rindo" y con fechas reales.
 
 ---
 

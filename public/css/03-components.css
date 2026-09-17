@@ -394,7 +394,7 @@
    papel apoyado sobre otro papel. Es el gesto del afiche, no el del vidrio.
    ========================================================================== */
 .card,
-.news-card, .hc-card, .biblio-card, .bolsa-card,
+.hc-card, .biblio-card, .bolsa-card,
 .guia-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -408,7 +408,7 @@
 }
 
 .card:hover,
-.news-card:hover, .hc-card:hover, .biblio-card:hover, .bolsa-card:hover,
+.hc-card:hover, .biblio-card:hover, .bolsa-card:hover,
 .guia-card:hover {
   border-color: var(--text);
   box-shadow: 4px 4px 0 var(--text);

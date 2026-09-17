@@ -68,38 +68,6 @@ const ODONTO_DATA = {
     }
   ],
 
-  // Próximas Fechas Clave / Agenda Rápida
-  fechasClave: [
-    {
-      evento: "Inscripción a Cursadas 1° Cuatrimestre",
-      fecha: "02 Mar - 06 Mar 2026",
-      tipo: "Inscripción",
-      sistema: "SIU Guaraní",
-      urgente: true
-    },
-    {
-      evento: "1° Llamado a Finales Turno Marzo",
-      fecha: "09 Mar - 13 Mar 2026",
-      tipo: "Exámenes",
-      sistema: "Presencial",
-      urgente: true
-    },
-    {
-      evento: "Inicio de Clínicas de 4° y 5° Año",
-      fecha: "16 Mar 2026",
-      tipo: "Clínicas",
-      sistema: "Hospital Odontológico",
-      urgente: false
-    },
-    {
-      evento: "Presentación de Fichas y Equivalencias",
-      fecha: "Hasta 20 Mar 2026",
-      tipo: "Trámite",
-      sistema: "Mesa de Entradas / FOE",
-      urgente: false
-    }
-  ],
-
   // Plan de Estudios Completo UNLP (Por Años)
   planEstudios: [
     {

@@ -73,6 +73,7 @@ MAPA = [
     ("tilde-circulo", ["circle-check", "check-circle-2"]),
     ("diana",         ["target"]),
     ("columnas",      ["landmark"]),
+    ("flecha-abajo",  ["arrow-down"]),
     ("flecha-der",    ["arrow-right"]),
     ("flecha-izq",    ["arrow-left"]),
     ("entrar",        ["log-in"]),

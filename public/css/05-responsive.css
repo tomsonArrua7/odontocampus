@@ -21,17 +21,21 @@
   .nav-menu { display: none; }
   .mobile-toggle { display: flex; }
 
-  .hero-grid { grid-template-columns: 1fr; gap: var(--sp-8); }
   .calc-tablero { grid-template-columns: 1fr; }
-  .hero-title { max-width: none; }
-  .home-panel { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr 1fr; gap: var(--sp-6); }
 }
 
 /* ---- Móvil --------------------------------------------------------------- */
 @media (max-width: 768px) {
-  .hero-banner { padding: var(--sp-8) 0; }
-  .hero-cta-group .btn { flex: 1 1 100%; }
+  .portada { min-height: calc(100vh - 64px); min-height: calc(100svh - 64px); padding: var(--sp-10) 0; }
+  .inicio-cuerpo { padding-top: var(--sp-10); }
+  .atajos { grid-template-columns: 1fr; gap: var(--sp-3); }
+  .atajo { padding: var(--sp-4); }
+  /* En el celular la categoría va arriba del título y no al costado. */
+  .novedad { grid-template-columns: minmax(0, 1fr) auto; gap: var(--sp-1) var(--sp-3); }
+  .novedad-meta { grid-column: 1; flex-direction: row; gap: var(--sp-2); }
+  .novedad-titulo { grid-column: 1; }
+  .novedad-flecha { grid-column: 2; grid-row: 1 / span 2; }
 
   .section-header { margin: var(--sp-8) 0 var(--sp-5); }
 
@@ -66,8 +70,6 @@
   .llamado-que { grid-area: texto; }
   .etiqueta-modalidad { grid-area: etiqueta; justify-self: start; }
 
-  .fecha-item { flex-direction: column; align-items: stretch; gap: var(--sp-3); }
-  .fecha-date-badge { width: 100%; min-width: 0; justify-content: center; }
 
   .hc-actions, .biblio-actions { flex-direction: column; }
   .hc-actions .btn, .biblio-actions .btn { width: 100%; }
@@ -126,23 +128,17 @@
   .btn-search-trigger { display: none; }
   .solo-menu-chico { display: block; }
 
+  /* Las dos reglas del antetítulo no entran junto al texto. */
+  .hero-tag::before, .hero-tag::after { display: none; }
+
   .odonto-piezas { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-  .news-footer { flex-direction: column; align-items: stretch; }
-  .news-footer .btn { width: 100%; }
 
   .banda-dia { gap: var(--sp-2); }
-  .card, .news-card, .hc-card, .biblio-card, .bolsa-card,
+  .card, .hc-card, .biblio-card, .bolsa-card,
   .guia-card { padding: var(--sp-4); }
 }
 
 /* ---- Pantallas anchas ---------------------------------------------------- */
-@media (min-width: 900px) {
-  /* La novedad destacada ocupa dos columnas. Sin esto, "destacada" era sólo
-     un color distinto: tres fichas del mismo tamaño se leen como tres cosas
-     de igual importancia. */
-  .news-card.news-destacada { grid-column: span 2; }
-}
-
 @media (min-width: 1440px) {
   :root { --page-pad: 2rem; }
 }
@@ -154,7 +150,7 @@
     --border-strong: var(--gray-600);
     --text-muted: var(--gray-700);
   }
-  .card, .news-card, .hc-card, .biblio-card, .bolsa-card,
+  .card, .hc-card, .biblio-card, .bolsa-card,
   .guia-card { border-width: 2px; }
   .fila-llamado { border-bottom-width: 2px; }
 }

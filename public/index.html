@@ -12,8 +12,8 @@
   <!-- Marca: un diente geométrico en blanco sobre el magenta de FOE. Se lee a
        16 px en una pestaña, que es la única prueba que importa para un ícono. -->
   <link rel="icon" href="favicon.ico" sizes="32x32">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260912h">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260912h">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260917a">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260917a">
 
   <meta property="og:title" content="OdontoCampus · FOE Odontología UNLP">
   <meta property="og:description" content="Mesas de examen y reválidas en vivo, historias clínicas, promedio y apuntes. Todo en un solo lugar.">
@@ -22,7 +22,7 @@
   <meta property="og:locale" content="es_AR">
   <!-- Imagen del enlace (WhatsApp, Instagram, Twitter). Tiene que ser una URL
        absoluta y un archivo rasterizado: ninguna de esas apps lee SVG. -->
-  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260912h">
+  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260917a">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="OdontoCampus · FOE Odontología UNLP">
@@ -57,13 +57,13 @@
        LÍNEAS (y en las plantillas de correo del override de Supabase).
        Pasó de verdad: el sitio nuevo quedó cargando el config.js viejo, con la
        clave en PENDIENTE, y las cuentas no aparecían por ningún lado. -->
-  <link rel="stylesheet" href="css/01-tokens.css?v=20260912h">
-  <link rel="stylesheet" href="css/02-base.css?v=20260912h">
-  <link rel="stylesheet" href="css/03-components.css?v=20260912h">
-  <link rel="stylesheet" href="css/04-sections.css?v=20260912h">
-  <link rel="stylesheet" href="css/05-responsive.css?v=20260912h">
-  <link rel="stylesheet" href="css/06-cuentas.css?v=20260912h">
-  <link rel="stylesheet" href="css/07-movimiento.css?v=20260912h">
+  <link rel="stylesheet" href="css/01-tokens.css?v=20260917a">
+  <link rel="stylesheet" href="css/02-base.css?v=20260917a">
+  <link rel="stylesheet" href="css/03-components.css?v=20260917a">
+  <link rel="stylesheet" href="css/04-sections.css?v=20260917a">
+  <link rel="stylesheet" href="css/05-responsive.css?v=20260917a">
+  <link rel="stylesheet" href="css/06-cuentas.css?v=20260917a">
+  <link rel="stylesheet" href="css/07-movimiento.css?v=20260917a">
 </head>
 <body>
 
@@ -120,6 +120,7 @@
   <symbol id="ic-etiqueta" viewBox="0 0 24 24"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z" /> <circle cx="7.5" cy="7.5" r=".5" fill="currentColor" /></symbol>
   <symbol id="ic-externo" viewBox="0 0 24 24"><path d="M15 3h6v6" /> <path d="M10 14 21 3" /> <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /></symbol>
   <symbol id="ic-filtro" viewBox="0 0 24 24"><path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" /></symbol>
+  <symbol id="ic-flecha-abajo" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
   <symbol id="ic-flecha-der" viewBox="0 0 24 24"><path d="M5 12h14" /> <path d="m12 5 7 7-7 7" /></symbol>
   <symbol id="ic-flecha-izq" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7" /> <path d="M19 12H5" /></symbol>
   <symbol id="ic-herramientas" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z" /></symbol>
@@ -247,75 +248,74 @@
   <section id="seccion-inicio" class="app-section active" aria-labelledby="titulo-inicio">
     <h1 class="visually-hidden" id="titulo-inicio">OdontoCampus, plataforma estudiantil de FOE Odontología UNLP</h1>
 
-    <div class="hero-banner">
-      <div class="container">
-        <div class="hero-grid">
-          <div>
-            <p class="hero-tag">Un servicio de FOE · Odontología UNLP</p>
-            <!-- El nombre como afiche: el bloque magenta cae sobre "Campus".
-                 Un nombre no dice qué es esto, así que el peso de explicarlo
-                 lo lleva la línea de abajo, que es la que se lee después. -->
-            <p class="hero-title">Odonto<span>Campus</span></p>
-            <p class="hero-subtitle">
-              Mesas de finales, reválidas, historias clínicas y tu promedio.
-              Todo en un solo lugar, sacado de la planilla oficial de cátedra.
-            </p>
-            <div class="hero-cta-group">
-              <a href="#fechas/mesas" class="btn btn-magenta btn-lg" data-nav="fechas/mesas">
-                <svg class="ic" aria-hidden="true"><use href="#ic-calendario"></use></svg> Ver mesas de finales
-              </a>
-              <a href="#fechas/revalidas" class="btn btn-lg btn-on-brand" data-nav="fechas/revalidas">
-                <svg class="ic" aria-hidden="true"><use href="#ic-certificado"></use></svg> Ver reválidas
-              </a>
-            </div>
-            <p class="hero-nota">
-              Historias clínicas, instrumental y apuntes, abiertos y sin cuenta.
-              Sólo Mi promedio pide una, para guardarte las materias.
-            </p>
-          </div>
-
-          <!-- La próxima mesa, en papel, montada sobre la banda de marca. Es lo
-               único de la portada que cambia con los datos y lo primero que
-               mira quien entra en época de finales. La llena js/app.js con la
-               misma planilla que alimenta la sección de fechas. -->
-          <aside class="ticket" id="ticket-proxima" aria-live="polite" aria-label="Tu próxima mesa">
-            <p class="ticket-tapa"><span>Tu próxima fecha</span></p>
-            <p class="ticket-vacio">Buscando en la planilla oficial…</p>
-          </aside>
-        </div>
+    <!-- PORTADA
+         Una sola idea por pantalla: el nombre, qué es y un botón. Antes la
+         portada ofrecía a la vez dos llamados, una nota, la próxima mesa, la
+         agenda de trámites y cuatro novedades: con siete cosas pidiendo
+         atención no se elige ninguna. Lo demás está un paso más abajo. -->
+    <div class="portada">
+      <div class="container portada-centro">
+        <p class="hero-tag">Un servicio de FOE · Odontología UNLP</p>
+        <p class="hero-title">Odonto<span>Campus</span></p>
+        <p class="portada-bajada">Mesas, clínica, apuntes y tu carrera, en un solo lugar.</p>
+        <button type="button" class="btn btn-magenta btn-lg btn-comenzar" data-action="comenzar">
+          Comenzar <svg class="ic" aria-hidden="true"><use href="#ic-flecha-abajo"></use></svg>
+        </button>
       </div>
     </div>
 
-    <div class="container">
+    <!-- Cuatro destinos, los mismos del menú. Cada uno dice en una línea qué
+         hay adentro: el nombre solo no alcanza la primera vez. -->
+    <div class="container inicio-cuerpo" id="que-necesitas" tabindex="-1">
+      <h2 class="inicio-titulo">¿Qué necesitás?</h2>
+      <ul class="atajos">
+        <li>
+          <a class="atajo" href="#fechas/mesas" data-nav="fechas/mesas">
+            <svg class="ic atajo-ic" aria-hidden="true"><use href="#ic-calendario"></use></svg>
+            <span class="atajo-texto">
+              <strong>Cuándo rindo</strong>
+              <span>Mesas de finales y reválidas</span>
+              <span class="atajo-dato" id="atajo-proxima" hidden></span>
+            </span>
+            <svg class="ic atajo-flecha" aria-hidden="true"><use href="#ic-flecha-der"></use></svg>
+          </a>
+        </li>
+        <li>
+          <a class="atajo" href="#cursada/historias" data-nav="cursada/historias">
+            <svg class="ic atajo-ic" aria-hidden="true"><use href="#ic-maletin"></use></svg>
+            <span class="atajo-texto">
+              <strong>Cursada y clínica</strong>
+              <span>Historias clínicas, instrumental y bolsa</span>
+            </span>
+            <svg class="ic atajo-flecha" aria-hidden="true"><use href="#ic-flecha-der"></use></svg>
+          </a>
+        </li>
+        <li>
+          <a class="atajo" href="#biblioteca" data-nav="biblioteca">
+            <svg class="ic atajo-ic" aria-hidden="true"><use href="#ic-libro"></use></svg>
+            <span class="atajo-texto">
+              <strong>Biblioteca</strong>
+              <span>Apuntes por año y materia</span>
+            </span>
+            <svg class="ic atajo-flecha" aria-hidden="true"><use href="#ic-flecha-der"></use></svg>
+          </a>
+        </li>
+        <li>
+          <a class="atajo" href="#carrera" data-nav="carrera">
+            <svg class="ic atajo-ic" aria-hidden="true"><use href="#ic-diente"></use></svg>
+            <span class="atajo-texto">
+              <strong>Mi carrera</strong>
+              <span>Tus materias y tu promedio</span>
+            </span>
+            <svg class="ic atajo-flecha" aria-hidden="true"><use href="#ic-flecha-der"></use></svg>
+          </a>
+        </li>
+      </ul>
 
-      <!-- Panel de orientación: "qué me toca ahora" -->
-      <div class="home-panel">
-        <div class="next-up">
-          <div class="next-up-head">
-            <h3><svg class="ic" aria-hidden="true"><use href="#ic-reloj"></use></svg> Tus próximas fechas</h3>
-            <a href="#fechas" class="btn btn-secondary btn-sm" data-nav="fechas">Ver todas</a>
-          </div>
-          <div class="next-list" id="proximas-fechas-lista">
-            <p class="search-hint">Buscando las próximas mesas…</p>
-          </div>
-        </div>
-
-        <div class="next-up">
-          <div class="next-up-head">
-            <h3><svg class="ic" aria-hidden="true"><use href="#ic-lista"></use></svg> Trámites y plazos</h3>
-          </div>
-          <div class="fechas-list" id="fechas-clave-lista"></div>
-        </div>
-      </div>
-
-      <div class="section-header">
-        <div class="section-title-wrap">
-          <h2><svg class="ic" aria-hidden="true"><use href="#ic-megafono"></use></svg> Novedades de FOE</h2>
-          <p>Avisos académicos y gremiales, talleres y beneficios estudiantiles.</p>
-        </div>
-      </div>
-
-      <div class="news-grid" id="noticias-grid"></div>
+      <section class="novedades" aria-labelledby="titulo-novedades">
+        <h2 class="inicio-titulo" id="titulo-novedades">Novedades de FOE</h2>
+        <ul class="novedades-lista" id="noticias-lista"></ul>
+      </section>
     </div>
   </section>
 
@@ -1037,7 +1037,7 @@
           <img src="FOE.jpg" alt="" width="40" height="40">
           <h3>Odonto<span>Campus</span></h3>
         </div>
-        <p>Plataforma académica y gremial de las y los estudiantes de la Facultad de Odontología de la UNLP. Información abierta y sin cuenta. Solo Mi promedio pide una, para guardar tus materias.</p>
+        <p>Plataforma académica y gremial de las y los estudiantes de la Facultad de Odontología de la UNLP. Información abierta y sin cuenta. Solo Mi carrera pide una, para guardar tus materias.</p>
         <div class="footer-social">
           <a href="https://instagram.com/foe_odontounlp" target="_blank" rel="noopener noreferrer"
              class="btn btn-icon" aria-label="Instagram de FOE (se abre en una pestaña nueva)">
@@ -1088,15 +1088,15 @@
 </footer>
 
 <!-- Scripts: configuración y núcleo primero, módulos después, controlador al final -->
-<script src="js/config.js?v=20260912h"></script>
-<script src="js/core.js?v=20260912h"></script>
-<script src="js/api.js?v=20260912h"></script>
-<script src="js/data.js?v=20260912h"></script>
-<script src="js/live_sheets.js?v=20260912h"></script>
-<script src="js/calculator.js?v=20260912h"></script>
-<script src="js/carrera.js?v=20260912h"></script>
-<script src="js/auth.js?v=20260912h"></script>
-<script src="js/chatbot.js?v=20260912h"></script>
-<script src="js/app.js?v=20260912h"></script>
+<script src="js/config.js?v=20260917a"></script>
+<script src="js/core.js?v=20260917a"></script>
+<script src="js/api.js?v=20260917a"></script>
+<script src="js/data.js?v=20260917a"></script>
+<script src="js/live_sheets.js?v=20260917a"></script>
+<script src="js/calculator.js?v=20260917a"></script>
+<script src="js/carrera.js?v=20260917a"></script>
+<script src="js/auth.js?v=20260917a"></script>
+<script src="js/chatbot.js?v=20260917a"></script>
+<script src="js/app.js?v=20260917a"></script>
 </body>
 </html>

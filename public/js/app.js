@@ -56,7 +56,6 @@
       this.initEncabezadoAlDesplazar();
 
       this.initNoticias();
-      this.initFechasClave();
       this.initHistoriasClinicas();
       this.initBiblioteca();
       this.initBolsaInstrumental();
@@ -89,6 +88,7 @@
       UI.registerActions({
         ir: function (data) { app.navegarA(data.destino); },
         cambiarTema: function () { UI.theme.toggle(); },
+        comenzar: function () { app.comenzar(); },
         abrirBusqueda: function () {
           // Si se abrió desde el menú móvil, el menú se cierra: si no, queda
           // abierto detrás del buscador.
@@ -322,14 +322,31 @@
        "explorar la plataforma", sino saber qué te toca esta semana.
        ====================================================================== */
     /**
-     * Ticket de la portada: la próxima fecha, con cuántos días faltan.
+     * COMENZAR baja hasta los destinos y les pasa el foco.
      *
-     * Nadie calcula fechas de memoria: calcula días. "Faltan 3 días" es la
-     * información que la persona vino a buscar, y va antes que cualquier
-     * eslogan.
+     * Baja en la misma página en lugar de cambiar de sección: la portada y
+     * los destinos son un solo paso, y "atrás" en el celular no debería
+     * devolver a una pantalla con un solo botón.
      */
-    renderTicketProximaMesa: function () {
-      var cont = document.getElementById("ticket-proxima");
+    comenzar: function () {
+      var destino = document.getElementById("que-necesitas");
+      if (!destino) return;
+      var quieto = global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      // Se apunta al título y no al contenedor: así queda justo debajo del
+      // encabezado fijo (el margen lo pone scroll-padding-top en la base).
+      destino.querySelector("h2").scrollIntoView({ behavior: quieto ? "auto" : "smooth", block: "start" });
+      destino.focus({ preventScroll: true });
+    },
+
+    /**
+     * La próxima fecha, como una línea dentro del destino "Cuándo rindo".
+     *
+     * Es el único dato vivo de la portada y el que más se busca en época de
+     * finales. Va en una línea y no en una ficha aparte: informa sin sumar
+     * otra cosa para mirar. Lo llama js/live_sheets.js al traer la planilla.
+     */
+    renderProximasFechas: function () {
+      var cont = document.getElementById("atajo-proxima");
       if (!cont) return;
 
       var sheets = global.OdontoLiveSheets;
@@ -345,151 +362,41 @@
         })
         .sort(function (a, b) { return a.fecha - b.fecha; })[0];
 
-      if (!proxima) {
-        cont.innerHTML =
-          '<p class="ticket-tapa"><span>Tu próxima fecha</span></p>' +
-          '<p class="ticket-vacio">' + (items.length
-            ? "No hay fechas próximas cargadas en la planilla. Mirá el listado " +
-              "completo: puede haber llamados sin fecha confirmada."
-            : "Estamos trayendo las fechas desde la planilla oficial…") +
-          "</p>";
-        return;
-      }
+      if (!proxima) { cont.hidden = true; return; }
 
       var it = proxima.item;
       var corta = UI.fechaCorta(proxima.fecha);
       var dias = UI.diasHasta(proxima.fecha);
-      var esRevalida = it.tipo === "revalida" || it.tipo === "actualizacion";
-      var esZoom = String(it.modalidad || "").toLowerCase().indexOf("zoom") !== -1;
-      var destino = esRevalida ? "fechas/revalidas" : "fechas/mesas";
-      var cuando = dias === 0 ? "Es hoy" : (dias === 1 ? "Es mañana" : "Faltan " + dias + " días");
+      var cuando = dias === 0 ? "es hoy" : (dias === 1 ? "es mañana" : "faltan " + dias + " días");
 
-      cont.innerHTML =
-        '<p class="ticket-tapa"><span>Tu próxima fecha</span>' +
-          "<span>" + (esRevalida ? "Reválida" : "Final") + "</span></p>" +
-        '<div class="ticket-cuerpo">' +
-          '<p class="ticket-dia"><b>' + esc(corta.dia) + "</b>" +
-            "<small>" + esc(corta.mes) + "</small></p>" +
-          "<div>" +
-            '<h3 class="ticket-materia">' + esc(it.materiaOriginal || it.materia) + "</h3>" +
-            '<p class="ticket-meta">' + esc(it.hora || "Horario a confirmar") + " · " +
-              esc(esZoom ? "Por Zoom" : (it.modalidad || "Presencial")) + "</p>" +
-          "</div>" +
-        "</div>" +
-        '<p class="ticket-pie"><b>' + esc(cuando) + "</b>" +
-          '<a href="#' + destino + '" data-nav="' + destino + '">Ver todas</a></p>';
-    },
-
-    renderProximasFechas: function () {
-      this.renderTicketProximaMesa();
-
-      var cont = document.getElementById("proximas-fechas-lista");
-      if (!cont) return;
-
-      var sheets = global.OdontoLiveSheets;
-      var items = sheets && sheets.cachedItems ? sheets.cachedItems : [];
-
-      var proximos = items
-        .map(function (item) {
-          return { item: item, fecha: UI.parseFechaTexto(item.dia) };
-        })
-        .filter(function (entry) {
-          var d = UI.diasHasta(entry.fecha);
-          return d !== null && d >= 0;
-        })
-        .sort(function (a, b) { return a.fecha - b.fecha; })
-        .slice(0, 4);
-
-      if (!proximos.length) {
-        cont.innerHTML =
-          '<p class="search-hint">' +
-          (items.length
-            ? "No hay fechas próximas cargadas en la planilla. Mirá el listado completo por si hay llamados sin fecha confirmada."
-            : "Todavía estamos trayendo las fechas desde la planilla oficial.") +
-          "</p>";
-        return;
-      }
-
-      cont.innerHTML = proximos.map(function (entry) {
-        var it = entry.item;
-        var corta = UI.fechaCorta(entry.fecha);
-        var esRevalida = it.tipo === "revalida" || it.tipo === "actualizacion";
-        var destino = esRevalida ? "fechas/revalidas" : "fechas/mesas";
-        var esZoom = String(it.modalidad || "").toLowerCase().indexOf("zoom") !== -1;
-
-        return (
-          '<a class="next-item" href="#' + destino + '" data-nav="' + destino + '">' +
-            '<span class="next-item-when">' +
-              "<b>" + esc(corta.dia) + "</b><span>" + esc(corta.mes) + "</span>" +
-            "</span>" +
-            '<span class="next-item-what">' +
-              "<strong>" + esc(it.materiaOriginal || it.materia) + "</strong>" +
-              "<small>" +
-                "<span>" + esc(UI.cuandoTexto(entry.fecha)) + "</span>" +
-                "<span>" + esc(it.hora || "Horario a confirmar") + "</span>" +
-                "<span>" + (esZoom ? "Por Zoom" : "Presencial") + "</span>" +
-              "</small>" +
-            "</span>" +
-          "</a>"
-        );
-      }).join("");
-    },
-
-    /* ======================================================================
-       INICIO · trámites y plazos
-       ====================================================================== */
-    initFechasClave: function () {
-      var cont = document.getElementById("fechas-clave-lista");
-      if (!cont || !global.ODONTO_DATA || !global.ODONTO_DATA.fechasClave) return;
-
-      cont.innerHTML = global.ODONTO_DATA.fechasClave.map(function (f) {
-        return (
-          '<div class="fecha-item' + (f.urgente ? " fecha-urgente" : "") + '">' +
-            '<div class="fecha-date-badge">' +
-              '<svg class="ic" aria-hidden="true"><use href="#ic-calendario"></use></svg>' +
-              "<span>" + esc(f.fecha) + "</span>" +
-            "</div>" +
-            '<div class="fecha-info">' +
-              "<h4>" + esc(f.evento) + "</h4>" +
-              '<p class="fecha-meta">' +
-                '<span><svg class="ic" aria-hidden="true"><use href="#ic-etiqueta"></use></svg> ' + esc(f.tipo) + "</span>" +
-                '<span><svg class="ic" aria-hidden="true"><use href="#ic-monitor"></use></svg> ' + esc(f.sistema) + "</span>" +
-              "</p>" +
-            "</div>" +
-          "</div>"
-        );
-      }).join("");
+      cont.textContent = "Próxima: " + (it.materiaOriginal || it.materia) + " · " +
+        corta.dia + " " + corta.mes.toLowerCase() + ", " + cuando;
+      cont.hidden = false;
     },
 
     /* ======================================================================
        NOTICIAS
        ====================================================================== */
     initNoticias: function () {
-      var cont = document.getElementById("noticias-grid");
+      var cont = document.getElementById("noticias-lista");
       if (!cont || !global.ODONTO_DATA) return;
 
+      /* Una línea por novedad: de qué tipo es, cuándo y el título. El resumen
+         se lee al abrirla. En la portada importa saber que hay algo nuevo,
+         no leerlo entero. */
       cont.innerHTML = global.ODONTO_DATA.noticias.map(function (n) {
         return (
-          '<article class="news-card' + (n.destacado ? " news-destacada" : "") + '">' +
-            /* Cinta a sangre arriba: la categoría y cuándo se publicó. En la
-               destacada la cinta va magenta. */
-            '<p class="news-cinta">' +
-              '<span class="news-tag">' + esc(n.tag) + "</span>" +
-              '<span class="news-date">' + esc(n.fecha) + "</span>" +
-            "</p>" +
-            '<div class="news-body">' +
-            '<h3 class="news-title">' + esc(n.titulo) + "</h3>" +
-            '<p class="news-summary">' + esc(n.resumen) + "</p>" +
-            '<div class="news-footer">' +
-              '<span class="author-badge"><svg class="ic" aria-hidden="true"><use href="#ic-escudo"></use></svg> ' + esc(n.autor) + "</span>" +
-              '<button type="button" class="btn btn-outline-magenta btn-sm" data-action="verNoticia" data-id="' + esc(n.id) + '">' +
-                "Leer más" +
-                '<span class="visually-hidden"> sobre ' + esc(n.titulo) + "</span>" +
-                '<svg class="ic" aria-hidden="true"><use href="#ic-flecha-der"></use></svg>' +
-              "</button>" +
-            "</div>" +
-            "</div>" +
-          "</article>"
+          "<li>" +
+            '<button type="button" class="novedad' + (n.destacado ? " novedad-destacada" : "") + '"' +
+                    ' data-action="verNoticia" data-id="' + esc(n.id) + '">' +
+              '<span class="novedad-meta">' +
+                '<span class="novedad-tag">' + esc(n.tag) + "</span>" +
+                "<span>" + esc(n.fecha) + "</span>" +
+              "</span>" +
+              '<span class="novedad-titulo">' + esc(n.titulo) + "</span>" +
+              UI.icono("flecha-der", "novedad-flecha") +
+            "</button>" +
+          "</li>"
         );
       }).join("");
     },

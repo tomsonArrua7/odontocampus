@@ -198,77 +198,65 @@
 }
 
 /* ==========================================================================
-   HERO
+   PORTADA
+   El nombre, una línea y un botón, centrados sobre la banda de marca. Ocupa
+   la pantalla para que lo primero que se ve sea una sola decisión.
+   La rejilla de cuaderno de antes se fue: sumaba textura justo donde tiene
+   que haber calma. Queda el grano, que no se ve como dibujo.
    ========================================================================== */
-.hero-banner {
-  position: relative;
-  /* Grano de impreso sobre el azul de marca, como capa de fondo. */
+.portada {
   background-color: var(--brand-surface);
   background-image: var(--grano);
   color: #fff;
-  padding: var(--sp-12) 0 var(--sp-16);
-  overflow: hidden;
   border-bottom: 3px solid var(--accent);
-}
-
-/* Trama de cuaderno en lugar del degradado anterior. El difuminado se PINTA
-   con un radial del color de la banda encima de la trama: una máscara haría
-   una capa compuesta aparte y rompería el pintado al desplazar. */
-.hero-banner::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(ellipse 70% 90% at 78% 8%, rgba(11, 25, 44, 0) 0%, var(--brand-surface) 68%),
-    linear-gradient(var(--rejilla) 1px, transparent 1px),
-    linear-gradient(90deg, var(--rejilla) 1px, transparent 1px);
-  background-size: auto, 64px 64px, 64px 64px;
-  pointer-events: none;
-}
-
-.hero-grid {
+  /* Alto de pantalla menos el encabezado. svh y no vh: en el celular, vh
+     cuenta la barra del navegador y el botón quedaba tapado. */
+  min-height: calc(100vh - 72px);
+  min-height: calc(100svh - 72px);
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: var(--sp-10);
-  align-items: start;
-  position: relative;
-  z-index: 1;
+  align-items: center;
+  padding: var(--sp-12) 0;
 }
 
-/* Antetítulo: una regla y una línea en mayúsculas. Reemplaza la píldora con
-   ícono, que era el gesto más "plantilla" de la portada. */
+.portada-centro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+/* En una columna centrada cada hijo toma el ancho de su contenido, y en un
+   celular angosto ese ancho se pasaba del borde. */
+.portada-centro > * { max-width: 100%; }
+
+/* Antetítulo: línea en mayúsculas entre dos reglas cortas. */
 .hero-tag {
   display: inline-flex;
   align-items: center;
   gap: var(--sp-3);
-  margin-bottom: var(--sp-4);
-  background: none;
-  border: 0;
-  padding: 0;
+  margin-bottom: var(--sp-5);
   color: var(--on-brand-accent);
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
   text-transform: uppercase;
   letter-spacing: var(--tracking-etiqueta);
 }
-.hero-tag::before { content: ""; width: 28px; height: 2px; background: var(--accent); flex-shrink: 0; }
+.hero-tag::before,
+.hero-tag::after { content: ""; width: 28px; height: 2px; background: var(--accent); flex-shrink: 0; }
 
 .hero-title {
   font-family: var(--font-heading);
-  font-size: var(--fs-5xl);
+  font-size: clamp(1.9rem, 9.5vw, 5.5rem);
   font-weight: var(--fw-black);
   line-height: var(--lh-tight);
   letter-spacing: var(--tracking-titulo);
   text-transform: uppercase;
   color: #fff;
   margin-bottom: var(--sp-5);
-  max-width: 17ch;
-  text-wrap: balance;
 }
 
-/* El bloque magenta detras de las palabras que importan. Va como fondo y no
-   como color de letra: el magenta pleno sobre azul no alcanza el contraste
-   minimo para texto, pero con blanco encima llega a 4,6:1. */
+/* El bloque magenta detras de "Campus". Va como fondo y no como color de
+   letra: el magenta pleno sobre azul no alcanza el contraste mínimo para
+   texto, pero con blanco encima llega a 4,6:1. */
 .hero-title span {
   color: #fff;
   background: var(--accent);
@@ -277,95 +265,20 @@
           box-decoration-break: clone;
 }
 
-.hero-subtitle {
+.portada-bajada {
   font-size: var(--fs-lg);
   color: var(--on-brand-muted);
-  margin-bottom: var(--sp-6);
-  max-width: 46ch;
+  max-width: min(34ch, 100%);
+  margin-bottom: var(--sp-8);
+  text-wrap: balance;
 }
 
-.hero-cta-group { display: flex; gap: var(--sp-3); flex-wrap: wrap; }
-
-.hero-nota {
-  margin-top: var(--sp-4);
-  font-size: var(--fs-sm);
-  color: var(--on-brand-soft);
-  max-width: 48ch;
-}
-
-/* ==========================================================================
-   TICKET DE LA PROXIMA MESA
-   Papel blanco montado sobre la banda de marca. Es lo unico de la portada que
-   cambia con los datos, y lo primero que mira quien entra en epoca de
-   finales: fecha, aula y cuantos dias faltan.
-   ========================================================================== */
-.ticket {
-  background: var(--surface);
-  color: var(--text);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-xl);
-  overflow: hidden;
-}
-
-.ticket-tapa {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-3);
-  background: var(--accent);
-  color: var(--accent-on);
-  padding: var(--sp-2) var(--sp-4);
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-bold);
+.btn-comenzar {
+  min-width: 220px;
+  justify-content: center;
   text-transform: uppercase;
   letter-spacing: var(--tracking-etiqueta);
-}
-
-.ticket-cuerpo {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-4);
-  padding: var(--sp-5) var(--sp-4);
-  border-bottom: 1px dashed var(--border);
-}
-
-.ticket-dia { min-width: 64px; text-align: center; flex-shrink: 0; }
-.ticket-dia b {
-  display: block;
-  font-family: var(--font-heading);
-  font-size: 2.5rem;
-  font-weight: var(--fw-black);
-  line-height: 1;
-  letter-spacing: var(--tracking-titulo);
-  font-variant-numeric: tabular-nums;
-}
-.ticket-dia small {
-  font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-etiqueta);
-  color: var(--text-soft);
-}
-
-.ticket-materia { font-size: var(--fs-lg); line-height: var(--lh-snug); }
-.ticket-meta { font-size: var(--fs-sm); color: var(--text-muted); margin-top: var(--sp-1); }
-
-.ticket-pie {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-3);
-  padding: var(--sp-3) var(--sp-4);
-  font-size: var(--fs-sm);
-  color: var(--text-muted);
-}
-.ticket-pie b { color: var(--accent-text); font-weight: var(--fw-bold); }
-
-.ticket-vacio {
-  padding: var(--sp-8) var(--sp-4);
-  text-align: center;
-  font-size: var(--fs-sm);
-  color: var(--text-muted);
 }
 
 /* ==========================================================================
@@ -418,155 +331,116 @@
 
 
 /* ==========================================================================
-   INICIO · PRÓXIMA FECHA Y AGENDA
-   Lo primero que necesita saber quien entra en época de finales es "cuándo es
-   lo próximo que me toca". Antes había que navegar dos niveles para saberlo.
+   INICIO · DESTINOS Y NOVEDADES
    ========================================================================== */
-.home-panel {
+.inicio-cuerpo {
+  padding-top: var(--sp-12);
+  padding-bottom: var(--sp-12);
+  outline: none;
+}
+
+.inicio-titulo {
+  font-family: var(--font-heading);
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-black);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-titulo);
+  line-height: var(--lh-tight);
+  margin-bottom: var(--sp-5);
+}
+
+.atajos {
+  list-style: none;
+  padding: 0;
   display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  gap: var(--gap-grid);
-  margin-top: var(--sp-8);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-4);
 }
 
-.next-up {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 5px solid var(--accent);
-  border-radius: var(--radius-lg);
-  padding: var(--sp-5);
-  box-shadow: var(--shadow-sm);
-}
-.next-up-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-3);
-  margin-bottom: var(--sp-4);
-  flex-wrap: wrap;
-}
-.next-up-head h3 { font-size: var(--fs-lg); display: flex; align-items: center; gap: var(--sp-2); }
-.next-up-head h3 .ic { color: var(--accent-text); }
-
-.next-list { display: flex; flex-direction: column; gap: var(--sp-2); }
-.next-item {
+/* Un destino: ícono, nombre, qué hay adentro y una flecha. Borde de tinta y
+   la sombra dura al pasar, como el resto de las fichas. */
+.atajo {
   display: flex;
   align-items: center;
   gap: var(--sp-4);
-  padding: var(--sp-3);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: var(--surface-2);
-  transition: var(--transition);
-}
-.next-item:hover { border-color: var(--accent); background: var(--surface); }
-.next-item-when {
-  flex-shrink: 0;
-  min-width: 82px;
-  text-align: center;
-  background: var(--brand-navy-800);
-  color: #fff;
-  border-radius: var(--radius-sm);
-  padding: var(--sp-2);
-  line-height: 1.15;
-}
-.next-item-when b { display: block; font-size: var(--fs-lg); font-family: var(--font-heading); }
-.next-item-when span { display: block; font-size: var(--fs-xs); color: var(--on-brand-muted); text-transform: uppercase; }
-.next-item-what { min-width: 0; }
-.next-item-what strong { display: block; font-size: var(--fs-base); color: var(--text-strong); }
-.next-item-what small { color: var(--text-muted); display: flex; gap: var(--sp-3); flex-wrap: wrap; }
-
-/* Agenda de trámites (inscripciones, cierres, etc.) */
-.fechas-list { display: flex; flex-direction: column; gap: var(--sp-3); }
-.fecha-item {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: var(--sp-4);
-  display: flex;
-  align-items: center;
-  gap: var(--sp-5);
-  transition: var(--transition);
-}
-.fecha-item:hover { border-color: var(--accent); box-shadow: var(--shadow-sm); }
-.fecha-item.fecha-urgente { border-left: 4px solid var(--accent); }
-.fecha-date-badge {
-  background: var(--brand-navy-800);
-  color: #fff;
-  padding: var(--sp-3) var(--sp-4);
-  border-radius: var(--radius-md);
-  text-align: center;
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-  min-width: 170px;
-  flex-shrink: 0;
-}
-.fecha-date-badge span { font-size: var(--fs-sm); font-weight: var(--fw-bold); }
-.fecha-info h4 { font-size: var(--fs-md); margin-bottom: var(--sp-1); }
-.fecha-meta { display: flex; gap: var(--sp-4); font-size: var(--fs-xs); color: var(--text-muted); flex-wrap: wrap; }
-
-/* ==========================================================================
-   NOTICIAS
-   ========================================================================== */
-/* Un afiche: borde de tinta, cinta de color arriba y el cuerpo en papel.
-   La cinta va a sangre, así que el relleno pasa del borde de la ficha a las
-   dos partes de adentro. */
-.news-card {
-  border: 2px solid var(--text);
-  padding: 0;
-  overflow: hidden;
-}
-
-.news-cinta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--sp-3);
-  padding: var(--sp-2) var(--sp-4);
-  background: var(--text);
-  color: #fff;
-  flex-wrap: wrap;
-}
-/* La destacada lleva la cinta magenta. Es la única diferencia de color, y
-   alcanza: no necesita además un borde distinto. */
-.news-card.news-destacada .news-cinta { background: var(--accent); }
-.news-date { font-size: var(--fs-xs); color: rgba(255, 255, 255, 0.75); }
-
-.news-body {
+  height: 100%;
   padding: var(--sp-5);
+  background: var(--surface);
+  color: var(--text);
+  border: 2px solid var(--text);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: var(--transition);
+}
+.atajo:hover { box-shadow: 4px 4px 0 var(--text); }
+
+.atajo-ic { font-size: 1.75rem; color: var(--accent-text); }
+
+.atajo-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.atajo-texto strong {
+  font-family: var(--font-heading);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  color: var(--text-strong);
+}
+.atajo-texto > span { font-size: var(--fs-sm); color: var(--text-muted); }
+
+
+.atajo-texto > .atajo-dato {
+  margin-top: var(--sp-1);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semi);
+  color: var(--accent-text);
+}
+
+.atajo-flecha { margin-left: auto; font-size: 1.25rem; color: var(--text-soft); }
+.atajo:hover .atajo-flecha { color: var(--text); }
+
+/* Novedades: una línea cada una, separadas por reglas finas. */
+.novedades { margin-top: var(--sp-12); }
+
+.novedades-lista { list-style: none; padding: 0; border-top: 2px solid var(--text); }
+
+.novedad {
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-4);
+  width: 100%;
+  padding: var(--sp-4) var(--sp-2);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.novedad:hover { background: var(--surface); }
+
+.novedad-meta {
   display: flex;
   flex-direction: column;
-  flex: 1;
-}
-
-.news-title {
-  font-family: var(--font-heading);
-  font-weight: var(--fw-bold);
-  font-size: var(--fs-lg);
-  line-height: var(--lh-snug);
-  margin-bottom: var(--sp-2);
-}
-.news-summary { font-size: var(--fs-base); color: var(--text-muted); margin-bottom: var(--sp-5); flex-grow: 1; }
-.news-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-3);
-  padding-top: var(--sp-4);
-  margin-top: auto;
-  border-top: 1px solid var(--border);
-  flex-wrap: wrap;
-}
-.author-badge {
+  gap: 2px;
   font-size: var(--fs-xs);
-  color: var(--text-strong);
-  font-weight: var(--fw-semi);
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
+  color: var(--text-muted);
 }
-.author-badge .ic { color: var(--accent-text); }
+.novedad-tag {
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-etiqueta);
+  color: var(--text-strong);
+}
+.novedad-destacada .novedad-tag { color: var(--accent-text); }
+
+.novedad-titulo { font-weight: var(--fw-semi); color: var(--text-strong); line-height: var(--lh-snug); }
+.novedad-flecha { color: var(--text-soft); }
+.novedad:hover .novedad-flecha { color: var(--text); }
+
 
 /* ==========================================================================
    FECHAS DE EXAMEN · sincronización en vivo

@@ -84,7 +84,7 @@ button { background: none; border: none; cursor: pointer; }
 .on-brand :focus-visible,
 .main-header :focus-visible,
 .main-footer :focus-visible,
-.hero-banner :focus-visible,
+.portada :focus-visible,
 .calc-dashboard :focus-visible {
   outline-color: #FFFFFF;
 }
@@ -197,7 +197,7 @@ main {
 @media print {
   .main-header, .main-footer, .odontobot-fab, .odontobot-window,
   .toast-container, .filter-bar, .live-sync-banner, .skip-link,
-  .tabs, .hero-banner { display: none !important; }
+  .tabs, .portada { display: none !important; }
   body { background: #fff; color: #000; }
   .app-section { display: block !important; }
   a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 11px; color: #555; }

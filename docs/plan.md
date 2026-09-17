@@ -201,8 +201,8 @@ Menores, pero anotados para que no se pierdan:
 
 - [ ] 🙋 Datos de contacto reales — el WhatsApp y el email de `public/js/data.js`
       y del pie de página son de ejemplo
-- [ ] 🙋 Actualizar `fechasClave` en `data.js` (escritas a mano, por cuatrimestre)
-- [ ] 💻 Reemplazar Font Awesome (~300 KB desde CDN) por un sprite SVG propio
+- [ ] 🙋 Actualizar `noticias` en `data.js` (escritas a mano)
+- [x] 💻 Reemplazar Font Awesome (~300 KB desde CDN) por un sprite SVG propio
 - [ ] 💻 Biblioteca: hoy las fichas existen pero no hay archivos detrás
 
 ---
