@@ -174,6 +174,15 @@ la base vieja, Mi carrera no puede guardar (pide tablas que no existen).
 - [x] 💻 Mi carrera: formación complementaria (horas contra las 160 del plan, notas en el promedio como el SIU)
 - [ ] 💻 Importar el reporte de materias del SIU Guaraní (PDF, leído en el navegador)
 
+### Panel de administración (septiembre 2026) 🙋 aplicar en el servidor
+
+- [ ] `git pull` en el sitio
+- [ ] Cargar `005_administracion.sql`
+- [ ] `pruebas_rls.sql`: 73 en OK (de 00 a 70)
+- [ ] Darse el rol con `otorgar_admin.sql` y el propio correo
+- [ ] Entrar al sitio → Mi cuenta → Panel de administración
+- [ ] Planillas: probar el enlace actual de mesas y reválidas
+
 **Principio que no se negocia:** el login suma, no tapa. Mesas, reválidas,
 historias clínicas, instrumental y biblioteca siguen abiertas sin cuenta. Lo
 único que la pide es Mi promedio, porque guarda datos de la persona.

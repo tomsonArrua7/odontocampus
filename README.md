@@ -73,6 +73,7 @@ public/               EL SITIO. Es exactamente lo que se copia a htdocs/
     calculator.js     Promedio y avance de carrera (sólo calcula y dibuja)
     carrera.js        Mi carrera con cuenta: plan, acceso, guardado, copia local
     auth.js           Registro, ingreso con contraseña, recuperación, Mi cuenta
+    admin.js          Panel de administración (la seguridad está en la base)
     chatbot.js        OdontoBot (buscador de preguntas frecuentes)
     app.js            Router, inicio, historias clínicas, biblioteca, buscador
 
@@ -269,6 +270,27 @@ del plan: cada quien carga sus cursos con horas, nota y fecha, en
 `complementarias_cursadas`. Las horas se comparan con las que pide el plan, y
 las notas entran al promedio igual que una materia, porque así lo calcula el
 SIU Guaraní (verificado contra un reporte real: 6,93 y 6,31).
+
+### Administración
+
+Hay un rol de administrador (`administradores`) y un panel en `#admin`, al que
+se llega desde **Mi cuenta** sólo si la cuenta lo tiene. Cuatro pestañas:
+
+- **Cuentas:** buscar, confirmar un correo a mano, suspender (con motivo),
+  reactivar y eliminar (escribiendo el correo).
+- **Planillas:** cambiar qué planilla de Google leen las mesas y las
+  reválidas. Antes de guardar, el sitio la lee y dice cuántos llamados
+  encontró. Queda en `configuracion_sitio`, que el sitio lee al cargar.
+- **Equipo:** sumar o quitar administradores.
+- **Registro:** todo lo que se hizo, con quién y cuándo.
+
+La seguridad está en la base, no en `admin.js`: cada acción es una función de
+`005_administracion.sql` que verifica el rol y anota en `registro_admin`.
+Nadie puede operar sobre su propia cuenta ni sobre otra admin sin quitarle el
+rol antes, y nadie se quita el rol a sí mismo, así que siempre queda alguien.
+
+**El panel no muestra materias, notas ni cursos.** Al registrarse se promete
+que son sólo para cada estudiante.
 
 ### La clave publicable es pública y está bien
 

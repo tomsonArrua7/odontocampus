@@ -1,7 +1,7 @@
 -- ==========================================================================
 -- OdontoCampus — Pruebas de seguridad del esquema (RLS y permisos)
 --
--- Correr DESPUÉS de aplicar todas las migraciones (001, 002, 003, 004, ...), y otra
+-- Correr DESPUÉS de aplicar todas las migraciones (001 a 005, ...), y otra
 -- vez después de cualquier cambio:
 --
 --   cd /opt/supabase
@@ -555,8 +555,231 @@ do $$ begin
   end if;
 end $$;
 
+-- ==========================================================================
+-- ADMINISTRACIÓN (005)
+-- ==========================================================================
+-- Preparación (como postgres): D y F administran, E es una cuenta común.
+insert into auth.users (id, email, email_confirmed_at, raw_user_meta_data) values
+  ('00000000-0000-4000-8000-00000000000d', 'admin-d@odontocampus.invalid', now(), '{"nombre_visible":"Admin D"}'),
+  ('00000000-0000-4000-8000-00000000000e', 'comun-e@odontocampus.invalid', null, '{"nombre_visible":"Comun E"}'),
+  ('00000000-0000-4000-8000-00000000000f', 'admin-f@odontocampus.invalid', now(), '{"nombre_visible":"Admin F"}');
+insert into public.administradores (usuario_id) values ('00000000-0000-4000-8000-00000000000d'), ('00000000-0000-4000-8000-00000000000f');
+
+-- ---------------------------------------------------------------- sin sesión
+set local role anon;
+do $$ begin perform set_config('request.jwt.claims', '{"role":"anon"}', true); end $$;
+
+do $$ declare n int; begin
+  select count(*) into n from public.configuracion_sitio where clave = 'planilla_mesas';
+  if n = 1 then raise notice 'OK     47. Sin sesión se lee qué planillas usa el sitio';
+  else raise notice 'FALLA  47. Sin sesión no se lee la configuración de planillas'; end if;
+exception when others then
+  raise notice 'FALLA  47. Sin sesión no se lee la configuración: %', sqlerrm;
+end $$;
+
+do $$ begin
+  perform public.admin_resumen();
+  raise notice 'FALLA  48. Sin sesión se puede llamar a una función del panel';
+exception when insufficient_privilege then
+  raise notice 'OK     48. Sin sesión no se llama a ninguna función del panel';
+end $$;
+
+reset role;
+
+-- ---------------------------------------------------------------- cuenta común (B)
+set local role authenticated;
+do $$ begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-00000000000b","role":"authenticated"}', true);
+end $$;
+
+do $$ begin
+  if not public.es_admin() then raise notice 'OK     49. Una cuenta común no figura como admin';
+  else raise notice 'FALLA  49. Una cuenta común figura como admin'; end if;
+end $$;
+
+do $$ begin
+  perform public.admin_listar_usuarios(null, 50, 0);
+  raise notice 'FALLA  50. Una cuenta común ve el listado de cuentas';
+exception when insufficient_privilege then
+  raise notice 'OK     50. Una cuenta común no ve el listado de cuentas';
+end $$;
+
+do $$ begin
+  insert into public.administradores (usuario_id) values ('00000000-0000-4000-8000-00000000000b');
+  raise notice 'FALLA  51. Una cuenta común se puede hacer admin sola';
+exception when insufficient_privilege then
+  raise notice 'OK     51. Nadie se hace admin solo';
+end $$;
+
+do $$ begin
+  perform public.admin_otorgar('prueba-b@odontocampus.invalid');
+  raise notice 'FALLA  52. Una cuenta común puede otorgar el rol';
+exception when insufficient_privilege then
+  raise notice 'OK     52. Una cuenta común no otorga el rol';
+end $$;
+
+do $$ begin
+  update public.configuracion_sitio set valor = '{"sheet_id":"x"}' where clave = 'planilla_mesas';
+  raise notice 'FALLA  53. Una cuenta común cambia las planillas';
+exception when insufficient_privilege then
+  raise notice 'OK     53. Una cuenta común no cambia las planillas';
+end $$;
+
+do $$ begin
+  perform count(*) from public.registro_admin;
+  raise notice 'FALLA  54. Una cuenta común lee el registro de administración';
+exception when insufficient_privilege then
+  raise notice 'OK     54. El registro de administración no se lee directo';
+end $$;
+
+-- ---------------------------------------------------------------- admin (D)
+do $$ begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-00000000000d","role":"authenticated"}', true);
+end $$;
+
+do $$ declare r jsonb; begin
+  r := public.admin_resumen();
+  if public.es_admin() and (r ->> 'admins')::int >= 2 then raise notice 'OK     55. Un admin ve el resumen de cuentas';
+  else raise notice 'FALLA  55. El resumen no salió bien: %', r; end if;
+exception when others then
+  raise notice 'FALLA  55. Un admin no pudo ver el resumen: %', sqlerrm;
+end $$;
+
+do $$ declare n int; t bigint; begin
+  select count(*), max(total) into n, t from public.admin_listar_usuarios('comun-e', 50, 0);
+  if n = 1 and t = 1 then raise notice 'OK     56. Un admin busca cuentas por correo';
+  else raise notice 'FALLA  56. La búsqueda devolvió % filas (total %)', n, t; end if;
+exception when others then
+  raise notice 'FALLA  56. Un admin no pudo listar cuentas: %', sqlerrm;
+end $$;
+
+do $$ begin
+  perform public.admin_suspender('00000000-0000-4000-8000-00000000000e', 'x');
+  raise notice 'FALLA  57. Se suspende sin motivo';
+exception when check_violation then
+  raise notice 'OK     57. Suspender pide un motivo';
+end $$;
+
+do $$ declare est text; ban timestamptz; begin
+  perform public.admin_suspender('00000000-0000-4000-8000-00000000000e', 'Publicaciones falsas en la bolsa');
+  reset role;
+  select p.estado, u.banned_until into est, ban
+  from public.perfiles p join auth.users u on u.id = p.id where p.id = '00000000-0000-4000-8000-00000000000e';
+  set local role authenticated;
+  if est = 'suspendido' and ban = 'infinity' then raise notice 'OK     58. Un admin suspende una cuenta (sin ingreso ni sesiones)';
+  else raise notice 'FALLA  58. La suspensión quedó a medias (%, %)', est, ban; end if;
+exception when others then
+  raise notice 'FALLA  58. Un admin no pudo suspender: %', sqlerrm;
+end $$;
+
+do $$ declare est text; ban timestamptz; begin
+  perform public.admin_reactivar('00000000-0000-4000-8000-00000000000e');
+  reset role;
+  select p.estado, u.banned_until into est, ban
+  from public.perfiles p join auth.users u on u.id = p.id where p.id = '00000000-0000-4000-8000-00000000000e';
+  set local role authenticated;
+  if est = 'activo' and ban is null then raise notice 'OK     59. Un admin reactiva una cuenta';
+  else raise notice 'FALLA  59. La reactivación quedó a medias (%, %)', est, ban; end if;
+exception when others then
+  raise notice 'FALLA  59. Un admin no pudo reactivar: %', sqlerrm;
+end $$;
+
+do $$ begin
+  perform public.admin_suspender('00000000-0000-4000-8000-00000000000d', 'Me suspendo a mí');
+  raise notice 'FALLA  60. Un admin se suspende a sí mismo';
+exception when insufficient_privilege then
+  raise notice 'OK     60. Un admin no opera sobre su propia cuenta';
+end $$;
+
+do $$ begin
+  perform public.admin_eliminar_usuario('00000000-0000-4000-8000-00000000000f', 'admin-f@odontocampus.invalid');
+  raise notice 'FALLA  61. Un admin elimina a otra persona admin';
+exception when insufficient_privilege then
+  raise notice 'OK     61. No se elimina ni suspende a otra admin sin quitarle el rol';
+end $$;
+
+do $$ begin
+  perform public.admin_otorgar('comun-e@odontocampus.invalid');
+  raise notice 'FALLA  62. Se otorga el rol a una cuenta sin confirmar';
+exception when check_violation then
+  raise notice 'OK     62. El rol sólo se otorga a cuentas confirmadas';
+end $$;
+
+do $$ declare conf timestamptz; begin
+  perform public.admin_confirmar_correo('00000000-0000-4000-8000-00000000000e');
+  reset role;
+  select email_confirmed_at into conf from auth.users where id = '00000000-0000-4000-8000-00000000000e';
+  set local role authenticated;
+  if conf is not null then raise notice 'OK     63. Un admin confirma un correo a mano';
+  else raise notice 'FALLA  63. El correo no quedó confirmado'; end if;
+exception when others then
+  raise notice 'FALLA  63. Un admin no pudo confirmar el correo: %', sqlerrm;
+end $$;
+
+do $$ begin
+  perform public.admin_quitar('00000000-0000-4000-8000-00000000000d');
+  raise notice 'FALLA  64. Un admin se quita el rol a sí mismo';
+exception when insufficient_privilege then
+  raise notice 'OK     64. Nadie se quita el rol a sí mismo (siempre queda alguien)';
+end $$;
+
+do $$ begin
+  perform public.admin_guardar_planilla('planilla_mesas', 'no es un id', '0');
+  raise notice 'FALLA  65. Se guardó una planilla inválida';
+exception when check_violation then
+  raise notice 'OK     65. No se guarda un enlace de planilla inválido';
+end $$;
+
+do $$ declare v jsonb; begin
+  perform public.admin_guardar_planilla('planilla_mesas', '1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789', '123');
+  select valor into v from public.configuracion_sitio where clave = 'planilla_mesas';
+  if v ->> 'gid' = '123' then raise notice 'OK     66. Un admin cambia la planilla de mesas';
+  else raise notice 'FALLA  66. La planilla no cambió: %', v; end if;
+exception when others then
+  raise notice 'FALLA  66. Un admin no pudo cambiar la planilla: %', sqlerrm;
+end $$;
+
+do $$ begin
+  perform public.admin_eliminar_usuario('00000000-0000-4000-8000-00000000000e', 'otro@correo.invalid');
+  raise notice 'FALLA  67. Se elimina una cuenta sin escribir bien su correo';
+exception when check_violation then
+  raise notice 'OK     67. Eliminar una cuenta pide escribir su correo';
+end $$;
+
+do $$ declare existe boolean; begin
+  perform public.admin_eliminar_usuario('00000000-0000-4000-8000-00000000000e', 'COMUN-E@odontocampus.invalid');
+  reset role;
+  select exists (select 1 from auth.users where id = '00000000-0000-4000-8000-00000000000e') into existe;
+  set local role authenticated;
+  if not existe then raise notice 'OK     68. Un admin elimina una cuenta común';
+  else raise notice 'FALLA  68. La cuenta sigue existiendo'; end if;
+exception when others then
+  raise notice 'FALLA  68. Un admin no pudo eliminar la cuenta: %', sqlerrm;
+end $$;
+
+do $$ declare acciones text; begin
+  select string_agg(accion, ',' order by accion) into acciones
+  from (select distinct accion from public.admin_registro(100)) x;
+  if acciones = 'cambiar_planilla,confirmar_correo,eliminar_cuenta,reactivar,suspender'
+  then raise notice 'OK     69. Todo lo que hace un admin queda en el registro';
+  else raise notice 'FALLA  69. El registro tiene: %', acciones; end if;
+exception when others then
+  raise notice 'FALLA  69. No se pudo leer el registro: %', sqlerrm;
+end $$;
+
+do $$ begin
+  perform public.admin_quitar('00000000-0000-4000-8000-00000000000f');
+  if not exists (select 1 from public.admin_listar_admins() where id = '00000000-0000-4000-8000-00000000000f')
+  then raise notice 'OK     70. Un admin le quita el rol a otra persona';
+  else raise notice 'FALLA  70. El rol no se quitó'; end if;
+exception when others then
+  raise notice 'FALLA  70. No se pudo quitar el rol: %', sqlerrm;
+end $$;
+
+reset role;
+
 rollback;
 
 \echo
-\echo 'Pruebas terminadas (00 a 46). Todo se deshizo con ROLLBACK: no quedó nada en la base.'
+\echo 'Pruebas terminadas (00 a 70). Todo se deshizo con ROLLBACK: no quedó nada en la base.'
 \echo 'Si alguna línea dice FALLA, no publiques el cambio en el sitio.'

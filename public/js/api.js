@@ -384,6 +384,11 @@
   /* ------------------------------------------------------------------------
      REST (PostgREST)
      --------------------------------------------------------------------- */
+  /** Lee una tabla pública sin sesión (sólo con la clave publicable). */
+  function seleccionarPublico(tabla, consulta) {
+    return pedir("/rest/v1/" + tabla + (consulta ? "?" + consulta : ""));
+  }
+
   function seleccionar(tabla, consulta) {
     return pedirAutenticado("/rest/v1/" + tabla + (consulta ? "?" + consulta : ""));
   }
@@ -441,6 +446,7 @@
     cerrarSesion: cerrarSesion,
 
     seleccionar: seleccionar,
+    seleccionarPublico: seleccionarPublico,
     guardar: guardar,
     insertar: insertar,
     borrar: borrar,

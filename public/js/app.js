@@ -19,7 +19,9 @@
     fechas:     { titulo: "Cuándo rindo", tabs: ["mesas", "revalidas"] },
     cursada:    { titulo: "Cursada y clínica", tabs: ["historias", "instrumental", "bolsa"] },
     biblioteca: { titulo: "Biblioteca de apuntes", tabs: null },
-    carrera:    { titulo: "Mi carrera", tabs: null }
+    carrera:    { titulo: "Mi carrera", tabs: null },
+    // No figura en el menú: se llega desde Mi cuenta, y sólo si es admin.
+    admin:      { titulo: "Administración", tabs: ["cuentas", "planillas", "equipo", "registro"] }
   };
 
   /* Enlaces viejos que la gente pudo haber guardado o compartido por WhatsApp.
@@ -71,6 +73,7 @@
          Carrera va antes que Auth: el registro usa su texto de términos. */
       if (global.OdontoCarrera) global.OdontoCarrera.init();
       if (global.OdontoAuth) global.OdontoAuth.init();
+      if (global.OdontoAdmin) global.OdontoAdmin.init();
 
       /* Llegada desde el botón de un correo (confirmar la cuenta o elegir una
          contraseña nueva): se atiende antes de mostrar la sección. */
@@ -290,6 +293,8 @@
       } else if (seccion === "carrera" && global.OdontoCarrera) {
         // Decide si mostrar el promedio o pedir cuenta primero.
         global.OdontoCarrera.mostrar();
+      } else if (seccion === "admin" && global.OdontoAdmin) {
+        global.OdontoAdmin.mostrar(tab);
       }
     },
 

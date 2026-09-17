@@ -761,12 +761,29 @@ JSON de GoTrue.
 
 ### Studio, por túnel SSH
 
+Studio es el panel completo de Supabase: tablas, SQL, usuarios. **No está
+publicado en internet a propósito** (es acceso total a la base); se abre por
+un túnel SSH que sólo existe mientras la terminal está abierta.
+
+Desde tu computadora (PowerShell o terminal):
+
 ```bash
-ssh -p 5469 -L 8000:127.0.0.1:8000 usuario@servidor
+ssh -p 5469 -L 8000:127.0.0.1:8000 odontocampus@179.43.126.185
 ```
 
-Y abrís `http://localhost:8000` en tu navegador. Usuario y contraseña son
-`DASHBOARD_USERNAME` / `DASHBOARD_PASSWORD`.
+Con esa ventana abierta, en tu navegador: `http://localhost:8000`. Usuario y
+contraseña son `DASHBOARD_USERNAME` / `DASHBOARD_PASSWORD`, que están en el
+`.env` del servidor. Para verlos, en el servidor y como root:
+
+```bash
+grep -E '^DASHBOARD_(USERNAME|PASSWORD)=' /opt/supabase/.env
+```
+
+Guardalos en tu gestor de contraseñas. **No los pegues en ningún chat.**
+
+Para el día a día (cuentas, suspensiones, planillas) está el panel de
+administración del sitio, que deja registro de cada acción. Studio es para lo
+que el panel no cubre, y ahí no queda registro: usalo con cuidado.
 
 Para Postgres con un cliente gráfico (DBeaver, TablePlus):
 
@@ -793,6 +810,15 @@ Después, **las migraciones siguientes, en orden**:
 docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/002_bolsa_y_privacidad.sql
 docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/003_cuentas_con_contrasena.sql
 docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/004_planes_de_estudio.sql
+docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/005_administracion.sql
+```
+
+La primera persona administradora se carga desde el servidor, con su correo
+(la cuenta tiene que existir y estar confirmada). Las siguientes se suman
+desde el panel del sitio:
+
+```bash
+docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 -v email="tu@correo.com" < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/otorgar_admin.sql
 ```
 
 Y los datos de los planes de estudio. Este archivo **no** es una migración:

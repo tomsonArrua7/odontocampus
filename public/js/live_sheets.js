@@ -19,11 +19,15 @@
 
   var UI = global.OdontoUI;
   var esc = UI.esc, escAttr = UI.escAttr;
+  var CLAVE_CONFIG = "odontocampus_planillas_v1";
 
   var OdontoLiveSheets = {
+    /* Las planillas de siempre. Si la base tiene otras (las cambia un admin
+       desde el panel), mandan las de la base: ver leerConfiguracion(). */
     sheetIdMesas: "1NC_lABOKN0w-RaxiAXVQwBvdJqGw4F6dAXHWSK2fi6I",
+    gidMesas: "0",
     sheetIdRevalidas: "1KWy04FseDtScAqYQ3kFopI_0jnfbmzd0gxl53tevD9M",
-    gid: "0",
+    gidRevalidas: "0",
 
     lastUpdatedMesas: null,
     lastUpdatedRevalidas: null,
@@ -38,17 +42,102 @@
     /* ====================================================================
        CARGA
        ==================================================================== */
-    endpoint: function (sheetId) {
-      return "https://docs.google.com/spreadsheets/d/" + sheetId +
-             "/gviz/tq?tqx=out:csv&gid=" + this.gid + "&t=" + Date.now();
+    endpoint: function (sheetId, gid) {
+      return "https://docs.google.com/spreadsheets/d/" + encodeURIComponent(sheetId) +
+             "/gviz/tq?tqx=out:csv&gid=" + encodeURIComponent(gid || "0") + "&t=" + Date.now();
     },
 
     init: function () {
+      var self = this;
       this.pintarEsqueleto("mesas-grid");
       this.pintarEsqueleto("revalidas-grid");
       this.initEventListeners();
-      this.cargarMesas(true);
-      this.cargarRevalidas(true);
+
+      // La última configuración conocida, para no esperar a la base.
+      var guardada = null;
+      try { guardada = JSON.parse(localStorage.getItem(CLAVE_CONFIG) || "null"); } catch (e) { guardada = null; }
+      if (guardada) {
+        if (guardada.planilla_mesas) this.aplicarPlanilla("planilla_mesas", guardada.planilla_mesas, false);
+        if (guardada.planilla_revalidas) this.aplicarPlanilla("planilla_revalidas", guardada.planilla_revalidas, false);
+      }
+
+      this.leerConfiguracion().then(function () {
+        self.cargarMesas(true);
+        self.cargarRevalidas(true);
+      });
+    },
+
+    /* ====================================================================
+       QUÉ PLANILLAS SE LEEN
+       Un admin las cambia desde el panel (tabla configuracion_sitio). Si la
+       base no responde rápido, se sigue con las últimas conocidas: las fechas
+       no pueden quedar esperando al servidor de cuentas.
+       ==================================================================== */
+    leerConfiguracion: function () {
+      var self = this;
+      var Api = global.OdontoApi;
+      if (!Api || !Api.hayBackend()) return Promise.resolve();
+
+      var pedido = Api.seleccionarPublico("configuracion_sitio", "select=clave,valor")
+        .then(function (filas) {
+          var config = {};
+          (filas || []).forEach(function (f) {
+            if (!f.valor || !f.valor.sheet_id) return;
+            config[f.clave] = { sheetId: f.valor.sheet_id, gid: f.valor.gid || "0" };
+            self.aplicarPlanilla(f.clave, config[f.clave], false);
+          });
+          try { localStorage.setItem(CLAVE_CONFIG, JSON.stringify(config)); } catch (e) { /* modo privado */ }
+        })
+        .catch(function () { /* sin base: siguen las conocidas */ });
+
+      var espera = new Promise(function (resolver) { global.setTimeout(resolver, 2500); });
+      return Promise.race([pedido, espera]);
+    },
+
+    planilla: function (clave) {
+      return clave === "planilla_mesas"
+        ? { sheetId: this.sheetIdMesas, gid: this.gidMesas }
+        : { sheetId: this.sheetIdRevalidas, gid: this.gidRevalidas };
+    },
+
+    /** Cambia la planilla en uso. Con `recargar`, la vuelve a leer ya. */
+    aplicarPlanilla: function (clave, cfg, recargar) {
+      if (!cfg || !/^[A-Za-z0-9_-]{20,100}$/.test(cfg.sheetId || "")) return;
+      var gid = /^\d{1,12}$/.test(String(cfg.gid)) ? String(cfg.gid) : "0";
+
+      if (clave === "planilla_mesas") {
+        this.sheetIdMesas = cfg.sheetId;
+        this.gidMesas = gid;
+        if (recargar) this.cargarMesas(false);
+      } else if (clave === "planilla_revalidas") {
+        this.sheetIdRevalidas = cfg.sheetId;
+        this.gidRevalidas = gid;
+        if (recargar) this.cargarRevalidas(false);
+      }
+
+      if (recargar) {
+        try {
+          var guardada = JSON.parse(localStorage.getItem(CLAVE_CONFIG) || "{}") || {};
+          guardada[clave] = { sheetId: cfg.sheetId, gid: gid };
+          localStorage.setItem(CLAVE_CONFIG, JSON.stringify(guardada));
+        } catch (e) { /* modo privado */ }
+      }
+    },
+
+    /** Lee una planilla sin usarla: para que un admin la pruebe antes de guardarla. */
+    probar: function (clave, sheetId, gid) {
+      var self = this;
+      return fetch(this.endpoint(sheetId, gid), { method: "GET" })
+        .then(function (res) {
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          var tipo = res.headers.get("content-type") || "";
+          // Una planilla privada no da error: Google responde con la página de ingreso.
+          if (tipo.indexOf("text/csv") === -1) throw new Error("HTTP planilla no pública");
+          return res.text();
+        })
+        .then(function (csv) {
+          return clave === "planilla_mesas" ? self.parseCSVMesas(csv) : self.parseCSVRevalidas(csv);
+        });
     },
 
     pintarEsqueleto: function (id) {
@@ -60,6 +149,7 @@
       return this.cargar({
         clave: "mesas",
         sheetId: this.sheetIdMesas,
+        gid: this.gidMesas,
         parser: this.parseCSVMesas,
         respaldo: this.getRespaldoMesas,
         storage: "odontocampus_cached_mesas_v2",
@@ -73,6 +163,7 @@
       return this.cargar({
         clave: "revalidas",
         sheetId: this.sheetIdRevalidas,
+        gid: this.gidRevalidas,
         parser: this.parseCSVRevalidas,
         respaldo: this.getRespaldoRevalidas,
         storage: "odontocampus_cached_revalidas_v2",
@@ -90,7 +181,7 @@
       this[flag] = true;
       this.estadoCarga(cfg.clave, true);
 
-      return fetch(this.endpoint(cfg.sheetId), {
+      return fetch(this.endpoint(cfg.sheetId, cfg.gid), {
         method: "GET",
         headers: { "Cache-Control": "no-cache" }
       })
