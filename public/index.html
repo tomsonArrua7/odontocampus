@@ -12,8 +12,8 @@
   <!-- Marca: un diente geométrico en blanco sobre el magenta de FOE. Se lee a
        16 px en una pestaña, que es la única prueba que importa para un ícono. -->
   <link rel="icon" href="favicon.ico" sizes="32x32">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260917b">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260917b">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260917c">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260917c">
 
   <meta property="og:title" content="OdontoCampus · FOE Odontología UNLP">
   <meta property="og:description" content="Mesas de examen y reválidas en vivo, historias clínicas, promedio y apuntes. Todo en un solo lugar.">
@@ -22,7 +22,7 @@
   <meta property="og:locale" content="es_AR">
   <!-- Imagen del enlace (WhatsApp, Instagram, Twitter). Tiene que ser una URL
        absoluta y un archivo rasterizado: ninguna de esas apps lee SVG. -->
-  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260917b">
+  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260917c">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="OdontoCampus · FOE Odontología UNLP">
@@ -57,13 +57,13 @@
        LÍNEAS (y en las plantillas de correo del override de Supabase).
        Pasó de verdad: el sitio nuevo quedó cargando el config.js viejo, con la
        clave en PENDIENTE, y las cuentas no aparecían por ningún lado. -->
-  <link rel="stylesheet" href="css/01-tokens.css?v=20260917b">
-  <link rel="stylesheet" href="css/02-base.css?v=20260917b">
-  <link rel="stylesheet" href="css/03-components.css?v=20260917b">
-  <link rel="stylesheet" href="css/04-sections.css?v=20260917b">
-  <link rel="stylesheet" href="css/05-responsive.css?v=20260917b">
-  <link rel="stylesheet" href="css/06-cuentas.css?v=20260917b">
-  <link rel="stylesheet" href="css/07-movimiento.css?v=20260917b">
+  <link rel="stylesheet" href="css/01-tokens.css?v=20260917c">
+  <link rel="stylesheet" href="css/02-base.css?v=20260917c">
+  <link rel="stylesheet" href="css/03-components.css?v=20260917c">
+  <link rel="stylesheet" href="css/04-sections.css?v=20260917c">
+  <link rel="stylesheet" href="css/05-responsive.css?v=20260917c">
+  <link rel="stylesheet" href="css/06-cuentas.css?v=20260917c">
+  <link rel="stylesheet" href="css/07-movimiento.css?v=20260917c">
 </head>
 <body>
 
@@ -612,6 +612,10 @@
                 <dt>Avance</dt>
                 <dd id="calc-avance-porcentaje">0%</dd>
               </div>
+              <div>
+                <dt>Complementaria</dt>
+                <dd id="calc-horas-complementarias">0 / 160 h</dd>
+              </div>
             </dl>
           </div>
 
@@ -660,12 +664,60 @@
             </p>
             <span class="estado-guardado" id="estado-guardado"></span>
             <button type="button" class="btn btn-secondary btn-sm" data-action="reiniciarNotas">
-              <svg class="ic" aria-hidden="true"><use href="#ic-deshacer"></use></svg> Borrar mis notas
+              <svg class="ic" aria-hidden="true"><use href="#ic-deshacer"></use></svg> Borrar mis datos
             </button>
           </div>
         </div>
 
         <div id="calculadora-materias-lista"></div>
+
+        <!-- Formación complementaria: optativas y electivas. Lo dibuja
+             js/calculator.js y lo guarda js/carrera.js, como las materias. -->
+        <section class="calculator-year-card cursos-card" aria-labelledby="titulo-cursos">
+          <div class="calculator-year-header">
+            <div>
+              <h3 class="year-badge" id="titulo-cursos">Formación complementaria</h3>
+              <p class="year-subtitle cursos-bajada">
+                Optativas y electivas. El plan pide <b id="cursos-horas-requeridas">160</b> horas
+                a lo largo de la carrera.
+              </p>
+            </div>
+            <span class="badge-materia-anio" id="cursos-horas-badge">0 de 160 h</span>
+          </div>
+
+          <div class="cursos-progreso" role="progressbar" aria-label="Horas de formación complementaria"
+               aria-valuemin="0" aria-valuemax="160" aria-valuenow="0">
+            <span id="cursos-barra"></span>
+          </div>
+
+          <div id="cursos-lista"></div>
+
+          <form class="form-curso" id="form-curso" novalidate>
+            <div class="field form-curso-nombre">
+              <label class="field-label" for="curso-nombre">Curso</label>
+              <input type="text" class="form-control" id="curso-nombre" name="curso-nombre"
+                     maxlength="160" autocomplete="off" placeholder="Por ejemplo: Técnicas extrabucales">
+            </div>
+            <div class="field">
+              <label class="field-label" for="curso-horas">Horas</label>
+              <input type="number" class="form-control" id="curso-horas" name="curso-horas"
+                     inputmode="numeric" min="1" max="400" step="1" placeholder="30">
+            </div>
+            <div class="field">
+              <label class="field-label" for="curso-nota">Nota <span class="field-opcional">(opcional)</span></label>
+              <input type="number" class="form-control" id="curso-nota" name="curso-nota"
+                     inputmode="decimal" min="4" max="10" step="0.5" placeholder="4 a 10">
+            </div>
+            <div class="field">
+              <label class="field-label" for="curso-fecha">Fecha <span class="field-opcional">(opcional)</span></label>
+              <input type="date" class="form-control" id="curso-fecha" name="curso-fecha"
+                     min="1950-01-01" max="2100-01-01">
+            </div>
+            <button type="submit" class="btn btn-magenta form-curso-boton">
+              <svg class="ic" aria-hidden="true"><use href="#ic-flecha-der"></use></svg> Agregar curso
+            </button>
+          </form>
+        </section>
       </div>
     </div>
   </section>
@@ -1089,16 +1141,16 @@
 </footer>
 
 <!-- Scripts: configuración y núcleo primero, módulos después, controlador al final -->
-<script src="js/config.js?v=20260917b"></script>
-<script src="js/core.js?v=20260917b"></script>
-<script src="js/api.js?v=20260917b"></script>
-<script src="js/data.js?v=20260917b"></script>
-<script src="js/planes.js?v=20260917b"></script>
-<script src="js/live_sheets.js?v=20260917b"></script>
-<script src="js/calculator.js?v=20260917b"></script>
-<script src="js/carrera.js?v=20260917b"></script>
-<script src="js/auth.js?v=20260917b"></script>
-<script src="js/chatbot.js?v=20260917b"></script>
-<script src="js/app.js?v=20260917b"></script>
+<script src="js/config.js?v=20260917c"></script>
+<script src="js/core.js?v=20260917c"></script>
+<script src="js/api.js?v=20260917c"></script>
+<script src="js/data.js?v=20260917c"></script>
+<script src="js/planes.js?v=20260917c"></script>
+<script src="js/live_sheets.js?v=20260917c"></script>
+<script src="js/calculator.js?v=20260917c"></script>
+<script src="js/carrera.js?v=20260917c"></script>
+<script src="js/auth.js?v=20260917c"></script>
+<script src="js/chatbot.js?v=20260917c"></script>
+<script src="js/app.js?v=20260917c"></script>
 </body>
 </html>

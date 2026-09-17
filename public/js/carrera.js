@@ -44,6 +44,12 @@
   var PREFIJO_COPIA = "odontocampus_carrera_v2_";
   var PREFIJO_PENDIENTES = "odontocampus_carrera_pendientes_v2_";
   var PREFIJO_PLAN = "odontocampus_carrera_plan_";
+  var PREFIJO_CURSOS = "odontocampus_carrera_cursos_v1_";
+  /* Los cursos comparten la lista de pendientes con las materias. Una materia
+     es un código de cinco caracteres; un curso se anota con este prefijo y su
+     id, así no hay forma de confundirlos. */
+  var CLAVE_CURSO = "curso:";
+  var UUID_VALIDO = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
   // Donde la calculadora guardaba las notas antes de que existieran las cuentas.
   var CLAVE_ANTERIOR = "odontocampus_calificaciones_v1";
 
@@ -75,7 +81,46 @@
     var codigos = codigosDe(planId);
     var limpio = {};
     Object.keys(mapa || {}).forEach(function (id) {
-      if (codigos[id]) limpio[id] = mapa[id];
+      if (codigos[id] || id.indexOf(CLAVE_CURSO) === 0) limpio[id] = mapa[id];
+    });
+    return limpio;
+  }
+
+  /** Un id nuevo para un curso. Lo genera el navegador: así se puede cargar
+      sin conexión y subir después sin que se duplique. */
+  function nuevoId() {
+    if (global.crypto && global.crypto.randomUUID) return global.crypto.randomUUID();
+    var b = new Uint8Array(16);
+    global.crypto.getRandomValues(b);
+    b[6] = (b[6] & 0x0f) | 0x40;
+    b[8] = (b[8] & 0x3f) | 0x80;
+    var h = Array.prototype.map.call(b, function (x) { return (x + 0x100).toString(16).slice(1); }).join("");
+    return h.slice(0, 8) + "-" + h.slice(8, 12) + "-" + h.slice(12, 16) + "-" + h.slice(16, 20) + "-" + h.slice(20);
+  }
+
+  /**
+   * Deja un curso con la forma que acepta la base, o null si no sirve.
+   * Las mismas reglas que complementarias_cursadas (004): nombre de 2 a 160
+   * caracteres, de 1 a 400 horas, nota opcional, fecha opcional.
+   */
+  function normalizarCurso(curso) {
+    if (!curso) return null;
+    var nombre = String(curso.nombre || "").replace(/\s+/g, " ").trim().slice(0, 160);
+    var horas = parseInt(curso.horas, 10);
+    var nota = curso.nota === null || curso.nota === "" || curso.nota === undefined ? null : parseFloat(curso.nota);
+    var fecha = /^\d{4}-\d{2}-\d{2}$/.test(String(curso.fecha || "")) ? curso.fecha : null;
+
+    if (nombre.length < 2 || !(horas >= 1 && horas <= 400)) return null;
+    if (nota !== null && !(nota >= 4 && nota <= 10)) nota = null;
+    if (fecha && (fecha < "1950-01-01" || fecha > "2100-01-01")) fecha = null;
+    return { nombre: nombre, horas: horas, nota: nota, fecha: fecha };
+  }
+
+  function soloCursosValidos(mapa) {
+    var limpio = {};
+    Object.keys(mapa || {}).forEach(function (id) {
+      var curso = normalizarCurso(mapa[id]);
+      if (curso && UUID_VALIDO.test(id)) limpio[id] = curso;
     });
     return limpio;
   }
@@ -134,6 +179,7 @@
   var OdontoCarrera = {
     usuarioId: null,
     planId: PLANES.porDefecto,
+    cursos: {},
     // Promesa de "el plan ya está anotado en la cuenta", y de quién.
     planAsegurado: null,
     planListo: null,
@@ -191,6 +237,7 @@
 
       this.notas = id ? soloDelPlan(leerJSON(PREFIJO_COPIA + id), this.planId) : {};
       this.pendientes = id ? soloDelPlan(leerJSON(PREFIJO_PENDIENTES + id), this.planId) : {};
+      this.cursos = id ? soloCursosValidos(leerJSON(PREFIJO_CURSOS + id)) : {};
     },
 
     /** El plan que cursa la persona, con sus materias. */
@@ -267,6 +314,41 @@
       if (!this.usuarioId) return;
       escribirJSON(PREFIJO_COPIA + this.usuarioId, this.notas);
       escribirJSON(PREFIJO_PENDIENTES + this.usuarioId, this.pendientes);
+      escribirJSON(PREFIJO_CURSOS + this.usuarioId, this.cursos);
+    },
+
+    /* ====================================================================
+       FORMACIÓN COMPLEMENTARIA (la usa js/calculator.js)
+       ==================================================================== */
+    leerCursos: function () {
+      return JSON.parse(JSON.stringify(this.cursos));
+    },
+
+    /**
+     * Agrega o corrige un curso. Devuelve el id, o null si los datos no
+     * sirven (la calculadora valida antes y explica qué falta).
+     */
+    guardarCurso: function (id, datos) {
+      if (!this.usuarioId) return null;
+      var curso = normalizarCurso(datos);
+      if (!curso) return null;
+      id = id && UUID_VALIDO.test(id) ? id : nuevoId();
+      this.cursos[id] = curso;
+      this.marcarCursoCambiado(id);
+      return id;
+    },
+
+    quitarCurso: function (id) {
+      if (!this.usuarioId || !this.cursos[id]) return;
+      delete this.cursos[id];
+      this.marcarCursoCambiado(id);
+    },
+
+    marcarCursoCambiado: function (id) {
+      this.pendientes[CLAVE_CURSO + id] = true;
+      this.persistir();
+      this.pintarEstado("pendiente");
+      this.programarGuardado(RETARDO_GUARDADO);
     },
 
     /**
@@ -277,9 +359,11 @@
       quitar(PREFIJO_COPIA + id);
       quitar(PREFIJO_PENDIENTES + id);
       quitar(PREFIJO_PLAN + id);
+      quitar(PREFIJO_CURSOS + id);
       if (this.usuarioId === id) {
         this.cancelarTemporizadores();
         this.notas = {};
+        this.cursos = {};
         this.pendientes = {};
         this.preparado = false;
       }
@@ -342,12 +426,24 @@
           return self.subirPendientes().catch(nada);
         })
         .then(function () {
-          return Api.seleccionar("materias_cursadas",
-            "select=materia_id,estado,nota,aplazos,actualizado_at" +
-            "&plan_id=eq." + encodeURIComponent(self.planId));
+          var plan = "&plan_id=eq." + encodeURIComponent(self.planId);
+          return Promise.all([
+            Api.seleccionar("materias_cursadas", "select=materia_id,estado,nota,aplazos,actualizado_at" + plan),
+            Api.seleccionar("complementarias_cursadas", "select=id,nombre,horas,nota,fecha" + plan)
+          ]);
         })
-        .then(function (filas) {
+        .then(function (respuestas) {
           if (uid !== self.usuarioId) return;
+          var filas = respuestas[0];
+
+          var cursos = {};
+          (respuestas[1] || []).forEach(function (fila) {
+            var curso = normalizarCurso({
+              nombre: fila.nombre, horas: fila.horas,
+              nota: fila.nota === null ? null : Number(fila.nota), fecha: fila.fecha
+            });
+            if (curso) cursos[fila.id] = curso;
+          });
 
           var notas = {};
           (filas || []).forEach(function (fila) {
@@ -361,11 +457,18 @@
 
           // Lo que no se pudo subir es lo último que tocó la persona: manda.
           Object.keys(self.pendientes).forEach(function (id) {
+            if (id.indexOf(CLAVE_CURSO) === 0) {
+              var cursoId = id.slice(CLAVE_CURSO.length);
+              if (self.cursos[cursoId]) cursos[cursoId] = self.cursos[cursoId];
+              else delete cursos[cursoId];
+              return;
+            }
             if (self.notas[id]) notas[id] = self.notas[id];
             else delete notas[id];
           });
 
           self.notas = notas;
+          self.cursos = cursos;
           self.persistir();
           self.cargando = false;
           self.preparado = true;
@@ -470,9 +573,35 @@
       var foto = {};
       var filas = [];
       var bajas = [];
+      var filasCursos = [];
+      var bajasCursos = [];
+
+      /* Lo que se guarda de cada clave pendiente, para comparar después: una
+         materia o un curso. */
+      function valorDe(clave) {
+        return clave.indexOf(CLAVE_CURSO) === 0
+          ? self.cursos[clave.slice(CLAVE_CURSO.length)] || null
+          : self.notas[clave] || null;
+      }
 
       ids.forEach(function (id) {
-        foto[id] = JSON.stringify(self.notas[id] || null);
+        foto[id] = JSON.stringify(valorDe(id));
+
+        if (id.indexOf(CLAVE_CURSO) === 0) {
+          var cursoId = id.slice(CLAVE_CURSO.length);
+          if (!UUID_VALIDO.test(cursoId)) { delete self.pendientes[id]; return; }
+          var curso = normalizarCurso(self.cursos[cursoId]);
+          if (curso) {
+            filasCursos.push({
+              id: cursoId, usuario_id: uid, plan_id: planId,
+              nombre: curso.nombre, horas: curso.horas, nota: curso.nota, fecha: curso.fecha
+            });
+          } else {
+            bajasCursos.push(cursoId);
+          }
+          return;
+        }
+
         var registro = normalizar(self.notas[id]);
         if (registro) {
           filas.push({
@@ -502,6 +631,17 @@
           "&plan_id=eq." + encodeURIComponent(planId) +
           "&materia_id=in.(" + bajas.map(function (id) { return encodeURIComponent('"' + id + '"'); }).join(",") + ")"));
       }
+      if (filasCursos.length) {
+        pasos.push(Api.guardar("complementarias_cursadas", filasCursos, {
+          onConflict: "id",
+          devolver: false
+        }));
+      }
+      if (bajasCursos.length) {
+        pasos.push(Api.borrar("complementarias_cursadas",
+          "usuario_id=eq." + encodeURIComponent(uid) +
+          "&id=in.(" + bajasCursos.join(",") + ")"));
+      }
 
       this.pintarEstado("guardando");
 
@@ -512,7 +652,7 @@
         /* Sólo deja de estar pendiente lo que no cambió mientras viajaba. Si
            la persona tocó otra vez la misma materia, se vuelve a subir. */
         Object.keys(foto).forEach(function (id) {
-          if (JSON.stringify(self.notas[id] || null) === foto[id]) delete self.pendientes[id];
+          if (JSON.stringify(valorDe(id)) === foto[id]) delete self.pendientes[id];
         });
         self.persistir();
         global.clearTimeout(self.reintento);
@@ -558,17 +698,22 @@
       return (this.enVuelo || Promise.resolve())
         .catch(nada)
         .then(function () {
-          return Api.borrar("materias_cursadas", "usuario_id=eq." + encodeURIComponent(uid) +
-                            "&plan_id=eq." + encodeURIComponent(self.planId));
+          var filtro = "usuario_id=eq." + encodeURIComponent(uid) +
+                       "&plan_id=eq." + encodeURIComponent(self.planId);
+          return Promise.all([
+            Api.borrar("materias_cursadas", filtro),
+            Api.borrar("complementarias_cursadas", filtro)
+          ]);
         })
         .then(function () {
           if (uid !== self.usuarioId) return;
           self.notas = {};
+          self.cursos = {};
           self.pendientes = {};
           self.persistir();
           if (global.OdontoCalculator) global.OdontoCalculator.renderTabla();
           self.pintarEstado("guardado");
-          UI.toast("Listo: se borraron todas tus materias", "success");
+          UI.toast("Listo: se borraron tus materias y tus cursos", "success");
         }, function (error) {
           UI.toast(error.message, "danger");
           if (Object.keys(self.pendientes).length) self.programarGuardado(RETARDO_GUARDADO);
@@ -587,7 +732,7 @@
 
       function preguntar() {
         return global.confirm(
-          "Hay cambios en tus materias que todavía no se guardaron en tu cuenta " +
+          "Hay cambios en tu carrera que todavía no se guardaron en tu cuenta " +
           "(parece que no hay conexión).\n\n" +
           "Si cerrás sesión ahora, esos cambios se pierden. ¿Cerrar sesión igual?"
         );

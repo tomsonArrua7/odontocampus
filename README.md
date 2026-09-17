@@ -264,6 +264,12 @@ edita a mano ninguna de las dos salidas.
 Cada cuenta anota qué plan cursa (hasta tres, uno principal), y la base sólo
 acepta materias de un plan elegido y con códigos que existen en ese plan.
 
+La formación complementaria (optativas y electivas) no es un casillero fijo
+del plan: cada quien carga sus cursos con horas, nota y fecha, en
+`complementarias_cursadas`. Las horas se comparan con las que pide el plan, y
+las notas entran al promedio igual que una materia, porque así lo calcula el
+SIU Guaraní (verificado contra un reporte real: 6,93 y 6,31).
+
 ### La clave publicable es pública y está bien
 
 La `SUPABASE_PUBLISHABLE_KEY` (empieza con `sb_publishable_`) va en `config.js`,

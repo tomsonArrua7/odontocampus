@@ -44,6 +44,36 @@
   .odonto-piezas { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 
   .calculator-year-header { flex-direction: column; align-items: flex-start; }
+  .form-curso { grid-template-columns: 1fr 1fr; }
+
+  /* Cada curso, una ficha: en una tabla con desplazamiento lateral el nombre
+     quedaba cortado y la fecha y el botón de quitar, fuera de la pantalla. */
+  .tabla-cursos { min-width: 0; }
+  .tabla-cursos thead { display: none; }
+  .tabla-cursos caption { display: block; }
+  .tabla-cursos, .tabla-cursos tbody { display: block; }
+  .tabla-cursos tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.4fr;
+    gap: var(--sp-2) var(--sp-3);
+    padding: var(--sp-4) var(--sp-4) var(--sp-4);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .tabla-cursos td { display: block; padding: 0; border: 0; }
+  .tabla-cursos td[data-rotulo="Curso"] { grid-column: 1 / -1; padding-right: calc(var(--tap-target) + var(--sp-2)); }
+  .tabla-cursos td[data-rotulo]::before {
+    content: attr(data-rotulo);
+    display: block;
+    margin-bottom: var(--sp-1);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    color: var(--text-muted);
+  }
+  .tabla-cursos .curso-horas, .tabla-cursos .curso-nota, .tabla-cursos .curso-fecha { width: 100%; }
+  .tabla-cursos td.curso-quitar { position: absolute; top: var(--sp-3); right: var(--sp-3); width: auto; }
+  .form-curso-nombre, .form-curso-boton { grid-column: 1 / -1; }
+  .cursos-bajada { margin-left: 0; }
 
   /* Los filtros pasan a una columna: en 375px de ancho, dos selects lado a
      lado dejan etiquetas cortadas. */

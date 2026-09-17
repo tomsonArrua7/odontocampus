@@ -109,6 +109,10 @@
       return global.OdontoCarrera ? global.OdontoCarrera.leerCopia() : {};
     },
 
+    getCursos: function () {
+      return global.OdontoCarrera ? global.OdontoCarrera.leerCursos() : {};
+    },
+
     guardarNotas: function (notas) {
       if (global.OdontoCarrera) global.OdontoCarrera.escribirCopia(notas);
     },
@@ -178,6 +182,8 @@
     calcularMetricas: function () {
       var notas = this.getNotas();
       var todas = this.getTodasLasMaterias();
+      var cursos = this.getCursos();
+      var plan = this.getPlan();
 
       var aprobadas = 0, regulares = 0, cursando = 0;
       var sumaNotas = 0, sumaAplazos = 0, cantidadAplazos = 0;
@@ -202,7 +208,21 @@
         }
       });
 
-      var rendidos = aprobadas + cantidadAplazos;
+      /* Los cursos complementarios con nota entran al promedio igual que una
+         materia: así lo calcula el SIU Guaraní. Con el reporte de materias de
+         una estudiante real, sin contarlos el promedio daba 7,08 y 6,37; con
+         ellos, 6,93 y 6,31, exactamente lo que dice el SIU. */
+      var horas = 0, cursosConNota = 0, sumaCursos = 0;
+      Object.keys(cursos).forEach(function (id) {
+        var c = cursos[id];
+        horas += c.horas || 0;
+        if (c.nota >= 4) { cursosConNota++; sumaCursos += c.nota; }
+      });
+      sumaNotas += sumaCursos;
+
+      var promediables = aprobadas + cursosConNota;
+      var rendidos = promediables + cantidadAplazos;
+      var horasRequeridas = plan ? plan.horasComplementarias || 0 : 0;
 
       return {
         totalMaterias: todas.length,
@@ -211,7 +231,10 @@
         cursandoCount: cursando,
         pendientesCount: todas.length - (aprobadas + regulares + cursando),
         totalAplazosCount: cantidadAplazos,
-        promedioSinAplazos: aprobadas > 0 ? (sumaNotas / aprobadas).toFixed(2) : "0.00",
+        horasComplementarias: horas,
+        horasRequeridas: horasRequeridas,
+        cursosCount: Object.keys(cursos).length,
+        promedioSinAplazos: promediables > 0 ? (sumaNotas / promediables).toFixed(2) : "0.00",
         promedioConAplazos: rendidos > 0 ? ((sumaNotas + sumaAplazos) / rendidos).toFixed(2) : "0.00",
         porcentajeAvance: todas.length > 0 ? Math.round((aprobadas / todas.length) * 100) : 0
       };
@@ -232,6 +255,26 @@
         UI.on(filtro, "change", function () {
           self.filtroAnio = filtro.value;
           self.renderTabla();
+        });
+      }
+
+      UI.registerActions({
+        quitarCurso: function (data) { self.quitarCurso(data.id); }
+      });
+
+      var form = document.getElementById("form-curso");
+      if (form) {
+        UI.on(form, "submit", function (event) {
+          event.preventDefault();
+          self.agregarCurso(form);
+        });
+      }
+
+      var lista = document.getElementById("cursos-lista");
+      if (lista) {
+        UI.on(lista, "change", function (event) {
+          var fila = event.target.closest("[data-curso-id]");
+          if (fila) self.alCambiarCurso(fila, event.target);
         });
       }
 
@@ -303,6 +346,7 @@
         );
       }).join("");
 
+      this.renderCursos();
       this.renderResumen();
     },
 
@@ -420,11 +464,12 @@
       var metricas = this.calcularMetricas();
       var cargadas = metricas.aprobadasCount + metricas.regularesCount + metricas.cursandoCount;
 
-      if (cargadas === 0 && !Object.keys(this.getNotas()).length) {
+      if (cargadas === 0 && !Object.keys(this.getNotas()).length && !Object.keys(this.getCursos()).length) {
         UI.toast("Todavía no cargaste ninguna materia", "info");
         return;
       }
-      var mensaje = "Vas a borrar todas las materias de tu cuenta, en todos tus dispositivos. " +
+      var mensaje = "Vas a borrar todas las materias y los cursos complementarios de tu cuenta, " +
+                    "en todos tus dispositivos. " +
                     "No se puede deshacer.\n\n¿Seguís adelante?";
       if (!global.confirm(mensaje)) return;
 
@@ -490,6 +535,8 @@
       animarNumero("calc-avance-porcentaje", m.porcentajeAvance, 0, "%");
       set("calc-materias-aprobadas", m.aprobadasCount + " / " + m.totalMaterias);
       set("calc-materias-regulares", String(m.regularesCount));
+      set("calc-horas-complementarias", m.horasComplementarias + " / " + m.horasRequeridas + " h");
+      this.renderHorasCursos(m);
 
       var barra = document.getElementById("calc-barra-progreso");
       if (barra) barra.style.width = m.porcentajeAvance + "%";
@@ -501,6 +548,208 @@
       }
 
       this.renderOdontograma();
+    },
+
+    /* ====================================================================
+       FORMACIÓN COMPLEMENTARIA
+       Optativas y electivas. No son un casillero fijo del plan: cada quien
+       elige sus cursos, y el plan pide un total de horas.
+       ==================================================================== */
+
+    /** Los cursos en orden: primero los que tienen fecha, del más nuevo. */
+    cursosOrdenados: function () {
+      var cursos = this.getCursos();
+      return Object.keys(cursos).map(function (id) {
+        var c = cursos[id];
+        c.id = id;
+        return c;
+      }).sort(function (a, b) {
+        if ((a.fecha || "") !== (b.fecha || "")) return (b.fecha || "").localeCompare(a.fecha || "");
+        return a.nombre.localeCompare(b.nombre, "es");
+      });
+    },
+
+    /**
+     * Revisa los datos de un curso y dice qué está mal, en castellano.
+     * @returns {{datos: object}|{error: string, campo: string}}
+     */
+    validarCurso: function (nombre, horas, nota, fecha) {
+      nombre = String(nombre || "").replace(/\s+/g, " ").trim();
+      if (nombre.length < 2) return { error: "Escribí el nombre del curso", campo: "nombre" };
+      if (nombre.length > 160) return { error: "El nombre puede tener hasta 160 caracteres", campo: "nombre" };
+
+      var h = Number(horas);
+      if (!horas || !Number.isInteger(h) || h < 1 || h > 400) {
+        return { error: "Las horas van de 1 a 400, sin decimales", campo: "horas" };
+      }
+
+      var n = null;
+      if (nota !== "" && nota !== null && nota !== undefined) {
+        n = parseFloat(String(nota).replace(",", "."));
+        if (isNaN(n) || n < 4 || n > 10) {
+          return { error: "La nota va de 4 a 10. Si no tuvo nota, dejala vacía", campo: "nota" };
+        }
+      }
+
+      if (fecha && (fecha < "1950-01-01" || fecha > "2100-01-01")) {
+        return { error: "Revisá la fecha", campo: "fecha" };
+      }
+
+      return { datos: { nombre: nombre, horas: h, nota: n, fecha: fecha || null } };
+    },
+
+    agregarCurso: function (form) {
+      if (!global.OdontoCarrera) return;
+      var campo = function (nombre) { return form.elements["curso-" + nombre]; };
+
+      var r = this.validarCurso(campo("nombre").value, campo("horas").value,
+                                campo("nota").value, campo("fecha").value);
+      if (r.error) {
+        UI.toast(r.error, "warning");
+        campo(r.campo).focus();
+        return;
+      }
+
+      if (Object.keys(this.getCursos()).length >= 40) {
+        UI.toast("Llegaste al máximo de 40 cursos", "warning");
+        return;
+      }
+
+      global.OdontoCarrera.guardarCurso(null, r.datos);
+      form.reset();
+      campo("nombre").focus();
+
+      this.renderCursos();
+      this.renderResumen();
+      UI.announce("Se agregó " + r.datos.nombre + ", " + UI.plural(r.datos.horas, "hora"));
+    },
+
+    alCambiarCurso: function (fila, input) {
+      if (!global.OdontoCarrera) return;
+      var id = fila.getAttribute("data-curso-id");
+      var actual = this.getCursos()[id];
+      if (!actual) return;
+
+      var valor = function (clase) { return fila.querySelector("." + clase).value; };
+      var r = this.validarCurso(valor("curso-nombre"), valor("curso-horas"),
+                                valor("curso-nota"), valor("curso-fecha"));
+      if (r.error) {
+        UI.toast(r.error, "warning");
+        // Vuelve al último valor bueno: un curso a medio escribir no se guarda.
+        fila.querySelector(".curso-nombre").value = actual.nombre;
+        fila.querySelector(".curso-horas").value = actual.horas;
+        fila.querySelector(".curso-nota").value = actual.nota === null ? "" : actual.nota;
+        fila.querySelector(".curso-fecha").value = actual.fecha || "";
+        input.focus();
+        return;
+      }
+
+      global.OdontoCarrera.guardarCurso(id, r.datos);
+      this.renderResumen();
+    },
+
+    quitarCurso: function (id) {
+      if (!global.OdontoCarrera) return;
+      var curso = this.getCursos()[id];
+      if (!curso) return;
+
+      global.OdontoCarrera.quitarCurso(id);
+      this.renderCursos();
+      this.renderResumen();
+      UI.toast("Se quitó «" + curso.nombre + "»", "info");
+
+      var nombre = document.getElementById("curso-nombre");
+      if (nombre) nombre.focus();
+    },
+
+    renderCursos: function () {
+      var cont = document.getElementById("cursos-lista");
+      if (!cont) return;
+
+      var cursos = this.cursosOrdenados();
+
+      if (!cursos.length) {
+        cont.innerHTML =
+          '<p class="cursos-vacio">Todavía no cargaste cursos. Sumá los que ya aprobaste ' +
+          "con el formulario de abajo: las horas cuentan para las que pide el plan y la nota " +
+          "entra en tu promedio, como en el SIU Guaraní.</p>";
+        return;
+      }
+
+      cont.innerHTML =
+        '<div class="table-responsive">' +
+          '<table class="odonto-table tabla-cursos">' +
+            "<caption>Tus cursos. Podés corregir cualquier dato directamente en la tabla.</caption>" +
+            "<thead><tr>" +
+              "<th>Curso</th><th>Horas</th><th>Nota</th><th>Fecha</th>" +
+              '<th><span class="visually-hidden">Quitar</span></th>' +
+            "</tr></thead>" +
+            "<tbody>" +
+              cursos.map(function (c) {
+                var id = escAttr(c.id);
+                var nombre = escAttr(c.nombre);
+                return (
+                  '<tr class="curso-row" data-curso-id="' + id + '">' +
+                    '<td data-rotulo="Curso">' +
+                      '<label class="visually-hidden" for="cn-' + id + '">Nombre del curso</label>' +
+                      '<input type="text" class="form-control curso-nombre" id="cn-' + id + '" ' +
+                             'maxlength="160" value="' + nombre + '">' +
+                    "</td>" +
+                    '<td data-rotulo="Horas">' +
+                      '<label class="visually-hidden" for="ch-' + id + '">Horas de ' + nombre + "</label>" +
+                      '<input type="number" inputmode="numeric" min="1" max="400" step="1" ' +
+                             'class="form-control curso-horas" id="ch-' + id + '" value="' + escAttr(c.horas) + '">' +
+                    "</td>" +
+                    '<td data-rotulo="Nota">' +
+                      '<label class="visually-hidden" for="cq-' + id + '">Nota de ' + nombre + "</label>" +
+                      '<input type="number" inputmode="decimal" min="4" max="10" step="0.5" placeholder="—" ' +
+                             'class="form-control curso-nota" id="cq-' + id + '" value="' + escAttr(c.nota === null ? "" : c.nota) + '">' +
+                    "</td>" +
+                    '<td data-rotulo="Fecha">' +
+                      '<label class="visually-hidden" for="cf-' + id + '">Fecha de ' + nombre + "</label>" +
+                      '<input type="date" min="1950-01-01" max="2100-01-01" ' +
+                             'class="form-control curso-fecha" id="cf-' + id + '" value="' + escAttr(c.fecha || "") + '">' +
+                    "</td>" +
+                    '<td class="curso-quitar">' +
+                      '<button type="button" class="btn-icono-quitar" data-action="quitarCurso" data-id="' + id + '" ' +
+                              'aria-label="Quitar ' + nombre + '">' + UI.icono("tacho") + "</button>" +
+                    "</td>" +
+                  "</tr>"
+                );
+              }).join("") +
+            "</tbody>" +
+          "</table>" +
+        "</div>";
+    },
+
+    /** Las horas contra las que pide el plan, en la cabecera de la tarjeta. */
+    renderHorasCursos: function (m) {
+      var requeridas = m.horasRequeridas;
+      var hechas = m.horasComplementarias;
+      var porcentaje = requeridas ? Math.min(100, Math.round((hechas / requeridas) * 100)) : 0;
+      var completa = requeridas > 0 && hechas >= requeridas;
+
+      var badge = document.getElementById("cursos-horas-badge");
+      if (badge) {
+        badge.textContent = completa
+          ? "Completa · " + hechas + " h"
+          : hechas + " de " + requeridas + " h";
+        badge.classList.toggle("es-completa", completa);
+      }
+
+      var requeridasEl = document.getElementById("cursos-horas-requeridas");
+      if (requeridasEl) requeridasEl.textContent = String(requeridas);
+
+      var barra = document.getElementById("cursos-barra");
+      if (barra) {
+        barra.style.width = porcentaje + "%";
+        var wrap = barra.parentNode;
+        wrap.setAttribute("aria-valuenow", String(Math.min(hechas, requeridas)));
+        wrap.setAttribute("aria-valuemax", String(requeridas));
+        wrap.setAttribute("aria-valuetext", completa
+          ? "Completaste las " + requeridas + " horas"
+          : hechas + " de " + requeridas + " horas");
+      }
     },
 
     /* Compatibilidad con la versión anterior */

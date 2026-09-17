@@ -166,12 +166,12 @@ Acá vuelve el trabajo mío. Archivos nuevos en `public/js/`:
 El orden importa: **primero la base, después el sitio**. Con el sitio nuevo y
 la base vieja, Mi carrera no puede guardar (pide tablas que no existen).
 
-- [ ] Cargar `004_planes_de_estudio.sql` (si había materias del plan inventado, las aparta y avisa cuántas)
-- [ ] Cargar `datos_planes.sql` (tiene que mostrar `7v16 | 60 | 126`)
-- [ ] `pruebas_rls.sql`: 49 en OK
-- [ ] Recién ahí, `git pull` en el sitio
+- [x] Cargar `004_planes_de_estudio.sql` (si había materias del plan inventado, las aparta y avisa cuántas)
+- [x] Cargar `datos_planes.sql` (tiene que mostrar `7v16 | 60 | 126`)
+- [x] `pruebas_rls.sql`: 49 en OK
+- [x] Recién ahí, `git pull` en el sitio
 - [ ] Probar: entrar a Mi carrera, cargar una materia, recargar y verla
-- [ ] 💻 Mi carrera: pantalla para cargar la formación complementaria (la tabla ya existe)
+- [x] 💻 Mi carrera: formación complementaria (horas contra las 160 del plan, notas en el promedio como el SIU)
 - [ ] 💻 Importar el reporte de materias del SIU Guaraní (PDF, leído en el navegador)
 
 **Principio que no se negocia:** el login suma, no tapa. Mesas, reválidas,

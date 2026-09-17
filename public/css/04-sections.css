@@ -984,6 +984,63 @@
 .year-badge { font-family: var(--font-heading); font-weight: var(--fw-black); font-size: var(--fs-lg); color: var(--text-strong); }
 .year-subtitle { font-size: var(--fs-sm); color: var(--text-muted); margin-left: var(--sp-2); }
 
+/* --- Formación complementaria --- */
+.cursos-card .calculator-year-header { align-items: flex-start; }
+.cursos-card .year-badge { display: block; }
+.cursos-bajada { margin: var(--sp-1) 0 0; max-width: 52ch; }
+#cursos-horas-badge.es-completa { background: var(--text); color: var(--surface); border-color: var(--text); }
+
+/* Barra fina a sangre, pegada a la cabecera: las horas son un dato de
+   avance, no un título. */
+.cursos-progreso { height: 6px; background: var(--surface-3); }
+.cursos-progreso span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  transition: width var(--dur-slow) var(--ease);
+}
+
+.cursos-vacio {
+  padding: var(--sp-5);
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  max-width: 70ch;
+}
+
+.tabla-cursos { min-width: 620px; }
+.tabla-cursos td { padding: var(--sp-2) var(--sp-3); }
+.tabla-cursos .curso-horas,
+.tabla-cursos .curso-nota { width: 5.5rem; }
+.tabla-cursos .curso-fecha { width: 10rem; }
+.tabla-cursos td:last-child { width: 1%; text-align: right; }
+
+.btn-icono-quitar {
+  display: inline-grid;
+  place-items: center;
+  width: var(--tap-target);
+  height: var(--tap-target);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-soft);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-icono-quitar:hover { color: var(--danger); border-color: var(--border); background: var(--surface-2); }
+
+.form-curso {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 6rem 7rem 10.5rem auto;
+  gap: var(--sp-3);
+  align-items: end;
+  padding: var(--sp-4) var(--sp-5) var(--sp-5);
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.field-opcional { font-weight: var(--fw-normal); color: var(--text-soft); text-transform: none; letter-spacing: 0; }
+
 
 /* ==========================================================================
    ASISTENTE ODONTOBOT
