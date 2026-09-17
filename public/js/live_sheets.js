@@ -221,14 +221,52 @@
       return { hora: texto, modalidadExtra: "" };
     },
 
-    parseCSVMesas: function (csvText) {
+    /**
+     * Ubica las columnas por el encabezado ("Materia", "Hora", "Modalidad" o
+     * "Plataforma", "ID", "Acceso") en lugar de suponer que la materia está
+     * en la primera.
+     *
+     * En septiembre de 2026 la planilla pasó a empezar en la columna B, con
+     * la A vacía. El lector buscaba la materia en la A, descartaba todas las
+     * filas y el sitio mostraba en silencio los datos de ejemplo de agosto.
+     * Leyendo el encabezado, correr las columnas no rompe nada.
+     *
+     * @returns {object|null} índices de cada columna, o null si la fila no es
+     *                        un encabezado
+     */
+    leerEncabezado: function (celdas) {
+      var normal = celdas.map(function (c) { return UI.normalizar(c); });
+      var iMateria = normal.indexOf("materia");
+      if (iMateria === -1) return null;
+
+      var cols = { materia: iMateria, hora: iMateria + 1, modalidad: iMateria + 2, id: iMateria + 3, acceso: iMateria + 4 };
+      normal.forEach(function (texto, i) {
+        if (i <= iMateria) return;
+        if (texto === "hora" || texto === "horario") cols.hora = i;
+        else if (texto === "modalidad" || texto === "plataforma") cols.modalidad = i;
+        else if (texto === "id" || texto === "id zoom" || texto === "id de zoom") cols.id = i;
+        else if (texto === "acceso" || texto === "codigo" || texto === "contrasena") cols.acceso = i;
+      });
+      return cols;
+    },
+
+    /**
+     * Recorre las filas de un llamado: lleva la cuenta del día y de las
+     * columnas, descarta títulos y avisos, y entrega cada fila con materia.
+     */
+    recorrerLlamados: function (csvText, alEncontrar) {
       var self = this;
-      var items = [];
       var diaActual = "Fecha por confirmar";
+      // Hasta encontrar un encabezado, se asume el orden de siempre desde la
+      // primera columna con texto de la fila.
+      var cols = null;
 
       this.splitCSV(csvText).forEach(function (fila) {
         var info = self.normalizarFila(fila);
         if (info.vacia) return;
+
+        var encabezado = self.leerEncabezado(info.celdas);
+        if (encabezado) { cols = encabezado; return; }
 
         if (self.esEncabezadoDeDia(info.primerTexto)) {
           diaActual = self.formatearDia(info.primerTexto);
@@ -236,15 +274,38 @@
         }
         if (self.esFilaDeRuido(info.primerTexto)) return;
 
-        var celdas = info.celdas;
-        if (!celdas[0]) return; // fila de continuación sin materia
+        var c = cols;
+        if (!c) {
+          var inicio = info.celdas.indexOf(info.primerTexto);
+          c = { materia: inicio, hora: inicio + 1, modalidad: inicio + 2, id: inicio + 3, acceso: inicio + 4 };
+        }
 
-        var materia = celdas[0];
-        var idZoom = celdas[3] || "";
-        var acceso = celdas[4] || "";
+        var materia = info.celdas[c.materia] || "";
+        if (!materia) return; // fila de continuación sin materia
 
-        var lectura = self.interpretarHora(celdas[1]);
-        var modalidadRaw = [celdas[2] || "", lectura.modalidadExtra]
+        alEncontrar({
+          dia: diaActual,
+          materia: materia,
+          hora: info.celdas[c.hora] || "",
+          modalidad: info.celdas[c.modalidad] || "",
+          id: info.celdas[c.id] || "",
+          acceso: info.celdas[c.acceso] || ""
+        });
+      });
+    },
+
+    parseCSVMesas: function (csvText) {
+      var self = this;
+      var items = [];
+
+      this.recorrerLlamados(csvText, function (fila) {
+        var diaActual = fila.dia;
+        var materia = fila.materia;
+        var idZoom = fila.id;
+        var acceso = fila.acceso;
+
+        var lectura = self.interpretarHora(fila.hora);
+        var modalidadRaw = [fila.modalidad, lectura.modalidadExtra]
           .filter(Boolean).join(" · ");
 
         var esZoom = UI.normalizar(modalidadRaw).indexOf("zoom") !== -1 ||
@@ -275,27 +336,15 @@
     parseCSVRevalidas: function (csvText) {
       var self = this;
       var items = [];
-      var diaActual = "Fecha por confirmar";
 
-      this.splitCSV(csvText).forEach(function (fila) {
-        var info = self.normalizarFila(fila);
-        if (info.vacia) return;
+      this.recorrerLlamados(csvText, function (fila) {
+        var diaActual = fila.dia;
+        var materia = fila.materia;
+        var idZoom = fila.id;
+        var acceso = fila.acceso;
 
-        if (self.esEncabezadoDeDia(info.primerTexto)) {
-          diaActual = self.formatearDia(info.primerTexto);
-          return;
-        }
-        if (self.esFilaDeRuido(info.primerTexto)) return;
-
-        var celdas = info.celdas;
-        if (!celdas[0]) return;
-
-        var materia = celdas[0];
-        var idZoom = celdas[3] || "";
-        var acceso = celdas[4] || "";
-
-        var lectura = self.interpretarHora(celdas[1]);
-        var plataformaRaw = [celdas[2] || "", lectura.modalidadExtra]
+        var lectura = self.interpretarHora(fila.hora);
+        var plataformaRaw = [fila.modalidad, lectura.modalidadExtra]
           .filter(Boolean).join(" · ");
         var plataforma = UI.normalizar(plataformaRaw);
 
