@@ -61,16 +61,17 @@ public/               EL SITIO. Es exactamente lo que se copia a htdocs/
     03-components.css Botones, formularios, tarjetas, pestañas, modales, estados
     04-sections.css   Encabezado, hero, y cada sección de la aplicación
     05-responsive.css Puntos de corte, alto contraste
-    06-cuentas.css    Acceso, panel de cuenta, entrada a Mi promedio
+    06-cuentas.css    Acceso, panel de cuenta, entrada a Mi carrera
     07-movimiento.css Animaciones, todas dentro de prefers-reduced-motion
   js/
     config.js         URL de la API y clave pública. Lo único que cambia por entorno
     core.js           Núcleo: escapado, DOM, acciones, modales, pestañas, tema, fechas
     api.js            Cliente de Supabase: sesión, renovación de token, REST
-    data.js           Contenido editable a mano (noticias, plan, apuntes, bolsa…)
+    data.js           Contenido editable a mano (noticias, apuntes, bolsa…)
+    planes.js         Planes de estudio. GENERADO desde infra/planes/: no se edita
     live_sheets.js    Sincronización con las planillas de mesas y reválidas
     calculator.js     Promedio y avance de carrera (sólo calcula y dibuja)
-    carrera.js        Mi promedio con cuenta: acceso, guardado, copia local
+    carrera.js        Mi carrera con cuenta: plan, acceso, guardado, copia local
     auth.js           Registro, ingreso con contraseña, recuperación, Mi cuenta
     chatbot.js        OdontoBot (buscador de preguntas frecuentes)
     app.js            Router, inicio, historias clínicas, biblioteca, buscador
@@ -79,6 +80,7 @@ infra/                Todo lo del servidor
   supabase/           Compose de ajustes y esquema SQL con RLS
   backup/             Backup cifrado y su restauración
   iconos/             Generador del sprite de íconos
+  planes/             Planes de estudio (.json) y su generador
 
 docs/                 plan.md, arquitectura.md, despliegue-cloudpanel.md
 run_server.py         Servidor de desarrollo (sirve public/)
@@ -215,7 +217,7 @@ El backend es **Supabase autoalojado**. Detalles en
 ### El sitio funciona sin backend
 
 Mientras `js/config.js` tenga `publishableKey: "PENDIENTE"`, todo lo relativo a
-cuentas se apaga solo: no aparece el botón de ingresar y Mi promedio avisa que
+cuentas se apaga solo: no aparece el botón de ingresar y Mi carrera avisa que
 todavía no está disponible. **Nada de lo público —mesas, reválidas, historias
 clínicas, instrumental, biblioteca— depende de la cuenta.** Si el servidor se
 cae, se sigue pudiendo consultar a qué hora rendís.
@@ -227,11 +229,12 @@ la cuenta, una sola vez, y para elegir una contraseña nueva si se olvidó. Los
 dos correos traen un botón que abre el sitio con un token, y `auth.js` lo
 canjea (el porqué está al principio de ese archivo).
 
-### Mi promedio pide cuenta
+### Mi carrera pide cuenta
 
 Es lo único del sitio que la pide, porque guarda datos de la persona. Las
-materias viven en la tabla `materias_cursadas`, una fila por materia,
-protegidas por RLS: nadie ve las de otra persona. Quien administra el servidor
+materias viven en la tabla `materias_cursadas`, una fila por materia y atada
+al plan que la persona cursa (`planes_usuario`), protegidas por RLS: nadie ve
+las de otra persona. Quien administra el servidor
 sí puede leerlas, y se le dice así a cada estudiante antes de su primera
 carga.
 
@@ -239,6 +242,27 @@ carga.
 promedio se vea sin señal y ningún cambio se pierda si se corta el wifi: cada
 cambio queda pendiente hasta que el servidor confirma que lo guardó. Al cerrar
 sesión, esa copia se borra.
+
+### Los planes de estudio
+
+El plan real es el **7v16** (Plan 1994, actualización 2016): 60 materias con
+los códigos del SIU Guaraní (`00011`, `0002A`…), sus correlativas y las 160
+horas de formación complementaria. Usar los códigos del SIU es lo que permite
+importar después el reporte de materias de cada estudiante.
+
+La fuente es una sola: `infra/planes/7v16.json`. De ahí salen, con
+`python infra/planes/generar.py`:
+
+- `public/js/planes.js`, lo que usa Mi carrera en el navegador;
+- `infra/supabase/sql/datos_planes.sql`, las mismas filas para la base
+  (`planes_estudio`, `plan_materias`, `plan_correlativas`).
+
+Para corregir o sumar un plan: se edita el `.json`, se regenera, se sube el
+`?v=` de `planes.js` y se corre `datos_planes.sql` en el servidor. Nunca se
+edita a mano ninguna de las dos salidas.
+
+Cada cuenta anota qué plan cursa (hasta tres, uno principal), y la base sólo
+acepta materias de un plan elegido y con códigos que existen en ese plan.
 
 ### La clave publicable es pública y está bien
 

@@ -68,68 +68,8 @@ const ODONTO_DATA = {
     }
   ],
 
-  // Plan de Estudios Completo UNLP (Por Años)
-  planEstudios: [
-    {
-      anio: 1,
-      titulo: "Primer Año",
-      materias: [
-        { id: "101", codigo: "OD-101", nombre: "Anatomía General e Histología", correlativas: "Ciclo Básico", regimen: "Anual" },
-        { id: "102", codigo: "OD-102", nombre: "Biología Celular y Genética", correlativas: "Ciclo Básico", regimen: "1° Cuatrimestre" },
-        { id: "103", codigo: "OD-103", nombre: "Química Biológica", correlativas: "Ciclo Básico", regimen: "2° Cuatrimestre" },
-        { id: "104", codigo: "OD-104", nombre: "Introducción a la Odontología", correlativas: "Ciclo Básico", regimen: "1° Cuatrimestre" },
-        { id: "105", codigo: "OD-105", nombre: "Odontología Preventiva y Social I", correlativas: "Ciclo Básico", regimen: "Anual" }
-      ]
-    },
-    {
-      anio: 2,
-      titulo: "Segundo Año",
-      materias: [
-        { id: "201", codigo: "OD-201", nombre: "Fisiología Humana", correlativas: "Anatomía, Química Biológica", regimen: "Anual" },
-        { id: "202", codigo: "OD-202", nombre: "Microbiología e Inmunología", correlativas: "Biología Celular, Química", regimen: "Anual" },
-        { id: "203", codigo: "OD-203", nombre: "Materiales Dentales", correlativas: "Química Biológica", regimen: "Anual" },
-        { id: "204", codigo: "OD-204", nombre: "Anatomía Patológica General", correlativas: "Anatomía, Histología", regimen: "1° Cuatrimestre" },
-        { id: "205", codigo: "OD-205", nombre: "Oclusión y ATM", correlativas: "Anatomía General", regimen: "2° Cuatrimestre" },
-        { id: "206", codigo: "OD-206", nombre: "Odontología Preventiva y Social II", correlativas: "Odonto Prev. I", regimen: "Anual" }
-      ]
-    },
-    {
-      anio: 3,
-      titulo: "Tercer Año",
-      materias: [
-        { id: "301", codigo: "OD-301", nombre: "Operatoria Dental I (Preclínica y Clínica)", correlativas: "Materiales, Fisiología, Oclusión", regimen: "Anual" },
-        { id: "302", codigo: "OD-302", nombre: "Periodoncia I", correlativas: "Microbiología, Anatomía Patológica", regimen: "Anual" },
-        { id: "303", codigo: "OD-303", nombre: "Diagnóstico por Imágenes y Radiología", correlativas: "Anatomía, Fisiología", regimen: "1° Cuatrimestre" },
-        { id: "304", codigo: "OD-304", nombre: "Farmacología y Terapéutica", correlativas: "Fisiología Humana", regimen: "Anual" },
-        { id: "305", codigo: "OD-305", nombre: "Patología Bucal y Clínica Estomatológica", correlativas: "Anatomía Patológica, Microbiología", regimen: "Anual" },
-        { id: "306", codigo: "OD-306", nombre: "Ergonomía y Bioseguridad", correlativas: "Microbiología", regimen: "1° Cuatrimestre" }
-      ]
-    },
-    {
-      anio: 4,
-      titulo: "Cuarto Año",
-      materias: [
-        { id: "401", codigo: "OD-401", nombre: "Operatoria Dental II y Endodoncia", correlativas: "Operatoria I, Farmacología", regimen: "Anual" },
-        { id: "402", codigo: "OD-402", nombre: "Cirugía Bucomaxilofacial I", correlativas: "Patología Bucal, Farmacología, Radiología", regimen: "Anual" },
-        { id: "403", codigo: "OD-403", nombre: "Prótesis Fija y Removible I", correlativas: "Materiales Dentales, Oclusión", regimen: "Anual" },
-        { id: "404", codigo: "OD-404", nombre: "Odontopediatría I", correlativas: "Operatoria I, Periodoncia I", regimen: "Anual" },
-        { id: "405", codigo: "OD-405", nombre: "Ortodoncia y Ortopedia Funcional", correlativas: "Oclusión, Diagnóstico por Imágenes", regimen: "Anual" },
-        { id: "406", codigo: "OD-406", nombre: "Clínica Integral del Adulto I", correlativas: "Operatoria I, Periodoncia I, Radiología", regimen: "Anual" }
-      ]
-    },
-    {
-      anio: 5,
-      titulo: "Quinto Año",
-      materias: [
-        { id: "501", codigo: "OD-501", nombre: "Cirugía Bucomaxilofacial II (Alta Complejidad)", correlativas: "Cirugía I", regimen: "Anual" },
-        { id: "502", codigo: "OD-502", nombre: "Prótesis Completa e Implantología", correlativas: "Prótesis I, Cirugía I", regimen: "Anual" },
-        { id: "503", codigo: "OD-503", nombre: "Clínica Integral del Adulto II y Niño", correlativas: "Clínica Integral I, Odontopediatría I", regimen: "Anual" },
-        { id: "504", codigo: "OD-504", nombre: "Odontología Legal y Forense", correlativas: "Patología Bucal, Farmacología", regimen: "1° Cuatrimestre" },
-        { id: "505", codigo: "OD-505", nombre: "Salud Pública y Bioética", correlativas: "Odonto Preventiva II", regimen: "2° Cuatrimestre" },
-        { id: "506", codigo: "OD-506", nombre: "Práctica Profesional Supervisada (PPS)", correlativas: "Todo 4° año completo", regimen: "Anual" }
-      ]
-    }
-  ],
+  // El plan de estudios ya no está acá: vive en js/planes.js, que se genera
+  // desde infra/planes/*.json (el mismo origen que la tabla de la base).
 
   // Modelos de Historias Clínicas para Visualización y Descarga
   historiasClinicas: [

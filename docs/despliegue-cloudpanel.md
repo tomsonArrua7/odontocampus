@@ -792,6 +792,15 @@ Después, **las migraciones siguientes, en orden**:
 ```bash
 docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/002_bolsa_y_privacidad.sql
 docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/003_cuentas_con_contrasena.sql
+docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/004_planes_de_estudio.sql
+```
+
+Y los datos de los planes de estudio. Este archivo **no** es una migración:
+se genera desde `infra/planes/*.json` y se vuelve a correr cada vez que un
+plan cambia (actualiza sin tocar las materias de nadie):
+
+```bash
+docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/datos_planes.sql
 ```
 
 > **Una migración aplicada no se edita nunca.** Si el archivo y la base dejan

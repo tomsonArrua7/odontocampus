@@ -37,7 +37,7 @@
     /* Versión del texto de "qué guardamos" que se acepta al crear la cuenta.
        Si cambia ese texto (en index.html y en js/carrera.js), se sube este
        número: a quien aceptó una versión anterior se le vuelve a pedir antes
-       de entrar a Mi promedio. Queda en la tabla `consentimientos`.
+       de entrar a Mi carrera. Queda en la tabla `consentimientos`.
        Máximo 20 caracteres: la base corta lo que sobre. */
     versionTerminos: "2026-09-2",
 

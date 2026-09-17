@@ -10,7 +10,7 @@
      cargar veinte materias seguidas era una pelea.
    · Los controles se manejan por delegación, sin onchange en el HTML.
    · Cada campo tiene etiqueta accesible propia (hay una fila por materia; sin
-     etiquetas, un lector de pantalla anuncia veintinueve "combo box" iguales).
+     etiquetas, un lector de pantalla anuncia sesenta "combo box" iguales).
    ========================================================================== */
 (function (global) {
   "use strict";
@@ -36,6 +36,15 @@
     cursando: "cursando",
     pendiente: "pendiente"
   };
+
+  var PERIODOS = {
+    anual: "Anual",
+    "1c": "1.° cuatrimestre",
+    "2c": "2.° cuatrimestre",
+    bimestral: "Bimestral"
+  };
+
+  var TITULOS_ANIO = ["", "Primer año", "Segundo año", "Tercer año", "Cuarto año", "Quinto año", "Sexto año"];
 
   function limitarAplazos(valor) {
     return Math.min(MAX_APLAZOS, Math.max(0, parseInt(valor, 10) || 0));
@@ -104,20 +113,42 @@
       if (global.OdontoCarrera) global.OdontoCarrera.escribirCopia(notas);
     },
 
-    getTodasLasMaterias: function () {
-      var materias = [];
-      if (!global.ODONTO_DATA || !global.ODONTO_DATA.planEstudios) return materias;
+    /** El plan que cursa la persona (lo decide su cuenta; si no, el vigente). */
+    getPlan: function () {
+      if (global.OdontoCarrera) return global.OdontoCarrera.plan();
+      var planes = global.ODONTO_PLANES;
+      return planes ? planes.planes[planes.porDefecto] : null;
+    },
 
-      global.ODONTO_DATA.planEstudios.forEach(function (nivel) {
-        nivel.materias.forEach(function (mat) {
-          materias.push({
-            id: mat.id, codigo: mat.codigo, nombre: mat.nombre,
-            regimen: mat.regimen, correlativas: mat.correlativas,
-            anio: nivel.anio, anioTitulo: nivel.titulo
-          });
-        });
+    /**
+     * Materias del plan, en el orden de la facultad. El `id` es el código del
+     * SIU Guaraní: es lo que se guarda en la cuenta.
+     */
+    getTodasLasMaterias: function () {
+      var plan = this.getPlan();
+      if (!plan) return [];
+      return plan.materias.map(function (mat) {
+        return {
+          id: mat.codigo, codigo: mat.codigo, nombre: mat.nombre,
+          periodo: mat.periodo, correlativas: mat.correlativas || [],
+          condicion: mat.condicion || "",
+          anio: mat.anio, anioTitulo: TITULOS_ANIO[mat.anio] || (mat.anio + ".° año")
+        };
       });
-      return materias;
+    },
+
+    /** Las materias agrupadas por año, para la tabla. */
+    getNiveles: function () {
+      var niveles = [];
+      this.getTodasLasMaterias().forEach(function (mat) {
+        var nivel = niveles[niveles.length - 1];
+        if (!nivel || nivel.anio !== mat.anio) {
+          nivel = { anio: mat.anio, titulo: mat.anioTitulo, materias: [] };
+          niveles.push(nivel);
+        }
+        nivel.materias.push(mat);
+      });
+      return niveles;
     },
 
     actualizarNota: function (materiaId, estado, notaFinal, aplazos) {
@@ -221,14 +252,23 @@
 
     renderTabla: function (filtroAnio) {
       var cont = document.getElementById("calculadora-materias-lista");
-      if (!cont || !global.ODONTO_DATA) return;
+      if (!cont) return;
 
       if (filtroAnio !== undefined) this.filtroAnio = String(filtroAnio);
       var filtro = this.filtroAnio;
       var notas = this.getNotas();
       var self = this;
 
-      var niveles = global.ODONTO_DATA.planEstudios.filter(function (nivel) {
+      // Nombre de cada materia por código, para escribir las correlativas.
+      var nombres = {};
+      this.getTodasLasMaterias().forEach(function (m) { nombres[m.codigo] = m.nombre; });
+      this.nombresPorCodigo = nombres;
+
+      var plan = this.getPlan();
+      var rotulo = document.getElementById("calc-plan-nombre");
+      if (rotulo && plan) rotulo.textContent = "Plan " + plan.id + " · " + plan.nombre;
+
+      var niveles = this.getNiveles().filter(function (nivel) {
         return filtro === "todos" || String(filtro) === String(nivel.anio);
       });
 
@@ -251,7 +291,7 @@
               '<table class="odonto-table">' +
                 "<caption>" + esc(nivel.titulo) + ": marcá el estado de cada materia y, si la aprobaste, su nota.</caption>" +
                 "<thead><tr>" +
-                  "<th>Código</th><th>Materia</th><th>Régimen</th>" +
+                  "<th>Código</th><th>Materia</th><th>Período</th>" +
                   "<th>Estado</th><th>Nota final</th><th>Aplazos</th>" +
                 "</tr></thead>" +
                 "<tbody>" +
@@ -270,15 +310,23 @@
       registro = registro || { estado: "pendiente", nota: "", aplazos: 0 };
       var aprobada = registro.estado === "aprobada";
       var nombreSeguro = escAttr(mat.nombre);
+      var nombres = this.nombresPorCodigo || {};
+
+      /* Correlativas con nombre, no con código: "0003C" no le dice nada a
+         nadie. Lo que no es una materia (secundario completo, la PPS) se
+         escribe tal cual lo dice el plan. */
+      var requisitos = mat.correlativas.map(function (c) { return nombres[c] || c; });
+      if (mat.condicion) requisitos.push(mat.condicion);
+      var textoCorrelativas = requisitos.length ? requisitos.join(" · ") : "Sin correlativas";
 
       return (
         '<tr class="materia-row' + (aprobada ? " row-aprobada" : "") + '" data-materia-id="' + escAttr(mat.id) + '">' +
           '<td><span class="code-tag">' + esc(mat.codigo) + "</span></td>" +
           "<td>" +
             '<span class="materia-title">' + esc(mat.nombre) + "</span>" +
-            '<small class="correlativa-info">Correlativas: ' + esc(mat.correlativas) + "</small>" +
+            '<small class="correlativa-info">Correlativas: ' + esc(textoCorrelativas) + "</small>" +
           "</td>" +
-          '<td><span class="regimen-tag">' + esc(mat.regimen) + "</span></td>" +
+          '<td><span class="regimen-tag">' + esc(PERIODOS[mat.periodo] || mat.periodo) + "</span></td>" +
           "<td>" +
             '<label class="visually-hidden" for="estado-' + escAttr(mat.id) + '">Estado de ' + nombreSeguro + "</label>" +
             '<select class="form-select status-select" id="estado-' + escAttr(mat.id) + '">' +
@@ -404,8 +452,9 @@
         var estado = NOMBRE_ESTADO[registro.estado] ? registro.estado : "pendiente";
         conteo[estado]++;
 
-        // "OD-101" se muestra como "101": el prefijo es igual en las 29.
-        var numero = String(mat.codigo || mat.id).replace(/^\D+/, "");
+        // "00011" se muestra como "11" y "0002A" como "2A": los ceros de
+        // adelante son iguales en las sesenta y sólo ocupan lugar.
+        var numero = String(mat.codigo || mat.id).replace(/^0+(?=.)/, "");
         var conAplazo = registro.aplazos > 0;
 
         var detalle = mat.nombre + " — " + NOMBRE_ESTADO[estado];

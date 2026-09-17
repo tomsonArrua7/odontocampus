@@ -32,7 +32,7 @@
    EL LOGIN SUMA, NO TAPA
 
    Mesas, reválidas, historias clínicas, instrumental y biblioteca siguen
-   abiertas sin cuenta. Lo único que la pide es Mi promedio, porque guarda
+   abiertas sin cuenta. Lo único que la pide es Mi carrera, porque guarda
    datos de la persona (ver js/carrera.js).
    ========================================================================== */
 (function (global) {
@@ -736,14 +736,18 @@
         // del resto de los usuarios.
         Api.rpc("mi_perfil"),
         Api.seleccionar("consentimientos", "select=*"),
-        Api.seleccionar("materias_cursadas", "select=*")
+        Api.seleccionar("materias_cursadas", "select=*"),
+        Api.seleccionar("planes_usuario", "select=*"),
+        Api.seleccionar("complementarias_cursadas", "select=*")
       ]).then(function (partes) {
         var paquete = {
           exportado_el: new Date().toISOString(),
           cuenta: { id: usuario.id, email: usuario.email, creada: usuario.created_at },
           perfil: partes[0],
           consentimientos: partes[1],
-          materias: partes[2]
+          materias: partes[2],
+          planes: partes[3],
+          cursos_complementarios: partes[4]
         };
 
         var blob = new Blob([JSON.stringify(paquete, null, 2)], { type: "application/json" });

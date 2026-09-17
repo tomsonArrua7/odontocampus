@@ -128,7 +128,8 @@ cd ~/htdocs/odontocampus.com.ar && git pull --ff-only
 - [x] Cargar [`002_bolsa_y_privacidad.sql`](../infra/supabase/sql/002_bolsa_y_privacidad.sql)
 - [ ] Cargar [`003_cuentas_con_contrasena.sql`](../infra/supabase/sql/003_cuentas_con_contrasena.sql)
 - [ ] Correr las dos consultas de verificación del final del archivo
-- [ ] **`pruebas_rls.sql`: todas las pruebas en OK** (35, de 00 a 34, después de cargar 003)
+- [ ] Cargar [`004_planes_de_estudio.sql`](../infra/supabase/sql/004_planes_de_estudio.sql) y después [`datos_planes.sql`](../infra/supabase/sql/datos_planes.sql)
+- [ ] **`pruebas_rls.sql`: todas las pruebas en OK** (49, de 00 a 46, después de cargar 004)
 - [ ] **Advisor de Studio sin alertas críticas**
 - [ ] Prueba con `curl` y la clave publicable desde incógnito: no debe devolver nada
 
@@ -141,7 +142,7 @@ Acá vuelve el trabajo mío. Archivos nuevos en `public/js/`:
 - [x] `config.js` — URL de la API y `ANON_KEY`, con apagado automático
 - [x] `api.js` — cliente propio: sesión, renovación de token, REST
 - [x] `auth.js` — registro, ingreso con contraseña, confirmación y recuperación por correo, Mi cuenta
-- [x] `carrera.js` — Mi promedio pide cuenta; materias en la cuenta, con copia local y cambios pendientes sin conexión
+- [x] `carrera.js` — Mi carrera pide cuenta; materias en la cuenta, con copia local y cambios pendientes sin conexión
 - [x] `calculator.js` — avisa a `carrera.js` en cada cambio
 - [x] Exportar mis datos (Ley 25.326)
 - [x] 🙋 Pegar la `SUPABASE_PUBLISHABLE_KEY` en `config.js` cuando arranque Supabase
@@ -154,11 +155,24 @@ Acá vuelve el trabajo mío. Archivos nuevos en `public/js/`:
 - [ ] `git pull` en el sitio
 - [ ] Copiar el override a `/opt/supabase/` y `docker compose up -d auth`
 - [ ] Vhost de la API: cerrar `/auth/v1/otp` y `/auth/v1/magiclink`
-- [ ] Cargar `003_cuentas_con_contrasena.sql` y correr `pruebas_rls.sql` (35 en OK)
+- [ ] Cargar `003_cuentas_con_contrasena.sql`
 - [ ] Probar: crear cuenta, confirmar, ingresar, cargar una materia y verla desde otro dispositivo
 - [ ] Probar: "¿Olvidaste tu contraseña?" de punta a punta
 - [ ] Probar que se rechaza la contraseña `12345678`
 - [ ] Log de Auth sin "rate limiting is not applied"
+
+### Plan de estudios real (septiembre 2026) 🙋 aplicar en el servidor
+
+El orden importa: **primero la base, después el sitio**. Con el sitio nuevo y
+la base vieja, Mi carrera no puede guardar (pide tablas que no existen).
+
+- [ ] Cargar `004_planes_de_estudio.sql` (si había materias del plan inventado, las aparta y avisa cuántas)
+- [ ] Cargar `datos_planes.sql` (tiene que mostrar `7v16 | 60 | 126`)
+- [ ] `pruebas_rls.sql`: 49 en OK
+- [ ] Recién ahí, `git pull` en el sitio
+- [ ] Probar: entrar a Mi carrera, cargar una materia, recargar y verla
+- [ ] 💻 Mi carrera: pantalla para cargar la formación complementaria (la tabla ya existe)
+- [ ] 💻 Importar el reporte de materias del SIU Guaraní (PDF, leído en el navegador)
 
 **Principio que no se negocia:** el login suma, no tapa. Mesas, reválidas,
 historias clínicas, instrumental y biblioteca siguen abiertas sin cuenta. Lo

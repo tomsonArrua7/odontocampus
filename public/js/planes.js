@@ -1,0 +1,77 @@
+/* ==========================================================================
+   ODONTOCAMPUS — PLANES DE ESTUDIO
+   GENERADO por infra/planes/generar.py a partir de infra/planes/*.json.
+   No se edita a mano: se cambia el .json y se vuelve a generar.
+
+   Los códigos son los del SIU Guaraní. La misma información está en la base
+   (tablas planes_estudio, plan_materias y plan_correlativas), cargada con
+   infra/supabase/sql/datos_planes.sql, que sale del mismo .json.
+   ========================================================================== */
+window.ODONTO_PLANES = {
+  "porDefecto": "7v16",
+  "planes": {
+    "7v16": {"id": "7v16", "carrera": "Odontología", "titulo": "Odontólogo/a", "facultad": "Facultad de Odontología · UNLP", "nombre": "Plan 1994, actualización 2016", "horasComplementarias": 160,
+    "materias": [
+      {"codigo": "0001F", "nombre": "Introducción a la Odontología", "anio": 1, "periodo": "bimestral", "correlativas": [], "condicion": "Secundario completo"},
+      {"codigo": "0001E", "nombre": "Odontología Preventiva y Social I", "anio": 1, "periodo": "anual", "correlativas": ["0001F"]},
+      {"codigo": "00011", "nombre": "Anatomía I", "anio": 1, "periodo": "1c", "correlativas": ["0001F"]},
+      {"codigo": "00012", "nombre": "Bioquímica Estomatológica I", "anio": 1, "periodo": "1c", "correlativas": ["0001F"]},
+      {"codigo": "00013", "nombre": "Biofísica I", "anio": 1, "periodo": "1c", "correlativas": ["0001F"]},
+      {"codigo": "00014", "nombre": "Biología General I", "anio": 1, "periodo": "1c", "correlativas": ["0001F"]},
+      {"codigo": "00016", "nombre": "Anatomía II", "anio": 1, "periodo": "2c", "correlativas": ["00011"]},
+      {"codigo": "00017", "nombre": "Histología y Embriología I", "anio": 1, "periodo": "2c", "correlativas": ["00014"]},
+      {"codigo": "00018", "nombre": "Biofísica II", "anio": 1, "periodo": "2c", "correlativas": ["00013"]},
+      {"codigo": "00019", "nombre": "Biología General II", "anio": 1, "periodo": "2c", "correlativas": ["00014"]},
+      {"codigo": "0002E", "nombre": "Odontología Preventiva y Social II", "anio": 2, "periodo": "anual", "correlativas": ["0001E"]},
+      {"codigo": "00021", "nombre": "Fisiología I", "anio": 2, "periodo": "1c", "correlativas": ["00016", "00017", "00018"]},
+      {"codigo": "00022", "nombre": "Histología y Embriología II", "anio": 2, "periodo": "1c", "correlativas": ["00012", "00017"]},
+      {"codigo": "00023", "nombre": "Microbiología y Parasitología I", "anio": 2, "periodo": "1c", "correlativas": ["00012", "00018", "00019"]},
+      {"codigo": "00024", "nombre": "Biomateriales I", "anio": 2, "periodo": "1c", "correlativas": ["00012", "00016", "00018"]},
+      {"codigo": "00025", "nombre": "Dimensión Psicológica de la Atención Odontológica", "anio": 2, "periodo": "1c", "correlativas": ["0001F"]},
+      {"codigo": "00027", "nombre": "Fisiología II", "anio": 2, "periodo": "2c", "correlativas": ["00021", "00022"]},
+      {"codigo": "00028", "nombre": "Patología y Clínica Estomatológica I", "anio": 2, "periodo": "2c", "correlativas": ["00016", "00019", "00022", "00023"]},
+      {"codigo": "00029", "nombre": "Microbiología y Parasitología II", "anio": 2, "periodo": "2c", "correlativas": ["00023"]},
+      {"codigo": "0002A", "nombre": "Bioquímica Estomatológica II", "anio": 2, "periodo": "2c", "correlativas": ["00012"]},
+      {"codigo": "0002B", "nombre": "Biomateriales II", "anio": 2, "periodo": "2c", "correlativas": ["00024"]},
+      {"codigo": "0003E", "nombre": "Odontología Preventiva y Social III", "anio": 3, "periodo": "anual", "correlativas": ["0002B", "0002E", "00023", "00028"]},
+      {"codigo": "00031", "nombre": "Cirugía I", "anio": 3, "periodo": "1c", "correlativas": ["00027", "00028", "00029"]},
+      {"codigo": "00032", "nombre": "Farmacología y Terapéutica I", "anio": 3, "periodo": "1c", "correlativas": ["0002A", "00027", "00028", "00029"]},
+      {"codigo": "00033", "nombre": "Patología y Clínica Estomatológica II", "anio": 3, "periodo": "1c", "correlativas": ["00028", "00029"]},
+      {"codigo": "00034", "nombre": "Diagnóstico por Imágenes I", "anio": 3, "periodo": "1c", "correlativas": ["00018", "00028"]},
+      {"codigo": "00035", "nombre": "Operatoria Dental I", "anio": 3, "periodo": "1c", "correlativas": ["00022", "00024"]},
+      {"codigo": "00036", "nombre": "Prótesis I", "anio": 3, "periodo": "1c", "correlativas": ["0002B", "00027"]},
+      {"codigo": "00037", "nombre": "Cirugía II", "anio": 3, "periodo": "2c", "correlativas": ["0002B", "00031", "00032", "00033"]},
+      {"codigo": "00038", "nombre": "Farmacología y Terapéutica II", "anio": 3, "periodo": "2c", "correlativas": ["00032", "00033"]},
+      {"codigo": "00039", "nombre": "Patología y Clínica Estomatológica III", "anio": 3, "periodo": "2c", "correlativas": ["00027", "00033"]},
+      {"codigo": "0003A", "nombre": "Operatoria Dental II", "anio": 3, "periodo": "2c", "correlativas": ["00033", "00035"]},
+      {"codigo": "0003B", "nombre": "Prótesis II", "anio": 3, "periodo": "2c", "correlativas": ["00036"]},
+      {"codigo": "0003C", "nombre": "Diagnóstico por Imágenes II", "anio": 3, "periodo": "2c", "correlativas": ["00033", "00034"]},
+      {"codigo": "0004E", "nombre": "Odontología Preventiva y Social IV", "anio": 4, "periodo": "anual", "correlativas": ["0003E", "00038"]},
+      {"codigo": "00041", "nombre": "Endodoncia I", "anio": 4, "periodo": "1c", "correlativas": ["0003C", "00033", "00038"]},
+      {"codigo": "00042", "nombre": "Periodoncia I", "anio": 4, "periodo": "1c", "correlativas": ["0003C", "0003E", "00033"]},
+      {"codigo": "00043", "nombre": "Cirugía III", "anio": 4, "periodo": "1c", "correlativas": ["00037", "00038", "00039"]},
+      {"codigo": "00044", "nombre": "Operatoria Dental III", "anio": 4, "periodo": "1c", "correlativas": ["0003A", "0003C", "00033", "00038"]},
+      {"codigo": "00045", "nombre": "Prótesis III", "anio": 4, "periodo": "1c", "correlativas": ["0003B", "00037", "00039"]},
+      {"codigo": "00046", "nombre": "Patología y Clínica Estomatológica IV", "anio": 4, "periodo": "1c", "correlativas": ["00039"]},
+      {"codigo": "00047", "nombre": "Endodoncia II", "anio": 4, "periodo": "2c", "correlativas": ["00041"]},
+      {"codigo": "00048", "nombre": "Periodoncia II", "anio": 4, "periodo": "2c", "correlativas": ["00042"]},
+      {"codigo": "00049", "nombre": "Cirugía IV", "anio": 4, "periodo": "2c", "correlativas": ["00043"]},
+      {"codigo": "0004A", "nombre": "Operatoria Dental IV", "anio": 4, "periodo": "2c", "correlativas": ["00042", "00044"]},
+      {"codigo": "0004B", "nombre": "Prótesis IV", "anio": 4, "periodo": "2c", "correlativas": ["00042", "00045"]},
+      {"codigo": "0004C", "nombre": "Patología y Clínica Estomatológica V", "anio": 4, "periodo": "2c", "correlativas": ["00046"]},
+      {"codigo": "0005E", "nombre": "Odontología Preventiva y Social V", "anio": 5, "periodo": "anual", "correlativas": ["0004A", "0004E", "00047", "00048", "00049"]},
+      {"codigo": "00051", "nombre": "Odontología Integral Niños I", "anio": 5, "periodo": "1c", "correlativas": ["0004A", "0004B", "0004C", "0004E", "00047", "00048", "00049"]},
+      {"codigo": "00052", "nombre": "Odontología Integral Niños II", "anio": 5, "periodo": "1c", "correlativas": ["00028", "0003C", "00036"]},
+      {"codigo": "00053", "nombre": "Cirugía V", "anio": 5, "periodo": "1c", "correlativas": ["0004C", "00049"]},
+      {"codigo": "00054", "nombre": "Odontología Legal y Forense", "anio": 5, "periodo": "1c", "correlativas": ["0004A", "0004B", "0004C", "00047", "00048", "00049"]},
+      {"codigo": "00055", "nombre": "Operatoria Dental V", "anio": 5, "periodo": "1c", "correlativas": ["0004A", "00048"]},
+      {"codigo": "00056", "nombre": "Prótesis V", "anio": 5, "periodo": "1c", "correlativas": ["0004B", "00047"]},
+      {"codigo": "00057", "nombre": "Odontología Integral Niños III", "anio": 5, "periodo": "2c", "correlativas": ["00051", "00052"]},
+      {"codigo": "00058", "nombre": "Cirugía VI", "anio": 5, "periodo": "2c", "correlativas": ["00053"]},
+      {"codigo": "00059", "nombre": "Bioética", "anio": 5, "periodo": "2c", "correlativas": ["00051", "00052", "00054"]},
+      {"codigo": "0005A", "nombre": "Operatoria Dental VI", "anio": 5, "periodo": "2c", "correlativas": ["00047", "00055"]},
+      {"codigo": "0005B", "nombre": "Prótesis VI", "anio": 5, "periodo": "2c", "correlativas": ["00056"]},
+      {"codigo": "0005D", "nombre": "Prácticas Profesionales Supervisadas", "anio": 5, "periodo": "2c", "correlativas": [], "condicion": "Todas las asignaturas vigentes o aprobadas hasta el primer cuatrimestre de 5.° año inclusive"}
+    ]}
+  }
+};

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   ODONTOCAMPUS — MI PROMEDIO CON CUENTA
+   ODONTOCAMPUS — MI CARRERA CON CUENTA
    Quién puede entrar a la sección, y cómo viajan las materias entre este
    navegador y la cuenta.
 
@@ -14,7 +14,9 @@
    --------------------------------------------------------------------------
    LA CUENTA MANDA, PERO EL PASILLO NO TIENE SEÑAL
 
-   · La fuente de verdad es la tabla `materias_cursadas`, una fila por materia.
+   · La fuente de verdad es la tabla `materias_cursadas`, una fila por materia,
+     atada al plan que la persona cursa (`planes_usuario`). El plan en sí está
+     en js/planes.js y, con los mismos datos, en la base.
    · Este navegador guarda una copia por usuario, para mostrar el promedio sin
      conexión y para no perder un cambio si se corta el wifi.
    · Cada cambio queda marcado como pendiente hasta que el servidor confirma
@@ -41,6 +43,7 @@
 
   var PREFIJO_COPIA = "odontocampus_carrera_v2_";
   var PREFIJO_PENDIENTES = "odontocampus_carrera_pendientes_v2_";
+  var PREFIJO_PLAN = "odontocampus_carrera_plan_";
   // Donde la calculadora guardaba las notas antes de que existieran las cuentas.
   var CLAVE_ANTERIOR = "odontocampus_calificaciones_v1";
 
@@ -50,6 +53,32 @@
   var RETARDO_REINTENTO = 20000;
 
   function nada() {}
+
+  var PLANES = global.ODONTO_PLANES || { porDefecto: null, planes: {} };
+
+  /** Códigos de materia de un plan, como conjunto. */
+  function codigosDe(planId) {
+    var plan = PLANES.planes[planId];
+    var codigos = {};
+    if (plan) plan.materias.forEach(function (m) { codigos[m.codigo] = true; });
+    return codigos;
+  }
+
+  /**
+   * Se queda sólo con lo que existe en el plan.
+   *
+   * Las copias locales de antes del plan real tienen códigos del plan
+   * inventado ("101", "203"). Subirlas fallaría para siempre (la base ya no
+   * las acepta) y dejaría el aviso de "No se pudo guardar" clavado.
+   */
+  function soloDelPlan(mapa, planId) {
+    var codigos = codigosDe(planId);
+    var limpio = {};
+    Object.keys(mapa || {}).forEach(function (id) {
+      if (codigos[id]) limpio[id] = mapa[id];
+    });
+    return limpio;
+  }
 
   function leerJSON(clave) {
     try {
@@ -104,6 +133,10 @@
 
   var OdontoCarrera = {
     usuarioId: null,
+    planId: PLANES.porDefecto,
+    // Promesa de "el plan ya está anotado en la cuenta", y de quién.
+    planAsegurado: null,
+    planListo: null,
     notas: {},
     pendientes: {},
     preparado: false,
@@ -149,8 +182,61 @@
       this.usuarioId = id;
       this.preparado = false;
       this.cargando = false;
-      this.notas = id ? leerJSON(PREFIJO_COPIA + id) : {};
-      this.pendientes = id ? leerJSON(PREFIJO_PENDIENTES + id) : {};
+      this.planAsegurado = null;
+      this.planListo = null;
+
+      var guardado = null;
+      try { guardado = id ? localStorage.getItem(PREFIJO_PLAN + id) : null; } catch (e) { /* modo privado */ }
+      this.planId = guardado && PLANES.planes[guardado] ? guardado : PLANES.porDefecto;
+
+      this.notas = id ? soloDelPlan(leerJSON(PREFIJO_COPIA + id), this.planId) : {};
+      this.pendientes = id ? soloDelPlan(leerJSON(PREFIJO_PENDIENTES + id), this.planId) : {};
+    },
+
+    /** El plan que cursa la persona, con sus materias. */
+    plan: function () {
+      return PLANES.planes[this.planId] || PLANES.planes[PLANES.porDefecto] || null;
+    },
+
+    /**
+     * Deja anotado en la cuenta qué plan cursa la persona.
+     *
+     * Hace falta antes de guardar la primera materia: la base sólo acepta
+     * materias de un plan que la cuenta eligió. Si la cuenta ya tiene uno,
+     * se usa ese.
+     */
+    asegurarPlan: function () {
+      var self = this;
+      var uid = this.usuarioId;
+      if (!uid) return Promise.reject(new Error("Sin sesión"));
+      if (this.planAsegurado) return this.planAsegurado;
+
+      this.planAsegurado = Api.seleccionar("planes_usuario", "select=plan_id,principal&order=principal.desc")
+        .then(function (filas) {
+          var elegido = (filas || []).filter(function (f) { return PLANES.planes[f.plan_id]; })[0];
+          if (elegido) return elegido.plan_id;
+          return Api.guardar("planes_usuario",
+            { usuario_id: uid, plan_id: PLANES.porDefecto, principal: true },
+            { onConflict: "usuario_id,plan_id", devolver: false }
+          ).then(function () { return PLANES.porDefecto; });
+        })
+        .then(function (planId) {
+          if (uid !== self.usuarioId) return planId;
+          if (planId !== self.planId) {
+            self.planId = planId;
+            self.notas = soloDelPlan(self.notas, planId);
+            self.pendientes = soloDelPlan(self.pendientes, planId);
+          }
+          try { localStorage.setItem(PREFIJO_PLAN + uid, planId); } catch (e) { /* modo privado */ }
+          self.planListo = uid;
+          return planId;
+        }, function (error) {
+          // Que el próximo intento vuelva a preguntar.
+          if (uid === self.usuarioId) self.planAsegurado = null;
+          throw error;
+        });
+
+      return this.planAsegurado;
     },
 
     visible: function () {
@@ -190,6 +276,7 @@
     limpiarLocal: function (id) {
       quitar(PREFIJO_COPIA + id);
       quitar(PREFIJO_PENDIENTES + id);
+      quitar(PREFIJO_PLAN + id);
       if (this.usuarioId === id) {
         this.cancelarTemporizadores();
         this.notas = {};
@@ -249,11 +336,15 @@
     traer: function (uid) {
       var self = this;
 
-      // Primero se sube lo pendiente: si no, lo del servidor lo taparía.
-      return this.subirPendientes()
-        .catch(nada)
+      return this.asegurarPlan()
         .then(function () {
-          return Api.seleccionar("materias_cursadas", "select=materia_id,estado,nota,aplazos,actualizado_at");
+          // Primero se sube lo pendiente: si no, lo del servidor lo taparía.
+          return self.subirPendientes().catch(nada);
+        })
+        .then(function () {
+          return Api.seleccionar("materias_cursadas",
+            "select=materia_id,estado,nota,aplazos,actualizado_at" +
+            "&plan_id=eq." + encodeURIComponent(self.planId));
         })
         .then(function (filas) {
           if (uid !== self.usuarioId) return;
@@ -361,9 +452,20 @@
 
       if (!uid || !Api.haySesion()) return Promise.resolve();
       if (this.enVuelo) { this.otraVuelta = true; return this.enVuelo; }
+      if (!Object.keys(this.pendientes).length) return Promise.resolve();
 
+      // Antes de la primera materia, el plan tiene que estar en la cuenta.
+      if (this.planListo !== uid) {
+        return this.asegurarPlan().then(function () {
+          return self.subirPendientes();
+        }, function (error) {
+          self.pintarEstado(error.estado ? "error" : "sin-conexion", error.message);
+          throw error;
+        });
+      }
+
+      var planId = this.planId;
       var ids = Object.keys(this.pendientes);
-      if (!ids.length) return Promise.resolve();
 
       var foto = {};
       var filas = [];
@@ -375,6 +477,7 @@
         if (registro) {
           filas.push({
             usuario_id: uid,
+            plan_id: planId,
             materia_id: id,
             estado: registro.estado,
             nota: registro.nota,
@@ -389,13 +492,14 @@
       var pasos = [];
       if (filas.length) {
         pasos.push(Api.guardar("materias_cursadas", filas, {
-          onConflict: "usuario_id,materia_id",
+          onConflict: "usuario_id,plan_id,materia_id",
           devolver: false
         }));
       }
       if (bajas.length) {
         pasos.push(Api.borrar("materias_cursadas",
           "usuario_id=eq." + encodeURIComponent(uid) +
+          "&plan_id=eq." + encodeURIComponent(planId) +
           "&materia_id=in.(" + bajas.map(function (id) { return encodeURIComponent('"' + id + '"'); }).join(",") + ")"));
       }
 
@@ -454,7 +558,8 @@
       return (this.enVuelo || Promise.resolve())
         .catch(nada)
         .then(function () {
-          return Api.borrar("materias_cursadas", "usuario_id=eq." + encodeURIComponent(uid));
+          return Api.borrar("materias_cursadas", "usuario_id=eq." + encodeURIComponent(uid) +
+                            "&plan_id=eq." + encodeURIComponent(self.planId));
         })
         .then(function () {
           if (uid !== self.usuarioId) return;
@@ -528,7 +633,9 @@
         var registro = normalizar(crudo[id]);
         if (registro && ID_VALIDO.test(id)) validas[id] = registro;
       });
-      return validas;
+      // Las de antes de las cuentas son del plan inventado: no queda ninguna
+      // que coincida, y el aviso desaparece solo.
+      return soloDelPlan(validas, this.planId);
     },
 
     pintarAnteriores: function () {
@@ -550,7 +657,7 @@
           "<div>" +
             "<h3>Encontramos " + esc(UI.plural(cantidad, "materia")) +
               (cantidad === 1 ? " cargada" : " cargadas") + " en este navegador</h3>" +
-            "<p>Son de antes de que Mi promedio usara cuentas. ¿Las pasamos a la tuya? " +
+            "<p>Son de antes de que Mi carrera usara cuentas. ¿Las pasamos a la tuya? " +
             "Si una materia ya está en tu cuenta, queda la de tu cuenta.</p>" +
             '<div class="acciones-inline">' +
               '<button type="button" class="btn btn-magenta btn-sm" data-action="importarNotasAnteriores">' +
@@ -617,7 +724,7 @@
       var html = "";
 
       if (estado === "sin-backend") {
-        html = puerta("herramientas", "Mi promedio todavía no está disponible",
+        html = puerta("herramientas", "Mi carrera todavía no está disponible",
           '<p class="puerta-lead">Estamos terminando de preparar las cuentas. Mientras tanto, ' +
           "mesas, reválidas y el resto del sitio funcionan como siempre.</p>");
       } else if (estado === "sin-sesion") {
