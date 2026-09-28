@@ -287,8 +287,9 @@
     },
 
     visible: function () {
+      var panel = document.getElementById("panel-plan");
       var seccion = document.getElementById("seccion-carrera");
-      return !!seccion && seccion.classList.contains("active");
+      return !!seccion && seccion.classList.contains("active") && !!panel && !panel.hidden;
     },
 
     cancelarTemporizadores: function () {

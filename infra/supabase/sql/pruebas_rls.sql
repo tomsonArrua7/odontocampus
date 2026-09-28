@@ -1,7 +1,7 @@
 -- ==========================================================================
 -- OdontoCampus — Pruebas de seguridad del esquema (RLS y permisos)
 --
--- Correr DESPUÉS de aplicar todas las migraciones (001 a 005, ...), y otra
+-- Correr DESPUÉS de aplicar todas las migraciones (001 a 006, ...), y otra
 -- vez después de cualquier cambio:
 --
 --   cd /opt/supabase
@@ -778,8 +778,119 @@ end $$;
 
 reset role;
 
+-- ==========================================================================
+-- AGENDA PERSONAL Y PLANILLA DE PREGUNTAS (006)
+-- ==========================================================================
+-- Un recordatorio de B, cargado por postgres.
+insert into public.recordatorios (id, usuario_id, titulo, tipo, fecha)
+values ('00000000-0000-4000-8000-00000000000a', '00000000-0000-4000-8000-00000000000b', 'Entrega de B', 'entrega', current_date + 3);
+
+set local role authenticated;
+do $$ begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-00000000000b","role":"authenticated"}', true);
+end $$;
+
+do $$ declare n int; begin
+  select count(*) into n from public.recordatorios;
+  if n = 1 then raise notice 'OK     71. Cada quien ve sus propios recordatorios';
+  else raise notice 'FALLA  71. Se ven % recordatorios en vez de 1', n; end if;
+exception when others then
+  raise notice 'FALLA  71. No se pudieron leer los recordatorios: %', sqlerrm;
+end $$;
+
+do $$ begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-00000000000a","role":"authenticated"}', true);
+end $$;
+
+do $$ declare n int; begin
+  select count(*) into n from public.recordatorios;
+  if n = 0 then raise notice 'OK     72. No se ven los recordatorios de otra persona';
+  else raise notice 'FALLA  72. Se ven los recordatorios de otra persona'; end if;
+end $$;
+
+do $$ begin
+  insert into public.recordatorios (id, usuario_id, titulo, tipo, fecha)
+  values (gen_random_uuid(), '00000000-0000-4000-8000-00000000000b', 'Ajeno', 'entrega', current_date);
+  raise notice 'FALLA  73. Se anotan recordatorios a nombre de otra persona';
+exception when insufficient_privilege then
+  raise notice 'OK     73. No se anotan recordatorios a nombre de otra persona';
+end $$;
+
+do $$ declare t text; begin
+  insert into public.recordatorios (id, usuario_id, titulo, tipo, fecha, hora, materia)
+  values ('00000000-0000-4000-8000-00000000000b', '00000000-0000-4000-8000-00000000000a', 'Historia clínica', 'entrega', current_date + 7, '14:30', 'Operatoria Dental IV')
+  on conflict (id) do update set titulo = excluded.titulo;
+
+  insert into public.recordatorios (id, usuario_id, titulo, tipo, fecha, hecho)
+  values ('00000000-0000-4000-8000-00000000000b', '00000000-0000-4000-8000-00000000000a', 'Historia clínica corregida', 'entrega', current_date + 7, true)
+  on conflict (id) do update
+    set titulo = excluded.titulo, fecha = excluded.fecha, hecho = excluded.hecho;
+
+  select titulo into t from public.recordatorios where id = '00000000-0000-4000-8000-00000000000b';
+  if t = 'Historia clínica corregida' then raise notice 'OK     74. Cada quien anota y corrige sus recordatorios';
+  else raise notice 'FALLA  74. El recordatorio quedó como %', t; end if;
+exception when others then
+  raise notice 'FALLA  74. No se pudo anotar el recordatorio: %', sqlerrm;
+end $$;
+
+do $$ begin
+  insert into public.recordatorios (id, usuario_id, titulo, tipo, fecha)
+  values (gen_random_uuid(), '00000000-0000-4000-8000-00000000000a', 'Cualquiera', 'cumpleaños', current_date);
+  raise notice 'FALLA  75. Se guardó un tipo de recordatorio inventado';
+exception when check_violation then
+  raise notice 'OK     75. Sólo se guardan entregas, finales y otros';
+end $$;
+
+do $$ begin
+  insert into public.recordatorios (id, usuario_id, titulo, tipo, fecha)
+  select gen_random_uuid(), '00000000-0000-4000-8000-00000000000a', 'Clase ' || g, 'otro', current_date
+  from generate_series(1, 200) g;
+  raise notice 'FALLA  76. Se superó el tope de 200 recordatorios';
+exception when insufficient_privilege then
+  raise notice 'OK     76. No se supera el tope de 200 recordatorios';
+end $$;
+
+-- ---------------------------------------------------------------- preguntas
+do $$ begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-00000000000d","role":"authenticated"}', true);
+end $$;
+
+do $$ declare v jsonb; begin
+  perform public.admin_guardar_planilla('planilla_preguntas', '1PreguntasAbCdEfGhIjKlMnOpQrStUvWx', '7');
+  select valor into v from public.configuracion_sitio where clave = 'planilla_preguntas';
+  if v ->> 'gid' = '7' then raise notice 'OK     77. Un admin carga la planilla de preguntas';
+  else raise notice 'FALLA  77. La planilla de preguntas no cambió: %', v; end if;
+exception when others then
+  raise notice 'FALLA  77. No se pudo cargar la planilla de preguntas: %', sqlerrm;
+end $$;
+
+do $$ declare v jsonb; begin
+  perform public.admin_guardar_planilla('planilla_preguntas', '', '0');
+  select valor into v from public.configuracion_sitio where clave = 'planilla_preguntas';
+  if v ->> 'sheet_id' = '' then raise notice 'OK     78. La planilla de preguntas se puede vaciar (apaga el juego)';
+  else raise notice 'FALLA  78. No se pudo vaciar la planilla de preguntas'; end if;
+exception when others then
+  raise notice 'FALLA  78. No se pudo vaciar la planilla de preguntas: %', sqlerrm;
+end $$;
+
+do $$ begin
+  perform public.admin_guardar_planilla('planilla_mesas', '', '0');
+  raise notice 'FALLA  79. Se vació la planilla de mesas (dejaría al sitio sin fechas)';
+exception when check_violation then
+  raise notice 'OK     79. Las planillas de mesas y reválidas no se pueden vaciar';
+end $$;
+
+reset role;
+
+do $$ declare n int; begin
+  delete from auth.users where id = '00000000-0000-4000-8000-00000000000b';
+  select count(*) into n from public.recordatorios where usuario_id = '00000000-0000-4000-8000-00000000000b';
+  if n = 0 then raise notice 'OK     80. Eliminar una cuenta borra también sus recordatorios';
+  else raise notice 'FALLA  80. Quedaron % recordatorios de una cuenta eliminada', n; end if;
+end $$;
+
 rollback;
 
 \echo
-\echo 'Pruebas terminadas (00 a 70). Todo se deshizo con ROLLBACK: no quedó nada en la base.'
+\echo 'Pruebas terminadas (00 a 80). Todo se deshizo con ROLLBACK: no quedó nada en la base.'
 \echo 'Si alguna línea dice FALLA, no publiques el cambio en el sitio.'

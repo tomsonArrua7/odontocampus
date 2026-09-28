@@ -12,8 +12,8 @@
   <!-- Marca: un diente geométrico en blanco sobre el magenta de FOE. Se lee a
        16 px en una pestaña, que es la única prueba que importa para un ícono. -->
   <link rel="icon" href="favicon.ico" sizes="32x32">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260917e">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260917e">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260928a">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260928a">
 
   <meta property="og:title" content="OdontoCampus · FOE Odontología UNLP">
   <meta property="og:description" content="Mesas de examen y reválidas en vivo, historias clínicas, promedio y apuntes. Todo en un solo lugar.">
@@ -22,7 +22,7 @@
   <meta property="og:locale" content="es_AR">
   <!-- Imagen del enlace (WhatsApp, Instagram, Twitter). Tiene que ser una URL
        absoluta y un archivo rasterizado: ninguna de esas apps lee SVG. -->
-  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260917e">
+  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260928a">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="OdontoCampus · FOE Odontología UNLP">
@@ -57,13 +57,14 @@
        LÍNEAS (y en las plantillas de correo del override de Supabase).
        Pasó de verdad: el sitio nuevo quedó cargando el config.js viejo, con la
        clave en PENDIENTE, y las cuentas no aparecían por ningún lado. -->
-  <link rel="stylesheet" href="css/01-tokens.css?v=20260917e">
-  <link rel="stylesheet" href="css/02-base.css?v=20260917e">
-  <link rel="stylesheet" href="css/03-components.css?v=20260917e">
-  <link rel="stylesheet" href="css/04-sections.css?v=20260917e">
-  <link rel="stylesheet" href="css/05-responsive.css?v=20260917e">
-  <link rel="stylesheet" href="css/06-cuentas.css?v=20260917e">
-  <link rel="stylesheet" href="css/07-movimiento.css?v=20260917e">
+  <link rel="stylesheet" href="css/01-tokens.css?v=20260928a">
+  <link rel="stylesheet" href="css/02-base.css?v=20260928a">
+  <link rel="stylesheet" href="css/03-components.css?v=20260928a">
+  <link rel="stylesheet" href="css/04-sections.css?v=20260928a">
+  <link rel="stylesheet" href="css/05-responsive.css?v=20260928a">
+  <link rel="stylesheet" href="css/06-cuentas.css?v=20260928a">
+  <link rel="stylesheet" href="css/08-agenda-juego.css?v=20260928a">
+  <link rel="stylesheet" href="css/07-movimiento.css?v=20260928a">
 </head>
 <body>
 
@@ -305,7 +306,7 @@
             <svg class="ic atajo-ic" aria-hidden="true"><use href="#ic-diente"></use></svg>
             <span class="atajo-texto">
               <strong>Mi carrera</strong>
-              <span>Tus materias y tu promedio</span>
+              <span>Tu plan, tu agenda y preguntas para practicar</span>
             </span>
             <svg class="ic atajo-flecha" aria-hidden="true"><use href="#ic-flecha-der"></use></svg>
           </a>
@@ -580,10 +581,26 @@
       <div class="section-header">
         <div class="section-title-wrap">
           <h2 id="titulo-carrera">Mi carrera</h2>
-          <p>Tu promedio con y sin aplazos, como lo calcula la UNLP, y el avance materia por materia.</p>
+          <p>Tu plan de estudios y tu promedio, tu agenda de entregas y finales, y preguntas para practicar.</p>
         </div>
       </div>
 
+      <div class="tabs" role="tablist" aria-label="Secciones de Mi carrera">
+        <button type="button" class="tab" role="tab" id="tab-plan" data-tab="plan"
+                aria-controls="panel-plan" aria-selected="true">
+          <svg class="ic" aria-hidden="true"><use href="#ic-birrete"></use></svg> Plan de estudios
+        </button>
+        <button type="button" class="tab" role="tab" id="tab-agenda" data-tab="agenda"
+                aria-controls="panel-agenda" aria-selected="false" tabindex="-1">
+          <svg class="ic" aria-hidden="true"><use href="#ic-calendario"></use></svg> Agenda
+        </button>
+        <button type="button" class="tab" role="tab" id="tab-juego" data-tab="juego"
+                aria-controls="panel-juego" aria-selected="false" tabindex="-1">
+          <svg class="ic" aria-hidden="true"><use href="#ic-diente"></use></svg> Odontopreguntados
+        </button>
+      </div>
+
+      <div class="tab-panel" id="panel-plan" role="tabpanel" aria-labelledby="tab-plan" tabindex="0">
 
       <!-- Crear cuenta, ingresar, aceptar qué se guarda o esperar la carga.
            Lo pinta js/carrera.js: el promedio aparece recién cuando hay cuenta. -->
@@ -719,6 +736,116 @@
           </form>
         </section>
       </div>
+      </div><!-- /panel-plan -->
+
+      <!-- ====================================================================
+           AGENDA — lo propio (tabla recordatorios) sobre el calendario, junto
+           a las mesas de la planilla oficial. Lo dibuja js/agenda.js.
+           ==================================================================== -->
+      <div class="tab-panel" id="panel-agenda" role="tabpanel" aria-labelledby="tab-agenda" tabindex="0" hidden>
+        <div id="agenda-acceso"></div>
+
+        <div id="agenda-panel" hidden>
+          <div class="agenda-grid">
+            <div class="agenda-calendario-caja">
+              <div class="agenda-controles">
+                <h3 id="agenda-mes" aria-live="polite">—</h3>
+                <div class="agenda-botones">
+                  <button type="button" class="btn btn-secondary btn-sm" data-action="agendaMes" data-paso="-1"
+                          aria-label="Mes anterior">
+                    <svg class="ic" aria-hidden="true"><use href="#ic-flecha-izq"></use></svg>
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm" data-action="agendaHoy">Hoy</button>
+                  <button type="button" class="btn btn-secondary btn-sm" data-action="agendaMes" data-paso="1"
+                          aria-label="Mes siguiente">
+                    <svg class="ic" aria-hidden="true"><use href="#ic-flecha-der"></use></svg>
+                  </button>
+                </div>
+              </div>
+              <div id="agenda-calendario"></div>
+              <ul class="agenda-referencias">
+                <li><span class="marca es-propio" aria-hidden="true"></span> Tuyo, pendiente</li>
+                <li><span class="marca es-hecho" aria-hidden="true"></span> Tuyo, ya está</li>
+                <li><span class="marca es-oficial" aria-hidden="true"></span> Mesa de la planilla</li>
+              </ul>
+            </div>
+
+            <div class="agenda-columna">
+              <div id="agenda-dia" class="agenda-dia"></div>
+
+              <section class="agenda-proximos-caja" aria-labelledby="agenda-proximos-titulo">
+                <h3 id="agenda-proximos-titulo">Lo que viene</h3>
+                <div id="agenda-proximos"></div>
+              </section>
+            </div>
+          </div>
+
+          <form class="form-recordatorio" id="form-recordatorio" novalidate>
+            <h3 id="form-recordatorio-titulo">Anotar algo nuevo</h3>
+            <div class="form-recordatorio-campos">
+              <div class="field campo-ancho">
+                <label class="field-label" for="rec-titulo">Qué</label>
+                <input type="text" class="form-control" id="rec-titulo" name="rec-titulo" maxlength="120"
+                       autocomplete="off" placeholder="Entregar historia clínica de Operatoria">
+              </div>
+              <div class="field">
+                <label class="field-label" for="rec-tipo">Tipo</label>
+                <select class="form-select" id="rec-tipo" name="rec-tipo">
+                  <option value="entrega">Entrega</option>
+                  <option value="final">Final</option>
+                  <option value="otro">Otro</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field-label" for="rec-fecha">Fecha</label>
+                <input type="date" class="form-control" id="rec-fecha" name="rec-fecha"
+                       min="2000-01-01" max="2100-01-01">
+              </div>
+              <div class="field">
+                <label class="field-label" for="rec-hora">Hora <span class="field-opcional">(opcional)</span></label>
+                <input type="time" class="form-control" id="rec-hora" name="rec-hora">
+              </div>
+              <div class="field campo-ancho">
+                <label class="field-label" for="rec-materia">Materia <span class="field-opcional">(opcional)</span></label>
+                <input type="text" class="form-control" id="rec-materia" name="rec-materia" maxlength="120"
+                       list="materias-sugeridas" autocomplete="off">
+                <datalist id="materias-sugeridas"></datalist>
+              </div>
+              <div class="field campo-ancho">
+                <label class="field-label" for="rec-nota">Nota <span class="field-opcional">(opcional)</span></label>
+                <input type="text" class="form-control" id="rec-nota" name="rec-nota" maxlength="300"
+                       autocomplete="off" placeholder="Aula 9, llevar el articulador…">
+              </div>
+            </div>
+            <div class="acciones-inline">
+              <button type="submit" class="btn btn-magenta" id="rec-guardar">Anotar</button>
+              <button type="button" class="btn btn-secondary" id="rec-cancelar" data-action="agendaCancelar" hidden>
+                Cancelar
+              </button>
+            </div>
+            <p class="privacy-note">
+              <svg class="ic" aria-hidden="true"><use href="#ic-candado"></use></svg>
+              Tus recordatorios son privados: nadie más los ve.
+            </p>
+          </form>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           ODONTOPREGUNTADOS — preguntas de una planilla de FOE. Sin cuenta:
+           practicar no guarda nada de nadie. Lo dibuja js/juego.js.
+           ==================================================================== -->
+      <div class="tab-panel" id="panel-juego" role="tabpanel" aria-labelledby="tab-juego" tabindex="0" hidden>
+        <div class="juego-controles" id="juego-controles" hidden>
+          <div class="field">
+            <label class="field-label" for="juego-materia">Materia</label>
+            <select class="form-select" id="juego-materia">
+              <option value="todas">Todas las materias</option>
+            </select>
+          </div>
+        </div>
+        <div id="juego-caja" class="juego-caja" aria-live="polite"></div>
+      </div>
     </div>
   </section>
   <!-- ======================================================================
@@ -789,6 +916,25 @@
               <button type="button" class="btn btn-magenta" data-action="adminGuardarPlanilla" data-clave="planilla_mesas">Probar y guardar</button>
             </div>
             <p class="admin-resultado" id="admin-planilla_mesas-resultado" role="status"></p>
+          </div>
+
+          <div class="admin-planilla">
+            <h3>Preguntas de Odontopreguntados</h3>
+            <p class="admin-planilla-actual" id="admin-planilla_preguntas-actual"></p>
+            <p class="admin-planilla-ayuda">
+              Una fila por pregunta, con encabezado:
+              <code>Materia · Pregunta · Opción A · Opción B · Opción C · Opción D · Correcta · Explicación</code>.
+              En «Correcta» va la letra (A, B, C o D). Para apagar el juego, guardá el campo vacío.
+            </p>
+            <div class="field">
+              <label class="field-label" for="admin-planilla_preguntas-enlace">Enlace nuevo</label>
+              <input type="url" class="form-control" id="admin-planilla_preguntas-enlace" autocomplete="off">
+            </div>
+            <div class="acciones-inline">
+              <button type="button" class="btn btn-secondary" data-action="adminProbarPlanilla" data-clave="planilla_preguntas">Probar</button>
+              <button type="button" class="btn btn-magenta" data-action="adminGuardarPlanilla" data-clave="planilla_preguntas">Probar y guardar</button>
+            </div>
+            <p class="admin-resultado" id="admin-planilla_preguntas-resultado" role="status"></p>
           </div>
 
           <div class="admin-planilla">
@@ -1273,17 +1419,19 @@
 </footer>
 
 <!-- Scripts: configuración y núcleo primero, módulos después, controlador al final -->
-<script src="js/config.js?v=20260917e"></script>
-<script src="js/core.js?v=20260917e"></script>
-<script src="js/api.js?v=20260917e"></script>
-<script src="js/data.js?v=20260917e"></script>
-<script src="js/planes.js?v=20260917e"></script>
-<script src="js/live_sheets.js?v=20260917e"></script>
-<script src="js/calculator.js?v=20260917e"></script>
-<script src="js/carrera.js?v=20260917e"></script>
-<script src="js/auth.js?v=20260917e"></script>
-<script src="js/admin.js?v=20260917e"></script>
-<script src="js/chatbot.js?v=20260917e"></script>
-<script src="js/app.js?v=20260917e"></script>
+<script src="js/config.js?v=20260928a"></script>
+<script src="js/core.js?v=20260928a"></script>
+<script src="js/api.js?v=20260928a"></script>
+<script src="js/data.js?v=20260928a"></script>
+<script src="js/planes.js?v=20260928a"></script>
+<script src="js/live_sheets.js?v=20260928a"></script>
+<script src="js/calculator.js?v=20260928a"></script>
+<script src="js/carrera.js?v=20260928a"></script>
+<script src="js/agenda.js?v=20260928a"></script>
+<script src="js/juego.js?v=20260928a"></script>
+<script src="js/auth.js?v=20260928a"></script>
+<script src="js/admin.js?v=20260928a"></script>
+<script src="js/chatbot.js?v=20260928a"></script>
+<script src="js/app.js?v=20260928a"></script>
 </body>
 </html>

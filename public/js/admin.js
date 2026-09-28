@@ -38,7 +38,8 @@
 
   var NOMBRE_PLANILLA = {
     planilla_mesas: "Mesas de finales",
-    planilla_revalidas: "Reválidas y actualizaciones"
+    planilla_revalidas: "Reválidas y actualizaciones",
+    planilla_preguntas: "Preguntas de Odontopreguntados"
   };
 
   function fecha(valor, conHora) {
@@ -449,13 +450,15 @@
     pintarPlanillas: function () {
       var sheets = global.OdontoLiveSheets;
       if (!sheets) return;
-      ["planilla_mesas", "planilla_revalidas"].forEach(function (clave) {
+      ["planilla_mesas", "planilla_revalidas", "planilla_preguntas"].forEach(function (clave) {
         var cfg = sheets.planilla(clave);
         var actual = document.getElementById("admin-" + clave + "-actual");
         var campo = document.getElementById("admin-" + clave + "-enlace");
         if (actual) {
-          actual.innerHTML = '<a href="' + escAttr(enlaceDe(cfg)) + '" target="_blank" rel="noopener noreferrer">' +
-            "Abrir la planilla actual " + UI.icono("externo") + "</a>";
+          actual.innerHTML = cfg.sheetId
+            ? '<a href="' + escAttr(enlaceDe(cfg)) + '" target="_blank" rel="noopener noreferrer">' +
+              "Abrir la planilla actual " + UI.icono("externo") + "</a>"
+            : "Todavía no hay planilla cargada.";
         }
         if (campo && !campo.value) campo.placeholder = enlaceDe(cfg);
       });
@@ -474,6 +477,19 @@
       if (!campo || !salida || !sheets) return;
 
       var cfg = leerEnlacePlanilla(campo.value);
+
+      // Guardar el campo vacío apaga el juego: es la única planilla que se
+      // puede dejar sin cargar.
+      if (!cfg && clave === "planilla_preguntas" && !campo.value.trim() && guardar) {
+        Api.rpc("admin_guardar_planilla", { p_clave: clave, p_sheet_id: "", p_gid: "0" }).then(function () {
+          sheets.aplicarPlanilla(clave, { sheetId: "", gid: "0" }, true);
+          salida.className = "admin-resultado es-ok";
+          salida.textContent = "Listo: Odontopreguntados queda sin preguntas hasta que cargues una planilla.";
+          self.pintarPlanillas();
+        }, function (error) { UI.toast(error.message, "danger"); });
+        return;
+      }
+
       if (!cfg) {
         salida.className = "admin-resultado es-error";
         salida.textContent = "Pegá el enlace completo de la planilla de Google (el que empieza con https://docs.google.com/spreadsheets/d/…).";
@@ -491,13 +507,19 @@
 
         if (!items.length) {
           salida.className = "admin-resultado es-error";
-          salida.textContent = "Se pudo abrir, pero no encontré ningún llamado. Revisá que sea la pestaña correcta " +
-            "y que tenga la fila de encabezado (Materia, Hora…).";
+          salida.textContent = clave === "planilla_preguntas"
+            ? "Se pudo abrir, pero no encontré ninguna pregunta completa. Revisá el encabezado " +
+              "(Materia, Pregunta, Opción A…, Correcta) y que cada fila tenga su respuesta correcta."
+            : "Se pudo abrir, pero no encontré ningún llamado. Revisá que sea la pestaña correcta " +
+              "y que tenga la fila de encabezado (Materia, Hora…).";
           return;
         }
 
-        var resumen = "Encontré " + UI.plural(items.length, "llamado") + " en " + UI.plural(cantidadDias, "día") +
-          " (primero: " + items[0].dia + ", " + items[0].materia + ").";
+        var resumen = clave === "planilla_preguntas"
+          ? "Encontré " + UI.plural(items.length, "pregunta") + " de " + UI.plural(cantidadDias, "materia") +
+            " (primera: " + items[0].materia + ")."
+          : "Encontré " + UI.plural(items.length, "llamado") + " en " + UI.plural(cantidadDias, "día") +
+            " (primero: " + items[0].dia + ", " + items[0].materia + ").";
 
         if (!guardar) {
           salida.className = "admin-resultado es-ok";

@@ -28,6 +28,9 @@
     gidMesas: "0",
     sheetIdRevalidas: "1KWy04FseDtScAqYQ3kFopI_0jnfbmzd0gxl53tevD9M",
     gidRevalidas: "0",
+    // La de Odontopreguntados arranca vacía: el juego avisa que no hay preguntas.
+    sheetIdPreguntas: "",
+    gidPreguntas: "0",
 
     lastUpdatedMesas: null,
     lastUpdatedRevalidas: null,
@@ -95,17 +98,29 @@
     },
 
     planilla: function (clave) {
-      return clave === "planilla_mesas"
-        ? { sheetId: this.sheetIdMesas, gid: this.gidMesas }
-        : { sheetId: this.sheetIdRevalidas, gid: this.gidRevalidas };
+      if (clave === "planilla_mesas") return { sheetId: this.sheetIdMesas, gid: this.gidMesas };
+      if (clave === "planilla_preguntas") return { sheetId: this.sheetIdPreguntas, gid: this.gidPreguntas };
+      return { sheetId: this.sheetIdRevalidas, gid: this.gidRevalidas };
     },
 
     /** Cambia la planilla en uso. Con `recargar`, la vuelve a leer ya. */
     aplicarPlanilla: function (clave, cfg, recargar) {
-      if (!cfg || !/^[A-Za-z0-9_-]{20,100}$/.test(cfg.sheetId || "")) return;
+      if (!cfg) return;
+      var vacia = (cfg.sheetId || "") === "";
+      // Vacío sólo vale para las preguntas: es cómo se apaga el juego.
+      if (!vacia && !/^[A-Za-z0-9_-]{20,100}$/.test(cfg.sheetId)) return;
+      if (vacia && clave !== "planilla_preguntas") return;
       var gid = /^\d{1,12}$/.test(String(cfg.gid)) ? String(cfg.gid) : "0";
 
-      if (clave === "planilla_mesas") {
+      if (clave === "planilla_preguntas") {
+        this.sheetIdPreguntas = cfg.sheetId;
+        this.gidPreguntas = gid;
+        if (recargar && global.OdontoJuego) {
+          global.OdontoJuego.preguntas = null;
+          global.OdontoJuego.error = null;
+          if (global.OdontoJuego.visible()) global.OdontoJuego.mostrar();
+        }
+      } else if (clave === "planilla_mesas") {
         this.sheetIdMesas = cfg.sheetId;
         this.gidMesas = gid;
         if (recargar) this.cargarMesas(false);
@@ -127,6 +142,7 @@
     /** Lee una planilla sin usarla: para que un admin la pruebe antes de guardarla. */
     probar: function (clave, sheetId, gid) {
       var self = this;
+      if (clave === "planilla_preguntas" && !sheetId) return Promise.resolve([]);
       return fetch(this.endpoint(sheetId, gid), { method: "GET" })
         .then(function (res) {
           if (!res.ok) throw new Error("HTTP " + res.status);
@@ -136,6 +152,12 @@
           return res.text();
         })
         .then(function (csv) {
+          if (clave === "planilla_preguntas") {
+            return (global.OdontoJuego ? global.OdontoJuego.parsear(csv) : []).map(function (p) {
+              // El panel muestra el resumen con las mismas palabras para las tres.
+              return { dia: p.materia, materia: p.enunciado };
+            });
+          }
           return clave === "planilla_mesas" ? self.parseCSVMesas(csv) : self.parseCSVRevalidas(csv);
         });
     },

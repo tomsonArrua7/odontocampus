@@ -183,6 +183,14 @@ la base vieja, Mi carrera no puede guardar (pide tablas que no existen).
 - [ ] Entrar al sitio → Mi cuenta → Panel de administración
 - [ ] Planillas: probar el enlace actual de mesas y reválidas
 
+### Agenda y Odontopreguntados (septiembre 2026) 🙋 aplicar en el servidor
+
+- [ ] `git pull` en el sitio
+- [ ] Cargar `006_agenda_y_preguntas.sql`
+- [ ] `pruebas_rls.sql`: 83 en OK (de 00 a 80)
+- [ ] Panel → Planillas → cargar la planilla de preguntas (ver `docs/plantilla-preguntas.csv`)
+- [ ] Probar: anotar una entrega, marcarla hecha y verla desde otro dispositivo
+
 **Principio que no se negocia:** el login suma, no tapa. Mesas, reválidas,
 historias clínicas, instrumental y biblioteca siguen abiertas sin cuenta. Lo
 único que la pide es Mi promedio, porque guarda datos de la persona.

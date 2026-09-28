@@ -1,0 +1,335 @@
+/* ==========================================================================
+   ODONTOCAMPUS — 08 · AGENDA Y ODONTOPREGUNTADOS
+   El calendario de entregas y finales, y el juego de preguntas. Las dos
+   pantallas nuevas de Mi carrera.
+   ========================================================================== */
+
+/* ==========================================================================
+   AGENDA
+   ========================================================================== */
+.agenda-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: var(--gap-grid);
+  align-items: start;
+}
+
+.agenda-calendario-caja,
+.agenda-dia,
+.agenda-proximos-caja,
+.form-recordatorio {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-5);
+}
+
+.agenda-columna { display: grid; gap: var(--gap-grid); }
+
+.agenda-controles {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+  flex-wrap: wrap;
+}
+.agenda-controles h3 {
+  font-family: var(--font-heading);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.agenda-botones { display: flex; gap: var(--sp-2); }
+
+/* --- El calendario ------------------------------------------------------- */
+.calendario { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.calendario th {
+  padding-bottom: var(--sp-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--text-muted);
+}
+.calendario th abbr { text-decoration: none; border: 0; }
+.calendario td { padding: 2px; }
+
+.dia {
+  width: 100%;
+  aspect-ratio: 1;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 3px;
+  padding: 0;
+  background: none;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.dia:hover { background: var(--surface-2); border-color: var(--border); }
+.dia.con-cosas { font-weight: var(--fw-bold); }
+/* Hoy: un recuadro. El día elegido: tinta plena. Dos señales distintas, que
+   además pueden coincidir sin pelearse. */
+.dia.es-hoy { border-color: var(--accent); color: var(--accent-text); }
+.dia.es-elegido { background: var(--text); border-color: var(--text); color: var(--surface); }
+.dia.es-elegido.es-hoy { box-shadow: inset 0 0 0 2px var(--accent); }
+
+.dia-numero { font-size: var(--fs-sm); line-height: 1; }
+.dia-marcas { display: flex; gap: 3px; min-height: 6px; }
+
+.marca { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.marca.es-propio { background: var(--accent); }
+.marca.es-hecho { background: var(--success); }
+.marca.es-oficial { background: var(--text-soft); }
+.dia.es-elegido .marca.es-oficial { background: var(--surface-3); }
+
+.agenda-referencias {
+  list-style: none;
+  padding: 0;
+  margin-top: var(--sp-4);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-4);
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+.agenda-referencias li { display: flex; align-items: center; gap: var(--sp-2); }
+
+/* --- El día elegido ------------------------------------------------------ */
+.agenda-dia-titulo {
+  font-family: var(--font-heading);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  margin-bottom: var(--sp-3);
+}
+.agenda-hoy {
+  font-family: var(--font-body);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-etiqueta);
+  color: var(--accent-text);
+}
+.agenda-vacio { font-size: var(--fs-sm); color: var(--text-muted); }
+
+.agenda-lista { list-style: none; padding: 0; display: grid; gap: var(--sp-2); }
+
+.agenda-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--text-soft);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+.agenda-item.es-entrega { border-left-color: var(--accent); }
+.agenda-item.es-final { border-left-color: var(--text); }
+.agenda-item.es-mesa { border-left-color: var(--text-soft); background: none; }
+.agenda-item.es-hecho { opacity: 0.66; }
+.agenda-item.es-hecho .agenda-item-texto strong { text-decoration: line-through; }
+
+.agenda-item-icono { color: var(--text-muted); font-size: 1.1rem; line-height: 1.4; }
+/* El texto manda: los botones bajan a su propia línea antes de que el título
+   se parta en tres renglones de dos palabras. */
+.agenda-item { flex-wrap: wrap; }
+.agenda-item-texto { flex: 1 1 12rem; min-width: 0; display: grid; gap: 2px; }
+.agenda-item-texto strong { color: var(--text-strong); }
+.agenda-item-texto small { color: var(--text-muted); font-size: var(--fs-xs); }
+.agenda-item-acciones {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  flex: 1 1 100%;
+  margin-top: var(--sp-2);
+}
+
+.agenda-proximos-caja h3 {
+  font-family: var(--font-heading);
+  font-size: var(--fs-md);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  margin-bottom: var(--sp-3);
+}
+.agenda-proximos-lista { list-style: none; padding: 0; display: grid; gap: var(--sp-3); }
+.agenda-proximos-lista li { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: var(--sp-3); }
+.agenda-proximos-lista strong { display: block; color: var(--text-strong); }
+.agenda-proximos-lista small { color: var(--text-muted); font-size: var(--fs-xs); }
+.agenda-cuando {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-etiqueta);
+  color: var(--accent-text);
+}
+
+/* --- Anotar -------------------------------------------------------------- */
+.form-recordatorio { margin-top: var(--gap-grid); }
+.form-recordatorio h3 {
+  font-family: var(--font-heading);
+  font-size: var(--fs-lg);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  margin-bottom: var(--sp-4);
+}
+.form-recordatorio-campos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+.form-recordatorio-campos .campo-ancho { grid-column: span 2; }
+
+/* ==========================================================================
+   ODONTOPREGUNTADOS
+   ========================================================================== */
+.juego-controles { max-width: 340px; margin-bottom: var(--sp-5); }
+
+.juego-caja {
+  background: var(--surface);
+  border: 2px solid var(--text);
+  border-radius: var(--radius-md);
+  padding: var(--sp-6);
+  min-height: 320px;
+}
+
+.juego-estado, .juego-inicio, .juego-resultado { text-align: center; display: grid; gap: var(--sp-4); justify-items: center; }
+.juego-estado .ic { font-size: 2rem; color: var(--accent-text); }
+.juego-estado h3, .juego-resultado h3 { font-family: var(--font-heading); font-size: var(--fs-xl); }
+.juego-lead { color: var(--text-muted); max-width: 52ch; }
+.juego-dato { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--text-soft); }
+
+/* --- Una pregunta -------------------------------------------------------- */
+.juego-cabecera { margin-bottom: var(--sp-5); }
+.juego-cabecera p { font-size: var(--fs-sm); color: var(--text-muted); margin-bottom: var(--sp-2); }
+.juego-aciertos { color: var(--accent-text); font-weight: var(--fw-bold); }
+.juego-barra { height: 4px; background: var(--surface-3); border-radius: var(--radius-full); overflow: hidden; }
+.juego-barra span { display: block; height: 100%; background: var(--accent); transition: width var(--dur) var(--ease); }
+
+.juego-materia {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-etiqueta);
+  color: var(--text-muted);
+  margin-bottom: var(--sp-2);
+}
+.juego-pregunta h3 {
+  font-family: var(--font-heading);
+  font-size: var(--fs-xl);
+  line-height: var(--lh-snug);
+  margin-bottom: var(--sp-5);
+  max-width: 60ch;
+}
+
+.juego-opciones { list-style: none; padding: 0; display: grid; gap: var(--sp-3); }
+
+.juego-opcion {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  text-align: left;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.juego-opcion:hover:not([disabled]) { border-color: var(--text); box-shadow: 3px 3px 0 var(--text); }
+.juego-opcion[disabled] { cursor: default; }
+
+/* La respuesta no se marca sólo con color: la correcta lleva borde grueso y
+   fondo, la elegida equivocada queda rayada. Con daltonismo, o en una
+   captura en blanco y negro, se sigue entendiendo. */
+.juego-opcion.es-correcta {
+  border-color: var(--success);
+  background: var(--success-bg);
+  font-weight: var(--fw-bold);
+}
+.juego-opcion.es-incorrecta {
+  border-color: var(--danger);
+  background: repeating-linear-gradient(135deg, var(--danger-bg) 0 6px, transparent 6px 12px);
+  text-decoration: line-through;
+}
+
+.juego-letra {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-heading);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-sm);
+}
+.juego-opcion.es-correcta .juego-letra { border-color: var(--success); color: var(--success); }
+.juego-opcion.es-incorrecta .juego-letra { border-color: var(--danger); color: var(--danger); }
+
+.juego-ayuda { margin-top: var(--sp-4); font-size: var(--fs-xs); color: var(--text-soft); }
+
+.juego-respuesta {
+  margin-top: var(--sp-5);
+  padding: var(--sp-4);
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--success);
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+}
+.juego-respuesta.es-mal { border-left-color: var(--danger); }
+.juego-respuesta p { max-width: 62ch; }
+
+/* --- Resultado ----------------------------------------------------------- */
+.juego-puntaje {
+  font-family: var(--font-heading);
+  font-size: var(--fs-5xl);
+  font-weight: var(--fw-black);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-text);
+}
+.juego-repaso { list-style: none; padding: 0; display: grid; gap: var(--sp-3); text-align: left; max-width: 60ch; }
+.juego-repaso li { padding-left: var(--sp-4); border-left: 3px solid var(--border); }
+.juego-repaso strong { display: block; }
+.juego-repaso small { color: var(--text-muted); }
+.juego-acciones { display: flex; gap: var(--sp-3); flex-wrap: wrap; justify-content: center; }
+
+/* ==========================================================================
+   PANTALLAS CHICAS
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .agenda-grid { grid-template-columns: 1fr; }
+  .form-recordatorio-campos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 768px) {
+  .agenda-calendario-caja, .agenda-dia, .agenda-proximos-caja, .form-recordatorio { padding: var(--sp-4); }
+  .form-recordatorio-campos { grid-template-columns: 1fr; }
+  .form-recordatorio-campos .campo-ancho { grid-column: span 1; }
+  .agenda-item { flex-wrap: wrap; }
+  .agenda-item-acciones { width: 100%; }
+  .juego-caja { padding: var(--sp-4); }
+  .juego-pregunta h3 { font-size: var(--fs-lg); }
+  .juego-respuesta { flex-direction: column; align-items: flex-start; }
+  .juego-respuesta .btn { width: 100%; justify-content: center; }
+  .agenda-proximos-lista li { grid-template-columns: 4.5rem minmax(0, 1fr); }
+}

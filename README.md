@@ -63,6 +63,7 @@ public/               EL SITIO. Es exactamente lo que se copia a htdocs/
     05-responsive.css Puntos de corte, alto contraste
     06-cuentas.css    Acceso, panel de cuenta, entrada a Mi carrera
     07-movimiento.css Animaciones, todas dentro de prefers-reduced-motion
+    08-agenda-juego.css Calendario de la agenda y pantallas del juego
   js/
     config.js         URL de la API y clave pública. Lo único que cambia por entorno
     core.js           Núcleo: escapado, DOM, acciones, modales, pestañas, tema, fechas
@@ -72,6 +73,8 @@ public/               EL SITIO. Es exactamente lo que se copia a htdocs/
     live_sheets.js    Sincronización con las planillas de mesas y reválidas
     calculator.js     Promedio y avance de carrera (sólo calcula y dibuja)
     carrera.js        Mi carrera con cuenta: plan, acceso, guardado, copia local
+    agenda.js         Agenda: entregas y finales propios sobre el calendario
+    juego.js          Odontopreguntados: preguntas de una planilla de FOE
     auth.js           Registro, ingreso con contraseña, recuperación, Mi cuenta
     admin.js          Panel de administración (la seguridad está en la base)
     chatbot.js        OdontoBot (buscador de preguntas frecuentes)
@@ -270,6 +273,23 @@ del plan: cada quien carga sus cursos con horas, nota y fecha, en
 `complementarias_cursadas`. Las horas se comparan con las que pide el plan, y
 las notas entran al promedio igual que una materia, porque así lo calcula el
 SIU Guaraní (verificado contra un reporte real: 6,93 y 6,31).
+
+### Mi carrera son tres cosas
+
+- **Plan de estudios:** las 60 materias, el promedio y la formación
+  complementaria. Pide cuenta.
+- **Agenda:** las entregas y los finales que anota cada quien
+  (`recordatorios`), en un calendario junto a las mesas de la planilla
+  oficial, que se muestran pero no se editan. Pide cuenta y es privada.
+- **Odontopreguntados:** rondas de diez preguntas con explicación.
+  **No pide cuenta** —practicar no guarda datos de nadie— y el puntaje queda
+  en el navegador.
+
+Las preguntas salen de una planilla de Google que carga FOE desde el panel
+(clave `planilla_preguntas`), con encabezado
+`Materia · Pregunta · Opción A · Opción B · Opción C · Opción D · Correcta ·
+Explicación`. Hay un ejemplo en `docs/plantilla-preguntas.csv`. Guardar el
+enlace vacío apaga el juego.
 
 ### Administración
 

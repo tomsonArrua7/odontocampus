@@ -31,18 +31,6 @@ const ODONTO_DATA = {
       destacado: true
     },
     {
-      id: 2,
-      titulo: "Banco de Instrumental Solidario FOE 2026",
-      categoria: "Gremial / Beneficios",
-      tag: "Beneficio",
-      fecha: "Hace 4 días",
-      resumen: "¿Necesitás instrumental para iniciar tus clínicas de Operatoria o Periodoncia? Ya abrimos la inscripción para el préstamo de cajas de instrumental y articuladores.",
-      autor: "FOE Conducción",
-      imagen: "instrumental",
-      icono: "tool",
-      destacado: true
-    },
-    {
       id: 3,
       titulo: "Guía paso a paso: Llenado de Historias Clínicas en Clínica Integral",
       categoria: "Clínicas",
@@ -413,7 +401,6 @@ const ODONTO_DATA = {
       respuesta: `🌟 **Agrupación Estudiantil FOE - Odontología UNLP**:
 Somos la agrupación gremial y académica de los estudiantes de Odontología de la UNLP.
 - **Servicios para vos**:
-  • Banco de instrumental y articuladores para clínicas.
   • Biblioteca virtual de resúmenes y modelos de examen.
   • Calculadora de promedios y modelos de historias clínicas.
   • Asesoría académica y defensa de los derechos estudiantiles en el Consejo Directivo.

@@ -19,7 +19,7 @@
     fechas:     { titulo: "Cuándo rindo", tabs: ["mesas", "revalidas"] },
     cursada:    { titulo: "Cursada y clínica", tabs: ["historias", "instrumental", "bolsa"] },
     biblioteca: { titulo: "Biblioteca de apuntes", tabs: null },
-    carrera:    { titulo: "Mi carrera", tabs: null },
+    carrera:    { titulo: "Mi carrera", tabs: ["plan", "agenda", "juego"] },
     // No figura en el menú: se llega desde Mi cuenta, y sólo si es admin.
     admin:      { titulo: "Administración", tabs: ["cuentas", "planillas", "equipo", "registro"] }
   };
@@ -32,8 +32,8 @@
     historias: "cursada/historias",
     instrumental: "cursada/instrumental",
     bolsa: "cursada/bolsa",
-    calculadora: "carrera",
-    promedio: "carrera",
+    calculadora: "carrera/plan",
+    promedio: "carrera/plan",
     // Enlaces viejos a las permutas: llevan al promedio en vez de a un 404.
     permutas: "carrera"
   };
@@ -72,6 +72,8 @@
          todavía no está configurado: el sitio funciona completo sin ellas.
          Carrera va antes que Auth: el registro usa su texto de términos. */
       if (global.OdontoCarrera) global.OdontoCarrera.init();
+      if (global.OdontoAgenda) global.OdontoAgenda.init();
+      if (global.OdontoJuego) global.OdontoJuego.init();
       if (global.OdontoAuth) global.OdontoAuth.init();
       if (global.OdontoAdmin) global.OdontoAdmin.init();
 
@@ -290,9 +292,11 @@
       if (seccion === "fechas" && global.OdontoLiveSheets) {
         if (tab === "revalidas") global.OdontoLiveSheets.renderRevalidas();
         else global.OdontoLiveSheets.renderMesasExamen();
-      } else if (seccion === "carrera" && global.OdontoCarrera) {
-        // Decide si mostrar el promedio o pedir cuenta primero.
-        global.OdontoCarrera.mostrar();
+      } else if (seccion === "carrera") {
+        // Cada pestaña decide si necesita cuenta y qué pedir.
+        if (tab === "agenda" && global.OdontoAgenda) global.OdontoAgenda.mostrar();
+        else if (tab === "juego" && global.OdontoJuego) global.OdontoJuego.mostrar();
+        else if (global.OdontoCarrera) global.OdontoCarrera.mostrar();
       } else if (seccion === "admin" && global.OdontoAdmin) {
         global.OdontoAdmin.mostrar(tab);
       }
