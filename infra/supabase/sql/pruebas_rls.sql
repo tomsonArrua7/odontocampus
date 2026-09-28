@@ -781,6 +781,11 @@ reset role;
 -- ==========================================================================
 -- AGENDA PERSONAL Y PLANILLA DE PREGUNTAS (006)
 -- ==========================================================================
+-- Preparación (como postgres). La persona A ya no existe: la eliminó la
+-- prueba 45, así que la agenda usa una cuenta nueva, G.
+insert into auth.users (id, email, email_confirmed_at, raw_user_meta_data) values
+  ('00000000-0000-4000-8000-000000000011', 'agenda-g@odontocampus.invalid', now(), '{"nombre_visible":"Agenda G"}');
+
 -- Un recordatorio de B, cargado por postgres.
 insert into public.recordatorios (id, usuario_id, titulo, tipo, fecha)
 values ('00000000-0000-4000-8000-00000000000a', '00000000-0000-4000-8000-00000000000b', 'Entrega de B', 'entrega', current_date + 3);
@@ -799,7 +804,7 @@ exception when others then
 end $$;
 
 do $$ begin
-  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-00000000000a","role":"authenticated"}', true);
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-000000000011","role":"authenticated"}', true);
 end $$;
 
 do $$ declare n int; begin
@@ -818,11 +823,11 @@ end $$;
 
 do $$ declare t text; begin
   insert into public.recordatorios (id, usuario_id, titulo, tipo, fecha, hora, materia)
-  values ('00000000-0000-4000-8000-00000000000b', '00000000-0000-4000-8000-00000000000a', 'Historia clínica', 'entrega', current_date + 7, '14:30', 'Operatoria Dental IV')
+  values ('00000000-0000-4000-8000-00000000000b', '00000000-0000-4000-8000-000000000011', 'Historia clínica', 'entrega', current_date + 7, '14:30', 'Operatoria Dental IV')
   on conflict (id) do update set titulo = excluded.titulo;
 
   insert into public.recordatorios (id, usuario_id, titulo, tipo, fecha, hecho)
-  values ('00000000-0000-4000-8000-00000000000b', '00000000-0000-4000-8000-00000000000a', 'Historia clínica corregida', 'entrega', current_date + 7, true)
+  values ('00000000-0000-4000-8000-00000000000b', '00000000-0000-4000-8000-000000000011', 'Historia clínica corregida', 'entrega', current_date + 7, true)
   on conflict (id) do update
     set titulo = excluded.titulo, fecha = excluded.fecha, hecho = excluded.hecho;
 
@@ -835,7 +840,7 @@ end $$;
 
 do $$ begin
   insert into public.recordatorios (id, usuario_id, titulo, tipo, fecha)
-  values (gen_random_uuid(), '00000000-0000-4000-8000-00000000000a', 'Cualquiera', 'cumpleaños', current_date);
+  values (gen_random_uuid(), '00000000-0000-4000-8000-000000000011', 'Cualquiera', 'cumpleaños', current_date);
   raise notice 'FALLA  75. Se guardó un tipo de recordatorio inventado';
 exception when check_violation then
   raise notice 'OK     75. Sólo se guardan entregas, finales y otros';
@@ -843,11 +848,14 @@ end $$;
 
 do $$ begin
   insert into public.recordatorios (id, usuario_id, titulo, tipo, fecha)
-  select gen_random_uuid(), '00000000-0000-4000-8000-00000000000a', 'Clase ' || g, 'otro', current_date
+  select gen_random_uuid(), '00000000-0000-4000-8000-000000000011', 'Clase ' || g, 'otro', current_date
   from generate_series(1, 200) g;
   raise notice 'FALLA  76. Se superó el tope de 200 recordatorios';
-exception when insufficient_privilege then
-  raise notice 'OK     76. No se supera el tope de 200 recordatorios';
+exception
+  when insufficient_privilege then
+    raise notice 'OK     76. No se supera el tope de 200 recordatorios';
+  when others then
+    raise notice 'FALLA  76. Error inesperado al probar el tope: %', sqlerrm;
 end $$;
 
 -- ---------------------------------------------------------------- preguntas
