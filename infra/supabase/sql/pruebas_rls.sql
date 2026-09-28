@@ -757,9 +757,12 @@ exception when others then
   raise notice 'FALLA  68. Un admin no pudo eliminar la cuenta: %', sqlerrm;
 end $$;
 
+-- Sólo lo que hizo esta prueba: en una base que ya viene usándose, el
+-- registro tiene además las acciones reales de quienes administran.
 do $$ declare acciones text; begin
   select string_agg(accion, ',' order by accion) into acciones
-  from (select distinct accion from public.admin_registro(100)) x;
+  from (select distinct accion from public.admin_registro(500)
+        where admin_email = 'admin-d@odontocampus.invalid') x;
   if acciones = 'cambiar_planilla,confirmar_correo,eliminar_cuenta,reactivar,suspender'
   then raise notice 'OK     69. Todo lo que hace un admin queda en el registro';
   else raise notice 'FALLA  69. El registro tiene: %', acciones; end if;
