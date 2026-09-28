@@ -12,8 +12,15 @@
   <!-- Marca: un diente geométrico en blanco sobre el magenta de FOE. Se lee a
        16 px en una pestaña, que es la única prueba que importa para un ícono. -->
   <link rel="icon" href="favicon.ico" sizes="32x32">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260928b">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260928b">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260928e">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260928e">
+  <!-- Instalable: "Agregar a pantalla de inicio" la abre sin barra del
+       navegador, como una app. -->
+  <link rel="manifest" href="manifest.json?v=20260928e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="OdontoCampus">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <meta property="og:title" content="OdontoCampus · FOE Odontología UNLP">
   <meta property="og:description" content="Mesas de examen y reválidas en vivo, historias clínicas, promedio y apuntes. Todo en un solo lugar.">
@@ -22,7 +29,7 @@
   <meta property="og:locale" content="es_AR">
   <!-- Imagen del enlace (WhatsApp, Instagram, Twitter). Tiene que ser una URL
        absoluta y un archivo rasterizado: ninguna de esas apps lee SVG. -->
-  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260928b">
+  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260928e">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="OdontoCampus · FOE Odontología UNLP">
@@ -57,14 +64,15 @@
        LÍNEAS (y en las plantillas de correo del override de Supabase).
        Pasó de verdad: el sitio nuevo quedó cargando el config.js viejo, con la
        clave en PENDIENTE, y las cuentas no aparecían por ningún lado. -->
-  <link rel="stylesheet" href="css/01-tokens.css?v=20260928b">
-  <link rel="stylesheet" href="css/02-base.css?v=20260928b">
-  <link rel="stylesheet" href="css/03-components.css?v=20260928b">
-  <link rel="stylesheet" href="css/04-sections.css?v=20260928b">
-  <link rel="stylesheet" href="css/05-responsive.css?v=20260928b">
-  <link rel="stylesheet" href="css/06-cuentas.css?v=20260928b">
-  <link rel="stylesheet" href="css/08-agenda-juego.css?v=20260928b">
-  <link rel="stylesheet" href="css/07-movimiento.css?v=20260928b">
+  <link rel="stylesheet" href="css/01-tokens.css?v=20260928e">
+  <link rel="stylesheet" href="css/02-base.css?v=20260928e">
+  <link rel="stylesheet" href="css/03-components.css?v=20260928e">
+  <link rel="stylesheet" href="css/04-sections.css?v=20260928e">
+  <link rel="stylesheet" href="css/05-responsive.css?v=20260928e">
+  <link rel="stylesheet" href="css/06-cuentas.css?v=20260928e">
+  <link rel="stylesheet" href="css/08-agenda-juego.css?v=20260928e">
+  <link rel="stylesheet" href="css/07-movimiento.css?v=20260928e">
+  <link rel="stylesheet" href="css/09-app.css?v=20260928e">
 </head>
 <body>
 
@@ -1010,6 +1018,21 @@
 </div>
 
 <!-- ==========================================================================
+     BARRA INFERIOR — sólo en el celular. Los cinco destinos al alcance del
+     pulgar. La pastilla que marca el activo la mueve js/app.js.
+     ========================================================================== -->
+<nav class="barra-app" id="barra-app" aria-label="Secciones">
+  <ul>
+    <li class="barra-app-indicador" aria-hidden="true"></li>
+    <li><a href="#inicio" class="barra-app-link" data-nav="inicio"><svg class="ic" aria-hidden="true"><use href="#ic-casa"></use></svg><span>Inicio</span></a></li>
+    <li><a href="#fechas" class="barra-app-link" data-nav="fechas"><svg class="ic" aria-hidden="true"><use href="#ic-calendario"></use></svg><span>Rindo</span></a></li>
+    <li><a href="#cursada" class="barra-app-link" data-nav="cursada"><svg class="ic" aria-hidden="true"><use href="#ic-maletin"></use></svg><span>Clínica</span></a></li>
+    <li><a href="#biblioteca" class="barra-app-link" data-nav="biblioteca"><svg class="ic" aria-hidden="true"><use href="#ic-libro"></use></svg><span>Apuntes</span></a></li>
+    <li><a href="#carrera" class="barra-app-link" data-nav="carrera"><svg class="ic" aria-hidden="true"><use href="#ic-diente"></use></svg><span>Mi carrera</span></a></li>
+  </ul>
+</nav>
+
+<!-- ==========================================================================
      ASISTENTE ODONTOBOT
      ========================================================================== -->
 <button type="button" class="odontobot-fab" id="odontobot-toggle-btn" data-action="alternarChat"
@@ -1432,19 +1455,19 @@
 </footer>
 
 <!-- Scripts: configuración y núcleo primero, módulos después, controlador al final -->
-<script src="js/config.js?v=20260928b"></script>
-<script src="js/core.js?v=20260928b"></script>
-<script src="js/api.js?v=20260928b"></script>
-<script src="js/data.js?v=20260928b"></script>
-<script src="js/planes.js?v=20260928b"></script>
-<script src="js/live_sheets.js?v=20260928b"></script>
-<script src="js/calculator.js?v=20260928b"></script>
-<script src="js/carrera.js?v=20260928b"></script>
-<script src="js/agenda.js?v=20260928b"></script>
-<script src="js/juego.js?v=20260928b"></script>
-<script src="js/auth.js?v=20260928b"></script>
-<script src="js/admin.js?v=20260928b"></script>
-<script src="js/chatbot.js?v=20260928b"></script>
-<script src="js/app.js?v=20260928b"></script>
+<script src="js/config.js?v=20260928e"></script>
+<script src="js/core.js?v=20260928e"></script>
+<script src="js/api.js?v=20260928e"></script>
+<script src="js/data.js?v=20260928e"></script>
+<script src="js/planes.js?v=20260928e"></script>
+<script src="js/live_sheets.js?v=20260928e"></script>
+<script src="js/calculator.js?v=20260928e"></script>
+<script src="js/carrera.js?v=20260928e"></script>
+<script src="js/agenda.js?v=20260928e"></script>
+<script src="js/juego.js?v=20260928e"></script>
+<script src="js/auth.js?v=20260928e"></script>
+<script src="js/admin.js?v=20260928e"></script>
+<script src="js/chatbot.js?v=20260928e"></script>
+<script src="js/app.js?v=20260928e"></script>
 </body>
 </html>

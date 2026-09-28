@@ -105,6 +105,21 @@
            '<use href="#ic-' + id + '"></use></svg>';
   }
 
+  /**
+   * Un toque de vibración, para confirmar algo en el celular.
+   *
+   * Muy corto, y nunca si el sistema pidió menos movimiento: a quien le
+   * molesta la animación, en general también le molesta esto. En iPhone no
+   * hace nada (Safari no lo permite), y está bien.
+   */
+  function vibrar(patron) {
+    try {
+      if (!global.navigator.vibrate) return;
+      if (global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      global.navigator.vibrate(patron || 8);
+    } catch (e) { /* sin permiso: nada */ }
+  }
+
   function announce(message) {
     if (!liveRegion) {
       liveRegion = document.createElement("div");
@@ -451,6 +466,7 @@
     registerActions: registerActions,
     initActionDelegation: initActionDelegation,
     announce: announce,
+    vibrar: vibrar,
     icono: icono,
     toast: toast,
     openModal: openModal,

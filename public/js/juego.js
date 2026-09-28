@@ -285,7 +285,12 @@
 
       this.respondida = true;
       pregunta.elegida = opcion;
-      if (opcion === pregunta.correcta) this.aciertos++;
+      if (opcion === pregunta.correcta) {
+        this.aciertos++;
+        UI.vibrar(12);
+      } else {
+        UI.vibrar([30, 50, 30]);
+      }
       this.pintarPregunta();
 
       var siguiente = document.getElementById("juego-siguiente");
@@ -461,6 +466,31 @@
         "</div>";
 
       UI.announce("Terminaste con " + this.aciertos + " de " + total + " correctas.");
+      if (porcentaje === 100) this.festejar();
+    },
+
+    /** Ronda perfecta: una lluvia corta de piezas, con los colores de marca. */
+    festejar: function () {
+      var quieto = global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (quieto) return;
+      UI.vibrar([15, 40, 15, 40, 30]);
+
+      var capa = document.createElement("div");
+      capa.className = "festejo";
+      capa.setAttribute("aria-hidden", "true");
+      var colores = ["var(--accent)", "var(--text)", "var(--success)", "var(--on-brand-accent)"];
+      var piezas = "";
+      for (var i = 0; i < 46; i++) {
+        piezas += '<i style="left:' + (Math.random() * 100).toFixed(1) + "%;" +
+          "background:" + colores[i % colores.length] + ";" +
+          "animation-delay:" + (Math.random() * 0.35).toFixed(2) + "s;" +
+          "--dur-caida:" + (1.2 + Math.random() * 0.9).toFixed(2) + "s;" +
+          "--dx:" + ((Math.random() - 0.5) * 160).toFixed(0) + "px;" +
+          "--giro:" + (Math.random() * 900).toFixed(0) + 'deg"></i>';
+      }
+      capa.innerHTML = piezas;
+      document.body.appendChild(capa);
+      global.setTimeout(function () { capa.remove(); }, 2600);
     }
   };
 

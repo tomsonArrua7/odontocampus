@@ -139,6 +139,7 @@
         var link = event.target.closest("[data-nav]");
         if (!link) return;
         event.preventDefault();
+        if (link.classList.contains("barra-app-link")) UI.vibrar(6);
         app.navegarA(link.getAttribute("data-nav"));
       });
 
@@ -169,9 +170,28 @@
       if (!header) return;
 
       var pendiente = false;
+      var anterior = global.scrollY || 0;
+      var chico = global.matchMedia ? global.matchMedia("(max-width: 768px)") : null;
+
       function pintar() {
         pendiente = false;
-        header.classList.toggle("desplazado", (global.scrollY || 0) > 24);
+        var y = global.scrollY || 0;
+        header.classList.toggle("desplazado", y > 24);
+
+        /* En el celular, al bajar leyendo el encabezado se aparta y deja más
+           pantalla; al subir un poco vuelve. Nunca se esconde con el menú
+           abierto ni cerca del principio. */
+        if (chico && chico.matches) {
+          var menuAbierto = document.getElementById("mobile-nav-menu");
+          menuAbierto = menuAbierto && menuAbierto.classList.contains("active");
+          var delta = y - anterior;
+          if (menuAbierto || y < 120) header.classList.remove("oculto");
+          else if (delta > 8) header.classList.add("oculto");
+          else if (delta < -8) header.classList.remove("oculto");
+        } else {
+          header.classList.remove("oculto");
+        }
+        if (Math.abs(y - anterior) > 8 || y < 120) anterior = y;
       }
 
       on(global, "scroll", function () {
@@ -249,6 +269,25 @@
 
       var cambioDeSeccion = this.seccionActual !== destino.seccion;
 
+      /* Donde el navegador sabe hacerlo, el cambio de sección es una
+         transición de pantalla (fundido y leve desplazamiento). Sin soporte,
+         o si el sistema pide menos movimiento, se cambia directo. */
+      var app = this;
+      var quieto = global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (cambioDeSeccion && document.startViewTransition && !quieto && !this.enTransicion) {
+        this.enTransicion = true;
+        document.documentElement.classList.add("con-vt");
+        var transicion = document.startViewTransition(function () {
+          app.aplicarSeccion(destino, forzarFoco, true, seccionEl);
+        });
+        transicion.finished.then(function () { app.enTransicion = false; }, function () { app.enTransicion = false; });
+        return;
+      }
+      this.aplicarSeccion(destino, forzarFoco, cambioDeSeccion, seccionEl);
+    },
+
+    aplicarSeccion: function (destino, forzarFoco, cambioDeSeccion, seccionEl) {
+
       $$(".app-section").forEach(function (sec) { sec.classList.remove("active"); });
       seccionEl.classList.add("active");
       this.seccionActual = destino.seccion;
@@ -263,7 +302,11 @@
       this.cerrarMenuMovil();
 
       if (cambioDeSeccion || forzarFoco) {
-        global.scrollTo({ top: 0, behavior: "smooth" });
+        // Con transición de pantalla, el salto arriba va sin animación: la
+        // transición ya cubre el cambio.
+        global.scrollTo({ top: 0, behavior: document.documentElement.classList.contains("con-vt") ? "auto" : "smooth" });
+        var header = document.querySelector(".main-header");
+        if (header) header.classList.remove("oculto");
         /* Mover el foco al inicio de la sección: sin esto, quien navega con
            teclado o lector de pantalla se queda en el enlace del menú y no
            percibe que la página cambió. */
@@ -278,13 +321,30 @@
       $$("[data-nav]").forEach(function (link) {
         var valor = link.getAttribute("data-nav");
         var activo = valor === rutaCompleta || valor === seccion;
-        link.classList.toggle("active", activo && link.classList.contains("nav-link"));
-        if (activo && link.classList.contains("nav-link")) {
+        var esMenu = link.classList.contains("nav-link") || link.classList.contains("barra-app-link");
+        link.classList.toggle("active", activo && esMenu);
+        if (activo && esMenu) {
           link.setAttribute("aria-current", "page");
         } else {
           link.removeAttribute("aria-current");
         }
       });
+
+      // La pastilla de la barra inferior va al destino activo. En secciones
+      // que no están en la barra (el panel de administración) se esconde.
+      var barra = document.getElementById("barra-app");
+      if (barra) {
+        var enlaces = $$(".barra-app-link", barra);
+        var indice = -1;
+        enlaces.forEach(function (link, i) {
+          if (link.getAttribute("data-nav") === seccion) indice = i;
+        });
+        if (indice === -1) barra.setAttribute("data-sin-activo", "");
+        else {
+          barra.removeAttribute("data-sin-activo");
+          barra.style.setProperty("--i", String(indice));
+        }
+      }
     },
 
     /** Cada pestaña reclama su render al mostrarse (evita trabajo invisible). */

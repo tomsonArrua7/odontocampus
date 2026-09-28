@@ -1,0 +1,307 @@
+/* ==========================================================================
+   ODONTOCAMPUS — 09 · SENTIRSE UNA APP
+   --------------------------------------------------------------------------
+   En el celular, el sitio se usa con el pulgar y en el pasillo. Lo que hace
+   que algo "se sienta app" no es el brillo: es que los destinos estén donde
+   llega el pulgar, que lo que se abre suba desde abajo, que cada toque
+   responda, y que la pantalla no tenga cosas que no sirven en ese momento.
+
+   Este archivo tiene dos partes:
+   1. Estructura (siempre): la barra inferior, las hojas, las zonas seguras
+      del teléfono, el encabezado que se aparta al bajar.
+   2. Movimiento (sólo con prefers-reduced-motion: no-preference): cómo
+      entran y salen las cosas. Sin esa preferencia, todo funciona igual,
+      quieto.
+   ========================================================================== */
+
+:root {
+  --barra-app-alto: 64px;
+  --zona-abajo: env(safe-area-inset-bottom, 0px);
+  --zona-arriba: env(safe-area-inset-top, 0px);
+}
+
+/* Instalada como app en iPhone, la barra de estado queda encima del sitio:
+   el encabezado se corre lo que ocupe. En un navegador común vale 0. */
+.main-header { padding-top: var(--zona-arriba); }
+
+/* ==========================================================================
+   1. BARRA DE NAVEGACIÓN INFERIOR (sólo en pantallas chicas)
+   Los cinco destinos a un pulgar de distancia. El menú de arriba queda para
+   lo secundario (pestañas puntuales, buscar).
+   ========================================================================== */
+.barra-app { display: none; }
+
+@media (max-width: 768px) {
+  .barra-app {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--z-header);
+    padding-bottom: var(--zona-abajo);
+    background-color: var(--brand-surface);
+    background-image: var(--grano);
+    border-top: 2px solid var(--accent);
+    box-shadow: 0 -6px 18px rgba(6, 13, 23, 0.18);
+  }
+
+  .barra-app ul {
+    list-style: none;
+    margin: 0;
+    padding: 0 var(--sp-1);
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    height: var(--barra-app-alto);
+    position: relative;
+  }
+
+  /* La marca del destino activo: una pastilla que se desliza de un lugar a
+     otro. El lugar lo pone js/app.js en --i (0 a 4). */
+  .barra-app-indicador {
+    position: absolute;
+    top: 8px;
+    left: var(--sp-1);
+    width: calc((100% - 2 * var(--sp-1)) / 5);
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    transform: translateX(calc(var(--i, 0) * 100%));
+    pointer-events: none;
+  }
+  .barra-app-indicador::before {
+    content: "";
+    width: 56px;
+    height: 100%;
+    border-radius: var(--radius-full);
+    background: var(--accent);
+  }
+  .barra-app[data-sin-activo] .barra-app-indicador { opacity: 0; }
+
+  .barra-app-link {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+    height: 100%;
+    padding-top: 12px;
+    color: var(--on-brand-muted);
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: var(--fw-semi);
+    letter-spacing: 0.01em;
+    -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
+  }
+  .barra-app-link .ic { font-size: 22px; height: 24px; }
+  .barra-app-link span { overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .barra-app-link:hover { text-decoration: none; color: #fff; }
+  .barra-app-link.active { color: #fff; }
+  .barra-app-link.active span { font-weight: var(--fw-bold); }
+  .barra-app-link:focus-visible { outline: 2px solid #fff; outline-offset: -4px; border-radius: var(--radius-sm); }
+
+  /* El contenido y lo que flota se corren para no quedar bajo la barra. */
+  body { padding-bottom: calc(var(--barra-app-alto) + var(--zona-abajo)); }
+  .odontobot-fab { bottom: calc(var(--barra-app-alto) + var(--zona-abajo) + var(--sp-3)); }
+  .toast-container { bottom: calc(var(--barra-app-alto) + var(--zona-abajo) + var(--sp-4) + 66px); }
+
+  /* El chat abierto tapa todo, barra incluida: es una pantalla más. */
+  .odontobot-window { z-index: calc(var(--z-header) + 2); }
+
+  /* Los cinco destinos ya están abajo: el menú de arriba no los repite. */
+  .mobile-nav-list > li:has(> a[data-nav="inicio"]),
+  .mobile-nav-list > li:has(> a[data-nav="biblioteca"]),
+  .mobile-nav-list > li:has(> a[data-nav="carrera"]) { display: none; }
+
+  /* ------------------------------------------------------------------------
+     ENCABEZADO QUE SE APARTA
+     Al bajar leyendo se esconde y deja más pantalla; al subir un poco
+     vuelve. La clase la pone js/app.js.
+     --------------------------------------------------------------------- */
+  .main-header.oculto { transform: translateY(-100%); box-shadow: none; }
+
+  /* ------------------------------------------------------------------------
+     HOJAS: los diálogos suben desde abajo, como en una app
+     --------------------------------------------------------------------- */
+  .modal-overlay { padding: 0; align-items: flex-end; }
+  .modal-card {
+    max-width: none;
+    margin: 0;
+    max-height: calc(92dvh - var(--zona-arriba));
+    border-radius: 18px 18px 0 0;
+    border-bottom: 0;
+    padding-bottom: var(--zona-abajo);
+  }
+  /* El tirador: dice "esto es una hoja" sin palabras. */
+  .modal-card-header { position: relative; padding-top: calc(var(--sp-4) + 6px); }
+  .modal-card-header::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    width: 40px;
+    height: 4px;
+    margin-left: -20px;
+    border-radius: var(--radius-full);
+    background: var(--border-strong);
+  }
+}
+
+/* ==========================================================================
+   RESPUESTA AL TOQUE (táctil)
+   Sin el recuadro azul que pinta el navegador al tocar: cada elemento tiene
+   su propia respuesta, más fina.
+   ========================================================================== */
+.atajo, .novedad, .dia, .juego-opcion, .sugg-chip, .tab, .btn,
+.agenda-item button, .btn-cuenta, .theme-toggle, .mobile-toggle {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ==========================================================================
+   2. MOVIMIENTO
+   ========================================================================== */
+@media (prefers-reduced-motion: no-preference) {
+
+  /* --- Barra inferior --------------------------------------------------- */
+  .barra-app-indicador { transition: transform 360ms var(--ease-resorte), opacity var(--dur) var(--ease); }
+  .barra-app-link { transition: color var(--dur) var(--ease); }
+  .barra-app-link .ic { transition: transform 260ms var(--ease-resorte); }
+  .barra-app-link.active .ic { transform: translateY(-1px) scale(1.06); }
+  .barra-app-link:active .ic { transform: scale(0.86); transition-duration: 80ms; }
+
+  /* --- Encabezado que se aparta ----------------------------------------- */
+  .main-header { transition: transform 260ms var(--ease), box-shadow var(--dur) var(--ease), background-color var(--dur) var(--ease); }
+
+  /* --- Hojas ------------------------------------------------------------- */
+  @keyframes oc-hoja {
+    from { transform: translateY(100%); }
+    to   { transform: none; }
+  }
+  @media (max-width: 768px) {
+    .modal-overlay.active .modal-card { animation: oc-hoja 320ms cubic-bezier(0.2, 0.9, 0.25, 1) both; }
+  }
+
+  /* --- Toques: todo lo que se aprieta se hunde un poco ------------------- */
+  .atajo:active, .novedad:active, .juego-opcion:active:not([disabled]),
+  .sugg-chip:active, .dia:active {
+    transform: scale(0.97);
+    transition-duration: 80ms;
+  }
+
+  /* --- Portada: entra por partes, en el orden en que se lee ------------- */
+  @keyframes oc-portada {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .portada-centro > * { animation: oc-portada 620ms var(--ease-entrada) both; }
+  .portada-centro > :nth-child(2) { animation-delay: 90ms; }
+  .portada-centro > :nth-child(3) { animation-delay: 200ms; }
+  .portada-centro > :nth-child(4) { animation-delay: 320ms; }
+
+  /* El bloque magenta de "Campus" se pinta de izquierda a derecha. */
+  @keyframes oc-pincel {
+    from { background-size: 0% 100%; }
+    to   { background-size: 100% 100%; }
+  }
+  .hero-title span {
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-color: transparent;
+    background-repeat: no-repeat;
+    animation: oc-pincel 700ms 380ms cubic-bezier(0.65, 0, 0.35, 1) both;
+  }
+
+  /* La flecha de COMENZAR invita tres veces y se queda quieta: un llamado,
+     no una alarma. */
+  @keyframes oc-invitar {
+    0%, 60%, 100% { transform: none; }
+    30% { transform: translateY(4px); }
+  }
+  .btn-comenzar .ic { animation: oc-invitar 1.2s 1.4s var(--ease) 3; }
+
+  /* --- Aparecer al llegar ------------------------------------------------ */
+  /* Lo que está debajo de la portada entra a medida que se lo ve, atado a la
+     posición en pantalla. Es CSS puro (animation-timeline): donde el
+     navegador no lo soporta, simplemente no hay efecto y todo se ve normal.
+     Se probó antes con JavaScript y con IntersectionObserver: si el aviso
+     no llegaba, el contenido quedaba invisible. Así no puede pasar. */
+  @supports (animation-timeline: view()) {
+    @keyframes oc-revelar {
+      from { opacity: 0; transform: translateY(26px); }
+      to   { opacity: 1; transform: none; }
+    }
+    .inicio-titulo,
+    .atajos > li,
+    .novedades-lista > li {
+      animation: oc-revelar linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+  }
+
+  /* --- Cambio de sección con View Transitions --------------------------- */
+  /* Donde el navegador lo sabe hacer, pasar de una sección a otra es un
+     fundido con un leve desplazamiento, como cambiar de pantalla en una app.
+     En ese caso se apaga la entrada propia de la sección, para no mover dos
+     veces lo mismo. */
+  ::view-transition-old(root) { animation: 160ms var(--ease) both oc-vt-salir; }
+  ::view-transition-new(root) { animation: 260ms var(--ease-entrada) both oc-vt-entrar; }
+  @keyframes oc-vt-salir { to { opacity: 0; transform: translateY(-8px); } }
+  @keyframes oc-vt-entrar { from { opacity: 0; transform: translateY(12px); } }
+  .con-vt .app-section.active > .portada,
+  .con-vt .app-section.active > .container { animation: none; }
+  /* El encabezado, la barra y el botón del chat quedan quietos durante la
+     transición: se mueve el contenido, no el marco de la app. */
+  .main-header { view-transition-name: oc-encabezado; }
+  .barra-app { view-transition-name: oc-barra; }
+  .odontobot-fab { view-transition-name: oc-chat; }
+
+  /* --- Odontopreguntados: la respuesta se siente ------------------------ */
+  @keyframes oc-acierto {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.035); }
+    100% { transform: scale(1); }
+  }
+  @keyframes oc-error {
+    0%, 100% { transform: none; }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(3px); }
+  }
+  .juego-opcion.es-correcta { animation: oc-acierto 420ms var(--ease-resorte); }
+  .juego-opcion.es-incorrecta { animation: oc-error 380ms var(--ease); }
+  .juego-respuesta { animation: oc-subir 320ms var(--ease-entrada) both; }
+  .juego-pregunta { animation: oc-subir 300ms var(--ease-entrada) both; }
+
+  @keyframes oc-puntaje {
+    0%   { transform: scale(0.6); opacity: 0; }
+    60%  { transform: scale(1.08); opacity: 1; }
+    100% { transform: none; }
+  }
+  .juego-puntaje { animation: oc-puntaje 560ms var(--ease-resorte) both; }
+
+  /* Ronda perfecta: una lluvia corta de piezas. La arma js/juego.js. */
+  .festejo { position: fixed; inset: 0; pointer-events: none; z-index: var(--z-toast); overflow: hidden; }
+  .festejo i {
+    position: absolute;
+    top: -12px;
+    width: 8px;
+    height: 12px;
+    border-radius: 2px;
+    animation: oc-caer var(--dur-caida, 1.6s) var(--ease) forwards;
+  }
+  @keyframes oc-caer {
+    to { transform: translate(var(--dx, 0), 110vh) rotate(var(--giro, 540deg)); opacity: 0.9; }
+  }
+
+  /* --- Agenda: el día elegido y lo recién anotado ----------------------- */
+  .dia.es-elegido { transition: background-color 180ms var(--ease), color 180ms var(--ease); }
+  @keyframes oc-anotado {
+    from { box-shadow: 0 0 0 0 var(--accent); }
+    to   { box-shadow: 0 0 0 10px transparent; }
+  }
+  .agenda-item.recien { animation: oc-anotado 700ms var(--ease) 2; }
+}

@@ -64,6 +64,7 @@ public/               EL SITIO. Es exactamente lo que se copia a htdocs/
     06-cuentas.css    Acceso, panel de cuenta, entrada a Mi carrera
     07-movimiento.css Animaciones, todas dentro de prefers-reduced-motion
     08-agenda-juego.css Calendario de la agenda y pantallas del juego
+    09-app.css        En el celular: barra inferior, hojas, zonas seguras, transiciones
   js/
     config.js         URL de la API y clave pública. Lo único que cambia por entorno
     core.js           Núcleo: escapado, DOM, acciones, modales, pestañas, tema, fechas
@@ -196,6 +197,27 @@ embebe en `index.html` entre las marcas `ICONOS`. Después hay que subir el
 300 KB de fuentes de íconos para usar setenta glifos. El sprite son 14 KB y no
 pide nada a otro dominio. De paso desaparecieron los íconos decorativos que
 repetían lo que el título de al lado ya decía.
+
+### En el celular se comporta como una app
+
+- **Barra inferior** con los cinco destinos, al alcance del pulgar. La
+  pastilla magenta se desliza al destino activo. El menú de arriba queda para
+  lo secundario.
+- **Los diálogos son hojas** que suben desde abajo, con tirador.
+- **El encabezado se aparta** al bajar leyendo y vuelve al subir un poco.
+- **Cambio de sección como cambio de pantalla** (View Transitions), donde el
+  navegador lo soporta. El encabezado y la barra quedan quietos.
+- **Instalable:** `manifest.json` + metas de iOS. "Agregar a pantalla de
+  inicio" la abre sin la barra del navegador, con atajos a Mesas, Agenda y
+  Odontopreguntados.
+- **Vibración corta** (`UI.vibrar`) al tocar la barra, al anotar y al
+  responder en el juego. Nunca con movimiento reducido; en iPhone no existe.
+
+Una regla aprendida a los golpes: **ningún efecto puede dejar contenido
+invisible si falla.** El "aparecer al llegar" se probó con JavaScript y con
+IntersectionObserver, y en algunos contextos el aviso no llegaba y la sección
+quedaba en blanco. Ahora es CSS puro (`animation-timeline: view()`): donde no
+se soporta, no hay efecto, y todo se ve.
 
 ### Movimiento
 

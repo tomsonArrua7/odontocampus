@@ -523,11 +523,22 @@
         self.pintar();
 
         UI.toast(editando ? "Recordatorio actualizado" : "Anotado para el " + textoFecha(item.fecha), "success");
+        UI.vibrar(10);
+        self.marcarReciente(item.id);
         form.elements["rec-titulo"].focus();
       }, function (error) {
         if (boton) boton.disabled = false;
         UI.toast(error.message, "danger");
       });
+    },
+
+    /** Un pulso sobre lo que se acaba de anotar: se ve dónde quedó. */
+    marcarReciente: function (id) {
+      var boton = document.querySelector('.agenda-item [data-id="' + id + '"]');
+      var item = boton && boton.closest(".agenda-item");
+      if (!item) return;
+      item.classList.add("recien");
+      global.setTimeout(function () { item.classList.remove("recien"); }, 1600);
     },
 
     editar: function (id) {
