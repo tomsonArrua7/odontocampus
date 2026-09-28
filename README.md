@@ -291,6 +291,25 @@ Las preguntas salen de una planilla de Google que carga FOE desde el panel
 Explicación`. Hay un ejemplo en `docs/plantilla-preguntas.csv`. Guardar el
 enlace vacío apaga el juego.
 
+### OdontoBot
+
+No es una IA y no se anuncia como tal: busca entre las respuestas escritas a
+mano (`knowledgeBase` en `js/data.js`) y consulta los datos que el sitio ya
+tiene cargados.
+
+- **Busca por palabras, no por frase exacta.** Acepta principios de palabra
+  ("amoxi" encuentra "amoxicilina") y tolera una letra de diferencia. Las
+  palabras largas pesan más que las cortas: sin eso, "dosis de amoxi"
+  contestaba sobre anestésicos, porque ganaba el tema "dosis máxima".
+- **Contesta con datos vivos:** cuándo se rinde una materia (planilla), año,
+  período y correlativas (plan 7v16), y —con sesión— la agenda y el promedio
+  de quien pregunta. Si la planilla tiene un turno vencido, lo dice en vez de
+  responder que no sabe.
+- **Cuando no sabe, lo anota.** La consulta va a `consultas_bot` (007) **sin
+  quién preguntó**, y con los correos y números largos borrados antes de
+  guardarse. El panel las muestra ordenadas por cuántas veces se repitieron,
+  para saber qué respuesta falta escribir. El chat lo avisa en pantalla.
+
 ### Administración
 
 Hay un rol de administrador (`administradores`) y un panel en `#admin`, al que

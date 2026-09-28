@@ -1,7 +1,7 @@
 -- ==========================================================================
 -- OdontoCampus — Pruebas de seguridad del esquema (RLS y permisos)
 --
--- Correr DESPUÉS de aplicar todas las migraciones (001 a 006, ...), y otra
+-- Correr DESPUÉS de aplicar todas las migraciones (001 a 007, ...), y otra
 -- vez después de cualquier cambio:
 --
 --   cd /opt/supabase
@@ -900,8 +900,94 @@ do $$ declare n int; begin
   else raise notice 'FALLA  80. Quedaron % recordatorios de una cuenta eliminada', n; end if;
 end $$;
 
+-- ==========================================================================
+-- CONSULTAS SIN RESPUESTA DEL BOT (007)
+-- ==========================================================================
+set local role anon;
+do $$ begin perform set_config('request.jwt.claims', '{"role":"anon"}', true); end $$;
+
+do $$ begin
+  perform public.anotar_consulta_bot('  ¿Cuándo abre la INSCRIPCIÓN   a cursadas? ');
+  perform public.anotar_consulta_bot('¿cuándo abre la inscripción a cursadas?');
+  raise notice 'OK     81. Sin sesión se puede anotar una consulta que el bot no supo';
+exception when others then
+  raise notice 'FALLA  81. Sin sesión no se pudo anotar la consulta: %', sqlerrm;
+end $$;
+
+do $$ begin
+  perform count(*) from public.consultas_bot;
+  raise notice 'FALLA  82. Sin sesión se lee la lista de consultas';
+exception when insufficient_privilege then
+  raise notice 'OK     82. La lista de consultas no se lee directo';
+end $$;
+
+do $$ begin
+  perform public.anotar_consulta_bot('escribime a nombre.apellido@gmail.com o al 2211234567 dni 40123456');
+  raise notice 'OK     83a. Se anota una consulta con datos personales adentro';
+exception when others then
+  raise notice 'FALLA  83a. No se pudo anotar: %', sqlerrm;
+end $$;
+
+reset role;
+
+do $$ declare n int; guardado text; begin
+  select count(*) into n from public.consultas_bot where texto like '%inscripcion%' or texto like '%inscripción%';
+  select texto into guardado from public.consultas_bot where texto like 'escribime%';
+  if n = 1 and guardado = 'escribime a (correo) o al (número) dni (número)' then
+    raise notice 'OK     83. Se juntan las repetidas y no se guardan correos ni números largos';
+  else
+    raise notice 'FALLA  83. Quedó: % (repetidas: %)', guardado, n;
+  end if;
+end $$;
+
+set local role authenticated;
+do $$ begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-000000000011","role":"authenticated"}', true);
+end $$;
+
+do $$ begin
+  perform public.admin_consultas_bot(100, false);
+  raise notice 'FALLA  84. Una cuenta común ve las consultas del bot';
+exception when insufficient_privilege then
+  raise notice 'OK     84. Una cuenta común no ve las consultas del bot';
+end $$;
+
+do $$ begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-00000000000d","role":"authenticated"}', true);
+end $$;
+
+do $$ declare v int; begin
+  select veces into v from public.admin_consultas_bot(100, false)
+  where texto like '%inscripci_n a cursadas%';
+  if v = 2 then raise notice 'OK     85. Un admin ve las consultas pendientes, con cuántas veces se repitieron';
+  else raise notice 'FALLA  85. El listado devolvió veces = %', v; end if;
+exception when others then
+  raise notice 'FALLA  85. Un admin no pudo ver las consultas: %', sqlerrm;
+end $$;
+
+do $$ declare pendientes int; begin
+  perform public.admin_marcar_consulta('¿cuándo abre la inscripción a cursadas?', true);
+  select count(*) into pendientes from public.admin_consultas_bot(100, false)
+  where texto like '%inscripci_n a cursadas%';
+  if pendientes = 0 then raise notice 'OK     86. Marcar una consulta como respondida la saca de las pendientes';
+  else raise notice 'FALLA  86. La consulta sigue pendiente'; end if;
+exception when others then
+  raise notice 'FALLA  86. No se pudo marcar la consulta: %', sqlerrm;
+end $$;
+
+do $$ declare n int; begin
+  perform public.admin_borrar_consulta('escribime a (correo) o al (número) dni (número)');
+  select count(*) into n from public.admin_consultas_bot(100, true) where texto like 'escribime%';
+  if n = 0 then raise notice 'OK     87. Un admin puede borrar una consulta de la lista';
+  else raise notice 'FALLA  87. La consulta no se borró'; end if;
+exception when others then
+  raise notice 'FALLA  87. No se pudo borrar la consulta: %', sqlerrm;
+end $$;
+
+reset role;
+
 rollback;
 
 \echo
-\echo 'Pruebas terminadas (00 a 80). Todo se deshizo con ROLLBACK: no quedó nada en la base.'
+\echo 'Pruebas terminadas (00 a 87). Todo se deshizo con ROLLBACK: no quedó nada en la base.'
 \echo 'Si alguna línea dice FALLA, no publiques el cambio en el sitio.'

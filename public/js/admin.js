@@ -33,7 +33,9 @@
     eliminar_cuenta: "Eliminó la cuenta",
     otorgar_admin: "Dio el rol de admin a",
     quitar_admin: "Quitó el rol de admin a",
-    cambiar_planilla: "Cambió la planilla"
+    cambiar_planilla: "Cambió la planilla",
+    consulta_bot: "Marcó una consulta del bot",
+    consulta_bot_borrada: "Borró una consulta del bot"
   };
 
   var NOMBRE_PLANILLA = {
@@ -41,6 +43,7 @@
     planilla_revalidas: "Reválidas y actualizaciones",
     planilla_preguntas: "Preguntas de Odontopreguntados"
   };
+
 
   function fecha(valor, conHora) {
     if (!valor) return "—";
@@ -89,6 +92,9 @@
         adminReactivar: function (data) { self.reactivar(data.id, data.email); },
         adminEliminar: function (data) { self.pedirAccion("eliminar", data.id, data.email); },
         adminQuitarRol: function (data) { self.quitarRol(data.id, data.email); },
+        adminConsultaResuelta: function (data) { self.marcarConsulta(data.texto, data.resuelta !== "no"); },
+        adminConsultaBorrar: function (data) { self.borrarConsulta(data.texto); },
+        adminConsultasTodas: function () { self.consultasResueltas = true; self.cargarConsultas(); },
         adminProbarPlanilla: function (data) { self.probarPlanilla(data.clave, false); },
         adminGuardarPlanilla: function (data) { self.probarPlanilla(data.clave, true); },
         adminConfirmarAccion: function () { self.ejecutarAccion(); },
@@ -217,6 +223,7 @@
       this.cargarResumen();
       if (this.pestana === "cuentas") this.cargarCuentas(false);
       else if (this.pestana === "planillas") this.pintarPlanillas();
+      else if (this.pestana === "bot") this.cargarConsultas();
       else if (this.pestana === "equipo") this.cargarEquipo();
       else if (this.pestana === "registro") this.cargarRegistro();
     },
@@ -543,6 +550,66 @@
           ? "No se pudo abrir la planilla. Tiene que estar compartida como «Cualquier persona con el enlace puede ver»."
           : error.message;
       });
+    },
+
+    /* ====================================================================
+       CONSULTAS QUE EL BOT NO SUPO RESPONDER
+       ==================================================================== */
+    consultasResueltas: false,
+
+    cargarConsultas: function () {
+      var self = this;
+      var cont = document.getElementById("admin-bot");
+      if (!cont) return;
+      cont.innerHTML = '<p class="search-hint">Cargando…</p>';
+
+      Api.rpc("admin_consultas_bot", { p_limite: 200, p_resueltas: this.consultasResueltas })
+        .then(function (filas) {
+          filas = filas || [];
+          if (!filas.length) {
+            cont.innerHTML = '<p class="search-hint">' + (self.consultasResueltas
+              ? "No hay consultas anotadas."
+              : "No hay consultas pendientes. Todo lo que preguntaron, el bot supo contestarlo.") + "</p>";
+            return;
+          }
+
+          cont.innerHTML =
+            '<ul class="admin-consultas">' + filas.map(function (c) {
+              var datos = ' data-texto="' + escAttr(c.texto) + '"';
+              return (
+                "<li" + (c.resuelta ? ' class="es-resuelta"' : "") + ">" +
+                  '<span class="admin-consulta-veces">' + esc(c.veces) + "×</span>" +
+                  "<span><strong>" + esc(c.texto) + "</strong>" +
+                    '<small>Última vez: ' + esc(fecha(c.ultima_at, true)) + "</small></span>" +
+                  '<span class="admin-consulta-acciones">' +
+                    '<button type="button" class="btn btn-secondary btn-sm" data-action="adminConsultaResuelta"' +
+                      datos + ' data-resuelta="' + (c.resuelta ? "no" : "si") + '">' +
+                      (c.resuelta ? "Volver a pendiente" : "Ya la respondimos") + "</button>" +
+                    '<button type="button" class="btn-icono-quitar" data-action="adminConsultaBorrar"' + datos +
+                      ' aria-label="Borrar esta consulta">' + UI.icono("tacho") + "</button>" +
+                  "</span>" +
+                "</li>"
+              );
+            }).join("") + "</ul>" +
+            (self.consultasResueltas ? "" :
+              '<div class="admin-mas"><button type="button" class="btn btn-secondary" ' +
+              'data-action="adminConsultasTodas">Ver también las respondidas</button></div>');
+        }, function (error) { self.errorEn("admin-bot", error); });
+    },
+
+    marcarConsulta: function (texto, resuelta) {
+      var self = this;
+      Api.rpc("admin_marcar_consulta", { p_texto: texto, p_resuelta: resuelta }).then(function () {
+        self.cargarConsultas();
+      }, function (error) { UI.toast(error.message, "danger"); });
+    },
+
+    borrarConsulta: function (texto) {
+      var self = this;
+      if (!global.confirm("¿Borrar esta consulta de la lista?\n\n«" + texto + "»")) return;
+      Api.rpc("admin_borrar_consulta", { p_texto: texto }).then(function () {
+        self.cargarConsultas();
+      }, function (error) { UI.toast(error.message, "danger"); });
     },
 
     /* ====================================================================

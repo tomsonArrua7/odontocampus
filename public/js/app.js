@@ -21,7 +21,7 @@
     biblioteca: { titulo: "Biblioteca de apuntes", tabs: null },
     carrera:    { titulo: "Mi carrera", tabs: ["plan", "agenda", "juego"] },
     // No figura en el menú: se llega desde Mi cuenta, y sólo si es admin.
-    admin:      { titulo: "Administración", tabs: ["cuentas", "planillas", "equipo", "registro"] }
+    admin:      { titulo: "Administración", tabs: ["cuentas", "planillas", "bot", "equipo", "registro"] }
   };
 
   /* Enlaces viejos que la gente pudo haber guardado o compartido por WhatsApp.

@@ -818,3 +818,8 @@
   transition: var(--transition);
 }
 .sugg-chip:hover { background: var(--accent); color: var(--accent-on); border-color: var(--accent); }
+
+/* Los botones que el bot ofrece debajo de una respuesta: llevan a la sección
+   que resuelve la consulta, en vez de dejar a la persona buscándola. */
+.chat-acciones { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-3); }
+.chat-acciones .sugg-chip { font-size: var(--fs-xs); }

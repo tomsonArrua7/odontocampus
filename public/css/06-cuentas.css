@@ -499,3 +499,30 @@
   .admin-registro-lista li { grid-template-columns: 1fr; gap: var(--sp-1); }
   .admin-resumen > div { border-bottom: 1px solid var(--border); }
 }
+
+/* --- Consultas que el bot no supo responder --- */
+.admin-consultas { list-style: none; padding: 0; border-top: 2px solid var(--text); }
+.admin-consultas li {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-2);
+  border-bottom: 1px solid var(--border);
+}
+.admin-consultas li.es-resuelta { opacity: 0.6; }
+.admin-consultas li.es-resuelta strong { text-decoration: line-through; }
+.admin-consulta-veces {
+  font-family: var(--font-heading);
+  font-weight: var(--fw-black);
+  font-size: var(--fs-lg);
+  color: var(--accent-text);
+  font-variant-numeric: tabular-nums;
+}
+.admin-consultas small { display: block; font-size: var(--fs-xs); color: var(--text-muted); }
+.admin-consulta-acciones { display: flex; align-items: center; gap: var(--sp-2); }
+
+@media (max-width: 768px) {
+  .admin-consultas li { grid-template-columns: 3rem minmax(0, 1fr); }
+  .admin-consulta-acciones { grid-column: 1 / -1; justify-content: flex-end; }
+}

@@ -191,6 +191,14 @@ la base vieja, Mi carrera no puede guardar (pide tablas que no existen).
 - [ ] Panel → Planillas → cargar la planilla de preguntas (ver `docs/plantilla-preguntas.csv`)
 - [ ] Probar: anotar una entrega, marcarla hecha y verla desde otro dispositivo
 
+### OdontoBot que aprende de sus huecos (septiembre 2026) 🙋 aplicar en el servidor
+
+- [ ] `git pull` en el sitio
+- [ ] Cargar `007_consultas_del_bot.sql`
+- [ ] `pruebas_rls.sql`: 90 en OK (de 00 a 87)
+- [ ] Panel → OdontoBot: revisar cada tanto qué preguntan y no sabe contestar
+- [ ] 💻 Con esa lista, ampliar `knowledgeBase` en `js/data.js`
+
 **Principio que no se negocia:** el login suma, no tapa. Mesas, reválidas,
 historias clínicas, instrumental y biblioteca siguen abiertas sin cuenta. Lo
 único que la pide es Mi promedio, porque guarda datos de la persona.
