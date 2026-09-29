@@ -1,6 +1,6 @@
 /* ==========================================================================
    ODONTOCAMPUS — PANEL DE ADMINISTRACIÓN
-   Cuentas, planillas de mesas y reválidas, equipo de administración y el
+   Cuentas, planillas de mesas y reválidas, moderación de la bolsa, equipo y el
    registro de todo lo que se hizo.
 
    --------------------------------------------------------------------------
@@ -35,7 +35,9 @@
     quitar_admin: "Quitó el rol de admin a",
     cambiar_planilla: "Cambió la planilla",
     consulta_bot: "Marcó una consulta del bot",
-    consulta_bot_borrada: "Borró una consulta del bot"
+    consulta_bot_borrada: "Borró una consulta del bot",
+    aprobar_bolsa: "Aprobó en la bolsa",
+    rechazar_bolsa: "Rechazó en la bolsa"
   };
 
   var NOMBRE_PLANILLA = {
@@ -98,6 +100,8 @@
         adminConsultasTodas: function () { self.consultasResueltas = true; self.cargarConsultas(); },
         adminProbarPlanilla: function (data) { self.probarPlanilla(data.clave, false); },
         adminGuardarPlanilla: function (data) { self.probarPlanilla(data.clave, true); },
+        adminBolsaAprobar: function (data, boton) { self.aprobarBolsa(data.id, boton); },
+        adminBolsaRechazar: function (data) { self.pedirAccion("rechazar_bolsa", data.id, data.titulo); },
         adminConfirmarAccion: function () { self.ejecutarAccion(); },
         adminCerrarAccion: function () { UI.closeModal("modal-admin-accion"); },
         irAlPanelAdmin: function () {
@@ -224,6 +228,7 @@
       this.cargarResumen();
       if (this.pestana === "cuentas") this.cargarCuentas(false);
       else if (this.pestana === "planillas") this.pintarPlanillas();
+      else if (this.pestana === "bolsa") this.cargarBolsa();
       else if (this.pestana === "bot") this.cargarConsultas();
       else if (this.pestana === "equipo") this.cargarEquipo();
       else if (this.pestana === "registro") this.cargarRegistro();
@@ -256,6 +261,18 @@
           return "<div><dt>" + esc(d[0]) + "</dt><dd>" + esc(d[1] === undefined ? "—" : d[1]) + "</dd></div>";
         }).join("");
       }, function () { cont.innerHTML = ""; });
+      this.contarBolsa();
+    },
+
+    /** El número de pendientes en la pestaña Bolsa: sin eso, esperan días. */
+    contarBolsa: function () {
+      var marca = document.getElementById("admin-bolsa-cantidad");
+      if (!marca) return;
+      Api.rpc("admin_bolsa_cantidad_pendientes").then(function (n) {
+        n = Number(n) || 0;
+        marca.hidden = n === 0;
+        marca.textContent = n;
+      }, function () { marca.hidden = true; });
     },
 
     /* ====================================================================
@@ -391,7 +408,14 @@
       this.accionPendiente = { tipo: tipo, id: id, email: email };
       campo.value = "";
 
-      if (tipo === "suspender") {
+      if (tipo === "rechazar_bolsa") {
+        titulo.textContent = "No aprobar «" + email + "»";
+        texto.textContent = "La publicación no aparece en la bolsa. Quien la hizo ve el motivo y puede corregirla y volver a enviarla.";
+        etiqueta.textContent = "Motivo (se le muestra a quien publicó)";
+        campo.type = "text";
+        campo.setAttribute("autocomplete", "off");
+        boton.textContent = "No aprobar";
+      } else if (tipo === "suspender") {
         titulo.textContent = "Suspender " + email;
         texto.textContent = "La cuenta no va a poder ingresar y se cierran sus sesiones abiertas. " +
           "Sus datos no se borran, y se puede reactivar en cualquier momento.";
@@ -421,7 +445,14 @@
 
       var valor = campo.value.trim();
       var llamada;
-      if (accion.tipo === "suspender") {
+      if (accion.tipo === "rechazar_bolsa") {
+        if (valor.length < 5) {
+          UI.toast("Escribí el motivo: se le muestra a quien publicó", "warning");
+          campo.focus();
+          return;
+        }
+        llamada = Api.rpc("admin_moderar_bolsa", { p_publicacion: accion.id, p_aprobar: false, p_motivo: valor });
+      } else if (accion.tipo === "suspender") {
         if (valor.length < 5) {
           UI.toast("Escribí el motivo: queda en el registro", "warning");
           campo.focus();
@@ -442,6 +473,12 @@
         boton.disabled = false;
         self.accionPendiente = null;
         UI.closeModal("modal-admin-accion");
+        if (accion.tipo === "rechazar_bolsa") {
+          UI.toast("Listo: se le avisa el motivo", "success");
+          self.cargarBolsa();
+          self.contarBolsa();
+          return;
+        }
         UI.toast(accion.tipo === "suspender"
           ? "Se suspendió " + accion.email
           : "Se eliminó " + accion.email, "success");
@@ -555,6 +592,62 @@
         salida.textContent = /HTTP|Failed|fetch|NetworkError/i.test(error.message)
           ? "No se pudo abrir la planilla. Tiene que estar compartida como «Cualquier persona con el enlace puede ver»."
           : error.message;
+      });
+    },
+
+    /* ====================================================================
+       BOLSA: lo que espera aprobación
+       Se ve el legajo para comprobar que sea estudiante, y el correo y el
+       teléfono por si hace falta preguntarle algo antes de aprobar.
+       ==================================================================== */
+    cargarBolsa: function () {
+      var self = this;
+      var cont = document.getElementById("admin-bolsa");
+      if (!cont) return;
+      cont.innerHTML = '<p class="search-hint">Cargando…</p>';
+
+      Api.rpc("admin_bolsa_pendientes").then(function (filas) {
+        filas = filas || [];
+        if (!filas.length) {
+          cont.innerHTML = '<p class="search-hint">No hay publicaciones esperando aprobación.</p>';
+          return;
+        }
+        cont.innerHTML = '<ul class="admin-bolsa-lista">' + filas.map(function (p) {
+          var venta = p.tipo === "venta";
+          return (
+            "<li>" +
+              '<div class="admin-bolsa-pub">' +
+                '<span class="bolsa-tipo ' + (venta ? "es-venta" : "es-compra") + '">' + (venta ? "Vende" : "Busca") + "</span> " +
+                "<strong>" + esc(p.titulo) + "</strong>" +
+                "<p>" + esc([p.categoria, p.precio_texto, venta ? p.estado_uso : null, p.ubicacion].filter(Boolean).join(" · ")) + "</p>" +
+                (p.descripcion ? '<p class="admin-bolsa-desc">' + esc(p.descripcion) + "</p>" : "") +
+              "</div>" +
+              '<dl class="admin-bolsa-autor">' +
+                "<div><dt>Quién</dt><dd>" + esc(p.autor_nombre || "Sin nombre") + '<span class="admin-correo">' + esc(p.autor_email) + "</span></dd></div>" +
+                "<div><dt>Legajo</dt><dd>" + esc(p.autor_legajo || "—") + "</dd></div>" +
+                "<div><dt>Teléfono</dt><dd>" + esc(p.autor_telefono || "—") + "</dd></div>" +
+                "<div><dt>Enviada</dt><dd>" + esc(fecha(p.creado_at, true)) + "</dd></div>" +
+              "</dl>" +
+              '<div class="admin-bolsa-acciones">' +
+                '<button type="button" class="btn btn-magenta btn-sm" data-action="adminBolsaAprobar" data-id="' + escAttr(p.id) + '">Aprobar</button>' +
+                '<button type="button" class="btn btn-secondary btn-sm" data-action="adminBolsaRechazar" data-id="' + escAttr(p.id) + '" data-titulo="' + escAttr(p.titulo) + '">No aprobar</button>' +
+              "</div>" +
+            "</li>"
+          );
+        }).join("") + "</ul>";
+      }, function (error) { self.errorEn("admin-bolsa", error); });
+    },
+
+    aprobarBolsa: function (id, boton) {
+      var self = this;
+      if (boton) boton.disabled = true;
+      Api.rpc("admin_moderar_bolsa", { p_publicacion: id, p_aprobar: true }).then(function () {
+        UI.toast("Aprobada: ya aparece en la bolsa por 60 días", "success");
+        self.cargarBolsa();
+        self.contarBolsa();
+      }, function (error) {
+        if (boton) boton.disabled = false;
+        UI.toast(error.message, "danger");
       });
     },
 

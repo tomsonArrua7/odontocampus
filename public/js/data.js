@@ -294,54 +294,6 @@ const ODONTO_DATA = {
     }
   ],
 
-  // Bolsa de Instrumental y Libros (Compra/Venta entre alumnos)
-  bolsaInstrumental: [
-    {
-      id: "art-1",
-      titulo: "Articulador Semiajustable tipo Whip-Mix con Arco Facial",
-      categoria: "Equipamiento",
-      estadoUso: "Como nuevo (1 cuatrimestre de uso)",
-      precio: "$ 140.000",
-      vendedor: "Martín (5° Año)",
-      contactoWhatsapp: "2215129876",
-      ubicacion: "La Plata / Facultad",
-      fecha: "Ayer"
-    },
-    {
-      id: "art-2",
-      titulo: "Caja Completa de Instrumental de Periodoncia (Curetas Gracey 1/2 a 13/14 Hu-Friedy)",
-      categoria: "Instrumental",
-      estadoUso: "Muy buen estado, excelente filo",
-      precio: "$ 85.000",
-      vendedor: "Florencia (Graduada)",
-      contactoWhatsapp: "2214332211",
-      ubicacion: "Facultad / Tolosa",
-      fecha: "Hace 3 días"
-    },
-    {
-      id: "art-3",
-      titulo: "Libro 'Operatoria Dental - Barrancos Mooney' 5ta Edición",
-      categoria: "Libros / Apuntes",
-      estadoUso: "Sin subrayar, encuadernación impecable",
-      precio: "$ 35.000",
-      vendedor: "Joaquín (4° Año)",
-      contactoWhatsapp: "2216778899",
-      ubicacion: "Centro La Plata",
-      fecha: "Hace 4 días"
-    },
-    {
-      id: "art-4",
-      titulo: "Micromotor y Contraángulo KaVo Intramatic",
-      categoria: "Rotatorios",
-      estadoUso: "Excelente funcionamiento, recién lubricado",
-      precio: "$ 110.000",
-      vendedor: "Lucía (5° Año)",
-      contactoWhatsapp: "2215904030",
-      ubicacion: "Mesa FOE",
-      fecha: "Hace 5 días"
-    }
-  ],
-
   // Base de Conocimiento Rápida para el Asistente OdontoBot
   knowledgeBase: [
     {

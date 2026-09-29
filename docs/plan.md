@@ -208,6 +208,19 @@ la base vieja, Mi carrera no puede guardar (pide tablas que no existen).
 - [ ] Compartirla como "cualquier persona con el enlace puede ver" y cargarla en Panel → Planillas → Biblioteca
 - [ ] Los militantes: sumar apuntes propios, revisar y marcar «sí» lo que se publica
 
+### Bolsa moderada: vendo / busco, con legajo y aprobación (septiembre 2026) 🙋 aplicar en el servidor
+
+- [x] 💻 Dos tipos de publicación, **Se vende** y **Se busca**, que se filtran por separado (y por categoría)
+- [x] 💻 Sólo con cuenta: sin sesión, la bolsa muestra la puerta de ingreso
+- [x] 💻 Para publicar se pide legajo y WhatsApp una sola vez; el legajo lo ve sólo el equipo de administración
+- [x] 💻 Toda publicación entra «en revisión»; Panel → Bolsa aprueba o rechaza con motivo (queda en el registro)
+- [x] 💻 Si quien publica cambia el contenido, vuelve a revisión; el teléfono se entrega sólo de aprobadas (`contacto_bolsa`)
+- [x] 💻 Fuera los datos de ejemplo de la bolsa en `js/data.js`
+- [ ] `git pull` en el sitio
+- [ ] Cargar `009_bolsa_moderada.sql`
+- [ ] `pruebas_rls.sql`: todo en OK (de 00 a 103)
+- [ ] Panel → Bolsa: revisar las pendientes (el número aparece en la pestaña)
+
 **Principio que no se negocia:** el login suma, no tapa. Mesas, reválidas,
 historias clínicas, instrumental y biblioteca siguen abiertas sin cuenta. Lo
 único que la pide es Mi promedio, porque guarda datos de la persona.

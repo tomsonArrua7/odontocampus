@@ -12,11 +12,11 @@
   <!-- Marca: un diente geométrico en blanco sobre el magenta de FOE. Se lee a
        16 px en una pestaña, que es la única prueba que importa para un ícono. -->
   <link rel="icon" href="favicon.ico" sizes="32x32">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260929f">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260929f">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260929g">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260929g">
   <!-- Instalable: "Agregar a pantalla de inicio" la abre sin barra del
        navegador, como una app. -->
-  <link rel="manifest" href="manifest.json?v=20260929f">
+  <link rel="manifest" href="manifest.json?v=20260929g">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="OdontoCampus">
@@ -29,7 +29,7 @@
   <meta property="og:locale" content="es_AR">
   <!-- Imagen del enlace (WhatsApp, Instagram, Twitter). Tiene que ser una URL
        absoluta y un archivo rasterizado: ninguna de esas apps lee SVG. -->
-  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260929f">
+  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260929g">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="OdontoCampus · FOE Odontología UNLP">
@@ -64,17 +64,17 @@
        LÍNEAS (y en las plantillas de correo del override de Supabase).
        Pasó de verdad: el sitio nuevo quedó cargando el config.js viejo, con la
        clave en PENDIENTE, y las cuentas no aparecían por ningún lado. -->
-  <link rel="stylesheet" href="css/01-tokens.css?v=20260929f">
-  <link rel="stylesheet" href="css/02-base.css?v=20260929f">
-  <link rel="stylesheet" href="css/03-components.css?v=20260929f">
-  <link rel="stylesheet" href="css/04-sections.css?v=20260929f">
-  <link rel="stylesheet" href="css/05-responsive.css?v=20260929f">
-  <link rel="stylesheet" href="css/06-cuentas.css?v=20260929f">
-  <link rel="stylesheet" href="css/08-agenda-juego.css?v=20260929f">
-  <link rel="stylesheet" href="css/07-movimiento.css?v=20260929f">
-  <link rel="stylesheet" href="css/09-app.css?v=20260929f">
-  <link rel="stylesheet" href="css/10-recursos.css?v=20260929f">
-  <link rel="stylesheet" href="css/11-consultorio.css?v=20260929f">
+  <link rel="stylesheet" href="css/01-tokens.css?v=20260929g">
+  <link rel="stylesheet" href="css/02-base.css?v=20260929g">
+  <link rel="stylesheet" href="css/03-components.css?v=20260929g">
+  <link rel="stylesheet" href="css/04-sections.css?v=20260929g">
+  <link rel="stylesheet" href="css/05-responsive.css?v=20260929g">
+  <link rel="stylesheet" href="css/06-cuentas.css?v=20260929g">
+  <link rel="stylesheet" href="css/08-agenda-juego.css?v=20260929g">
+  <link rel="stylesheet" href="css/07-movimiento.css?v=20260929g">
+  <link rel="stylesheet" href="css/09-app.css?v=20260929g">
+  <link rel="stylesheet" href="css/10-recursos.css?v=20260929g">
+  <link rel="stylesheet" href="css/11-consultorio.css?v=20260929g">
 </head>
 <body>
 
@@ -553,19 +553,43 @@
         <div class="guia-grid" id="guia-instrumental-grid"></div>
       </div>
 
+      <!-- La bolsa la dibuja js/bolsa.js: sólo con cuenta, y cada publicación
+           la aprueba FOE (009_bolsa_moderada.sql). -->
       <div class="tab-panel" id="panel-bolsa" role="tabpanel" aria-labelledby="tab-bolsa" tabindex="0" hidden>
-        <div class="filter-bar">
-          <div class="filter-group">
-            <div class="field search-field">
-              <label class="field-label" for="bolsa-search-input">Buscar artículo</label>
-              <svg class="ic" aria-hidden="true"><use href="#ic-buscar"></use></svg>
-              <input type="search" id="bolsa-search-input" class="form-control" placeholder="Articulador, turbina, fórceps, curetas…">
+        <div id="bolsa-acceso"></div>
+        <div id="bolsa-panel" hidden>
+          <div class="bolsa-cabecera">
+            <div class="bolsa-tipos" role="group" aria-label="Qué mostrar">
+              <button type="button" class="bolsa-tipo-btn es-activo" data-action="bolsaTipo" data-tipo="todas" aria-pressed="true">Todo</button>
+              <button type="button" class="bolsa-tipo-btn" data-action="bolsaTipo" data-tipo="venta" aria-pressed="false">Se vende</button>
+              <button type="button" class="bolsa-tipo-btn" data-action="bolsaTipo" data-tipo="compra" aria-pressed="false">Se busca</button>
             </div>
+            <button type="button" class="btn btn-magenta" data-action="bolsaPublicar">
+              <svg class="ic" aria-hidden="true"><use href="#ic-lapiz"></use></svg> Publicar
+            </button>
           </div>
-          <p class="filter-note"><svg class="ic" aria-hidden="true"><use href="#ic-escudo"></use></svg> Publicaciones entre estudiantes: coordiná siempre en la facultad</p>
+          <div class="filter-bar">
+            <div class="filter-group">
+              <div class="field search-field">
+                <label class="field-label" for="bolsa-buscar">Buscar</label>
+                <svg class="ic" aria-hidden="true"><use href="#ic-buscar"></use></svg>
+                <input type="search" id="bolsa-buscar" class="form-control" placeholder="Articulador, turbina, fórceps, libros…">
+              </div>
+              <div class="field">
+                <label class="field-label" for="bolsa-categoria">Categoría</label>
+                <select id="bolsa-categoria" class="form-control"></select>
+              </div>
+            </div>
+            <p class="filter-note"><svg class="ic" aria-hidden="true"><use href="#ic-escudo"></use></svg> Revisadas por FOE. Coordiná la entrega siempre en la facultad</p>
+          </div>
+          <p class="results-summary" id="bolsa-resumen" role="status" aria-live="polite"></p>
+          <div class="bolsa-lista" id="bolsa-lista"></div>
+
+          <section class="bolsa-mias" aria-labelledby="bolsa-mias-titulo">
+            <h3 id="bolsa-mias-titulo">Mis publicaciones</h3>
+            <div id="bolsa-mias"></div>
+          </section>
         </div>
-        <p class="results-summary" id="bolsa-summary" role="status" aria-live="polite"></p>
-        <div class="bolsa-grid" id="bolsa-grid"></div>
       </div>
     </div>
   </section>
@@ -910,7 +934,7 @@
       <div class="section-header">
         <div class="section-title-wrap">
           <h2 id="titulo-admin">Administración</h2>
-          <p>Cuentas, planillas y equipo. Todo lo que se hace desde acá queda registrado con nombre y fecha.</p>
+          <p>Cuentas, planillas, la bolsa y el equipo. Todo lo que se hace desde acá queda registrado con nombre y fecha.</p>
         </div>
       </div>
 
@@ -927,6 +951,11 @@
           <button type="button" class="tab" role="tab" id="tab-planillas" data-tab="planillas"
                   aria-controls="panel-planillas" aria-selected="false" tabindex="-1">
             <svg class="ic" aria-hidden="true"><use href="#ic-calendario"></use></svg> Planillas
+          </button>
+          <button type="button" class="tab" role="tab" id="tab-admin-bolsa" data-tab="bolsa"
+                  aria-controls="panel-admin-bolsa" aria-selected="false" tabindex="-1">
+            <svg class="ic" aria-hidden="true"><use href="#ic-etiqueta"></use></svg> Bolsa
+            <span class="admin-cantidad" id="admin-bolsa-cantidad" hidden></span>
           </button>
           <button type="button" class="tab" role="tab" id="tab-bot" data-tab="bot"
                   aria-controls="panel-bot" aria-selected="false" tabindex="-1">
@@ -1030,6 +1059,15 @@
           </div>
         </div>
 
+        <div class="tab-panel" id="panel-admin-bolsa" role="tabpanel" aria-labelledby="tab-admin-bolsa" tabindex="0" hidden>
+          <p class="admin-intro">
+            Publicaciones de la bolsa que esperan aprobación. Comprobá con el legajo que sea estudiante y que lo
+            publicado sea material de la carrera. <strong>El legajo y el teléfono no se comparten</strong>: el teléfono
+            se le da sólo a quien toque «Contactar» cuando esté aprobada.
+          </p>
+          <div id="admin-bolsa"></div>
+        </div>
+
         <div class="tab-panel" id="panel-bot" role="tabpanel" aria-labelledby="tab-bot" tabindex="0" hidden>
           <p class="admin-intro">
             Lo que le preguntaron al OdontoBot y no supo responder, ordenado por cuántas veces se repitió.
@@ -1078,6 +1116,77 @@
       <div class="acciones-inline">
         <button type="button" class="btn btn-secondary" data-action="adminCerrarAccion">Cancelar</button>
         <button type="submit" class="btn btn-danger-soft" id="admin-accion-boton">Confirmar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     BOLSA — publicar o editar (js/bolsa.js)
+     ========================================================================== -->
+<div class="modal-overlay" id="modal-bolsa" role="dialog" aria-modal="true" aria-labelledby="bolsa-form-titulo" aria-hidden="true">
+  <div class="modal-card">
+    <div class="modal-card-header">
+      <h2 id="bolsa-form-titulo">Nueva publicación</h2>
+      <button type="button" class="btn btn-icon btn-secondary" data-action="bolsaCerrarFormulario" aria-label="Cerrar">
+        <svg class="ic" aria-hidden="true"><use href="#ic-cerrar"></use></svg>
+      </button>
+    </div>
+    <form class="modal-card-body stack" id="form-bolsa" data-tipo="venta" novalidate>
+      <div class="bolsa-tipos bolsa-tipos-form" role="group" aria-label="Tipo de publicación">
+        <button type="button" class="bolsa-tipo-btn es-activo" data-action="bolsaTipoForm" data-tipo="venta" aria-pressed="true">Vendo algo</button>
+        <button type="button" class="bolsa-tipo-btn" data-action="bolsaTipoForm" data-tipo="compra" aria-pressed="false">Busco algo</button>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="bolsa-titulo">Qué es</label>
+        <input type="text" class="form-control" id="bolsa-titulo" name="bolsa-titulo" maxlength="120" required>
+      </div>
+      <div class="bolsa-form-fila">
+        <div class="field">
+          <label class="field-label" for="bolsa-categoria-form">Categoría</label>
+          <select class="form-control" id="bolsa-categoria-form" name="bolsa-categoria-form"></select>
+        </div>
+        <div class="field">
+          <label class="field-label" for="bolsa-precio" id="bolsa-precio-etiqueta">Precio</label>
+          <input type="text" class="form-control" id="bolsa-precio" name="bolsa-precio" maxlength="40" required>
+        </div>
+      </div>
+      <div class="bolsa-form-fila">
+        <div class="field" id="bolsa-uso-campo">
+          <label class="field-label" for="bolsa-estado-uso">Estado</label>
+          <select class="form-control" id="bolsa-estado-uso" name="bolsa-estado-uso"></select>
+        </div>
+        <div class="field">
+          <label class="field-label" for="bolsa-ubicacion">Dónde se entrega</label>
+          <input type="text" class="form-control" id="bolsa-ubicacion" name="bolsa-ubicacion" maxlength="120" required>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label" for="bolsa-descripcion">Detalles <span class="field-opcional">(opcional)</span></label>
+        <textarea class="form-control" id="bolsa-descripcion" name="bolsa-descripcion" rows="3" maxlength="600"></textarea>
+      </div>
+
+      <fieldset class="bolsa-datos" id="bolsa-datos">
+        <legend>Tus datos para publicar</legend>
+        <p>Se piden una sola vez. <strong>El legajo lo ve sólo el equipo de FOE</strong>, para comprobar que seas estudiante.
+          El teléfono se le da a quien toque «Contactar» en una publicación tuya aprobada.</p>
+        <div class="bolsa-form-fila">
+          <div class="field">
+            <label class="field-label" for="bolsa-legajo">Legajo</label>
+            <input type="text" class="form-control" id="bolsa-legajo" name="bolsa-legajo" placeholder="26778/6" inputmode="numeric" autocomplete="off">
+          </div>
+          <div class="field">
+            <label class="field-label" for="bolsa-telefono">WhatsApp</label>
+            <input type="tel" class="form-control" id="bolsa-telefono" name="bolsa-telefono" placeholder="2215551234" inputmode="tel" autocomplete="tel-national">
+          </div>
+        </div>
+      </fieldset>
+
+      <p class="bolsa-form-aviso" id="bolsa-form-aviso">FOE revisa cada publicación antes de que aparezca.</p>
+      <div class="acciones-inline">
+        <button type="button" class="btn btn-secondary" data-action="bolsaCerrarFormulario">Cancelar</button>
+        <button type="submit" class="btn btn-magenta" id="bolsa-enviar">Enviar a revisión</button>
       </div>
     </form>
   </div>
@@ -1527,22 +1636,23 @@
 </footer>
 
 <!-- Scripts: configuración y núcleo primero, módulos después, controlador al final -->
-<script src="js/config.js?v=20260929f"></script>
-<script src="js/core.js?v=20260929f"></script>
-<script src="js/api.js?v=20260929f"></script>
-<script src="js/data.js?v=20260929f"></script>
-<script src="js/planes.js?v=20260929f"></script>
-<script src="js/live_sheets.js?v=20260929f"></script>
-<script src="js/calculator.js?v=20260929f"></script>
-<script src="js/carrera.js?v=20260929f"></script>
-<script src="js/agenda.js?v=20260929f"></script>
-<script src="js/recursos.js?v=20260929f"></script>
-<script src="js/biblioteca-datos.js?v=20260929f"></script>
-<script src="js/biblioteca.js?v=20260929f"></script>
-<script src="js/hoy.js?v=20260929f"></script>
-<script src="js/auth.js?v=20260929f"></script>
-<script src="js/admin.js?v=20260929f"></script>
-<script src="js/chatbot.js?v=20260929f"></script>
-<script src="js/app.js?v=20260929f"></script>
+<script src="js/config.js?v=20260929g"></script>
+<script src="js/core.js?v=20260929g"></script>
+<script src="js/api.js?v=20260929g"></script>
+<script src="js/data.js?v=20260929g"></script>
+<script src="js/planes.js?v=20260929g"></script>
+<script src="js/live_sheets.js?v=20260929g"></script>
+<script src="js/calculator.js?v=20260929g"></script>
+<script src="js/carrera.js?v=20260929g"></script>
+<script src="js/agenda.js?v=20260929g"></script>
+<script src="js/recursos.js?v=20260929g"></script>
+<script src="js/biblioteca-datos.js?v=20260929g"></script>
+<script src="js/biblioteca.js?v=20260929g"></script>
+<script src="js/hoy.js?v=20260929g"></script>
+<script src="js/bolsa.js?v=20260929g"></script>
+<script src="js/auth.js?v=20260929g"></script>
+<script src="js/admin.js?v=20260929g"></script>
+<script src="js/chatbot.js?v=20260929g"></script>
+<script src="js/app.js?v=20260929g"></script>
 </body>
 </html>

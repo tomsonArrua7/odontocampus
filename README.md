@@ -69,7 +69,7 @@ public/               EL SITIO. Es exactamente lo que se copia a htdocs/
     config.js         URL de la API y clave pública. Lo único que cambia por entorno
     core.js           Núcleo: escapado, DOM, acciones, modales, pestañas, tema, fechas
     api.js            Cliente de Supabase: sesión, renovación de token, REST
-    data.js           Contenido editable a mano (noticias, apuntes, bolsa…)
+    data.js           Contenido editable a mano (noticias, historias clínicas…)
     planes.js         Planes de estudio. GENERADO desde infra/planes/: no se edita
     live_sheets.js    Sincronización con las planillas de mesas y reválidas
     calculator.js     Promedio y avance de carrera (sólo calcula y dibuja)
@@ -77,6 +77,7 @@ public/               EL SITIO. Es exactamente lo que se copia a htdocs/
     agenda.js         Agenda: entregas y finales propios sobre el calendario
     juego.js          Odontopreguntados: preguntas de una planilla de FOE
     auth.js           Registro, ingreso con contraseña, recuperación, Mi cuenta
+    bolsa.js          Bolsa de compra y venta: sólo con cuenta, vendo/busco, moderada
     admin.js          Panel de administración (la seguridad está en la base)
     chatbot.js        OdontoBot (buscador de preguntas frecuentes)
     app.js            Router, inicio, historias clínicas, biblioteca, buscador
@@ -399,6 +400,20 @@ Las que nunca van al repositorio ni al navegador son la `SUPABASE_SECRET_KEY`
 y la `SERVICE_ROLE_KEY`: saltean todas las políticas y viven sólo en el `.env`
 del servidor. `config.js` se niega a encender las cuentas si detecta una clave
 que no empiece con `sb_publishable_`.
+
+### La bolsa de compra y venta (009)
+
+- **Sólo con cuenta.** Sin sesión, la pestaña muestra la puerta de ingreso.
+- **Dos tipos:** «Se vende» y «Se busca» (un pedido, por si alguien lo tiene).
+  Se filtran por separado y por categoría.
+- **Legajo y WhatsApp para publicar.** Se piden una sola vez y quedan en el
+  perfil. El legajo no está entre las columnas que se pueden leer: lo ve sólo
+  el panel. El teléfono sale únicamente por `contacto_bolsa()`, y sólo de
+  publicaciones aprobadas y vigentes.
+- **Todo pasa por moderación.** Entra «pendiente»; Panel → Bolsa aprueba (60
+  días) o rechaza con un motivo que ve quien publicó. Si su dueño cambia el
+  contenido, vuelve a pendiente: se aprueba lo que se publica. Tope: 5 en
+  circulación (pendientes + activas).
 
 ---
 

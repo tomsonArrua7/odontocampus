@@ -22,7 +22,7 @@
     recursos:   { titulo: "Recursos", tabs: null },
     carrera:    { titulo: "Mi carrera", tabs: ["plan", "agenda", "juego"] },
     // No figura en el menú: se llega desde Mi cuenta, y sólo si es admin.
-    admin:      { titulo: "Administración", tabs: ["cuentas", "planillas", "bot", "equipo", "registro"] }
+    admin:      { titulo: "Administración", tabs: ["cuentas", "planillas", "bolsa", "bot", "equipo", "registro"] }
   };
 
   /* Enlaces viejos que la gente pudo haber guardado o compartido por WhatsApp.
@@ -62,7 +62,6 @@
 
       this.initNoticias();
       this.initHistoriasClinicas();
-      this.initBolsaInstrumental();
       this.initGuiaInstrumental();
       this.initBuscadorGlobal();
 
@@ -79,6 +78,7 @@
       if (global.OdontoRecursos) global.OdontoRecursos.init();
       if (global.OdontoBiblioteca) global.OdontoBiblioteca.init();
       if (global.OdontoHoy) global.OdontoHoy.init();
+      if (global.OdontoBolsa) global.OdontoBolsa.init();
       if (global.OdontoAuth) global.OdontoAuth.init();
       if (global.OdontoAdmin) global.OdontoAdmin.init();
 
@@ -393,6 +393,8 @@
         if (tab === "agenda" && global.OdontoAgenda) global.OdontoAgenda.mostrar();
         else if (tab === "juego" && global.OdontoHoy) global.OdontoHoy.pintarOdontopreguntados();
         else if (global.OdontoCarrera) global.OdontoCarrera.mostrar();
+      } else if (seccion === "cursada" && tab === "bolsa" && global.OdontoBolsa) {
+        global.OdontoBolsa.mostrar();
       } else if (seccion === "admin" && global.OdontoAdmin) {
         global.OdontoAdmin.mostrar(tab);
       }
@@ -746,71 +748,6 @@
 
     descargarApunte: function (titulo) {
       UI.toast('"' + titulo + '" todavía no está subido. Pedilo en la mesa de FOE y lo cargamos.', "info");
-    },
-
-    /* ======================================================================
-       BOLSA DE INSTRUMENTAL
-       ====================================================================== */
-    initBolsaInstrumental: function () {
-      var app = this;
-      if (!document.getElementById("bolsa-grid") || !global.ODONTO_DATA) return;
-
-      this.renderBolsa(global.ODONTO_DATA.bolsaInstrumental);
-
-      var input = document.getElementById("bolsa-search-input");
-      if (input) {
-        on(input, "input", UI.debounce(function () {
-          var q = UI.normalizar(input.value);
-          var lista = global.ODONTO_DATA.bolsaInstrumental.filter(function (item) {
-            return UI.normalizar(item.titulo).indexOf(q) !== -1 ||
-                   UI.normalizar(item.categoria).indexOf(q) !== -1 ||
-                   UI.normalizar(item.vendedor).indexOf(q) !== -1;
-          });
-          app.renderBolsa(lista, input.value);
-        }));
-      }
-    },
-
-    renderBolsa: function (lista, consulta) {
-      var cont = document.getElementById("bolsa-grid");
-      if (!cont) return;
-
-      this.resumen("bolsa-summary", lista.length, "publicación", "publicaciones", consulta);
-
-      if (!lista.length) {
-        cont.innerHTML = UI.emptyState({
-          icon: "maletin",
-          title: "No hay artículos con ese criterio",
-          text: "Probá con el nombre genérico del instrumento (turbina, fórceps, articulador) en vez de la marca."
-        });
-        return;
-      }
-
-      cont.innerHTML = lista.map(function (art) {
-        var mensaje = encodeURIComponent(
-          "Hola " + art.vendedor + "! Vi tu publicación en OdontoCampus (FOE) por \"" + art.titulo + "\". ¿Sigue disponible?"
-        );
-        var tel = String(art.contactoWhatsapp || "").replace(/\D/g, "");
-        var enlace = tel ? "https://wa.me/549" + tel + "?text=" + mensaje : "";
-
-        return (
-          '<article class="bolsa-card">' +
-            '<span class="bolsa-badge">' + esc(art.categoria) + "</span>" +
-            '<h3 class="bolsa-title">' + esc(art.titulo) + "</h3>" +
-            '<p class="bolsa-price">' + esc(art.precio) + "</p>" +
-            '<div class="bolsa-details">' +
-              '<span><svg class="ic" aria-hidden="true"><use href="#ic-tilde-circulo"></use></svg> Estado: ' + esc(art.estadoUso) + "</span>" +
-              '<span><svg class="ic" aria-hidden="true"><use href="#ic-pin"></use></svg> Entrega: ' + esc(art.ubicacion) + "</span>" +
-              '<span><svg class="ic" aria-hidden="true"><use href="#ic-persona"></use></svg> ' + esc(art.vendedor) + " · " + esc(art.fecha) + "</span>" +
-            "</div>" +
-            (enlace
-              ? '<a href="' + UI.safeUrl(enlace) + '" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-block">' +
-                  '<svg class="ic" aria-hidden="true"><use href="#ic-chat"></use></svg> Escribir a ' + esc(art.vendedor) +
-                "</a>"
-              : '<p class="filter-note">Sin contacto cargado</p>') +
-          "</article>"
-        );
-      }).join("");
     },
 
     /* ======================================================================

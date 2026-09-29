@@ -727,3 +727,96 @@ h1, h2, h3, h4 { letter-spacing: -0.01em; }
   #biblio-anio .chip-anio { flex-shrink: 0; }
   .biblio-materia { padding: var(--sp-4); }
 }
+
+
+/* ==========================================================================
+   10. BOLSA DE COMPRA Y VENTA (js/bolsa.js)
+   ========================================================================== */
+.bolsa-cabecera { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); flex-wrap: wrap; margin-bottom: var(--sp-4); }
+.bolsa-tipos { display: inline-flex; gap: 4px; padding: 4px; border-radius: 14px; background: var(--surface-3); }
+.bolsa-tipo-btn {
+  border: 0;
+  background: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semi);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.bolsa-tipo-btn:hover { color: var(--text-strong); }
+.bolsa-tipo-btn.es-activo { background: var(--surface); color: var(--text-strong); box-shadow: var(--shadow-md); }
+
+.bolsa-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--sp-4); }
+.bolsa-item { background: var(--surface); border-radius: var(--radius-xl); box-shadow: var(--shadow-md); padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-2); }
+.bolsa-item .btn { margin-top: auto; align-self: flex-start; }
+.bolsa-item-cab { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; }
+.bolsa-item h3 { font-family: var(--font-heading); font-size: var(--fs-lg); font-weight: var(--fw-bold); line-height: 1.25; }
+.bolsa-precio { font-size: var(--fs-md); font-weight: var(--fw-black); color: var(--text-strong); }
+.bolsa-desc { font-size: var(--fs-sm); color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.bolsa-meta { display: flex; flex-wrap: wrap; gap: 4px var(--sp-3); font-size: var(--fs-xs); color: var(--text-muted); margin-bottom: var(--sp-2); }
+.bolsa-meta span { display: inline-flex; align-items: center; gap: 4px; }
+.bolsa-propia { margin-top: auto; font-size: var(--fs-xs); font-weight: var(--fw-semi); color: var(--text-soft); }
+
+.bolsa-tipo, .bolsa-cat, .bolsa-estado {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+}
+.bolsa-tipo.es-venta { background: var(--accent-soft); color: var(--accent-soft-text); }
+.bolsa-tipo.es-compra { background: var(--info-bg); color: var(--info); }
+.bolsa-cat { background: var(--surface-2); color: var(--text-muted); font-weight: var(--fw-semi); }
+.bolsa-estado.es-pendiente { background: var(--warning-bg); color: var(--warning); }
+.bolsa-estado.es-activa { background: var(--success-bg); color: var(--success); }
+.bolsa-estado.es-pausada, .bolsa-estado.es-vendida { background: var(--surface-3); color: var(--text-muted); }
+.bolsa-estado.es-rechazada { background: var(--danger-bg); color: var(--danger); }
+
+.bolsa-mias { margin-top: var(--sp-8); max-width: 820px; }
+.bolsa-mias h3 { font-family: var(--font-heading); font-size: var(--fs-lg); font-weight: var(--fw-bold); margin-bottom: var(--sp-3); }
+.bolsa-mias-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-2); }
+.bolsa-mias-lista li { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); flex-wrap: wrap; background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-md); padding: var(--sp-3) var(--sp-4); }
+.bolsa-mia-texto { display: grid; gap: 2px; justify-items: start; min-width: 0; flex: 1 1 260px; }
+.bolsa-mia-texto small { font-size: var(--fs-xs); color: var(--text-muted); }
+.bolsa-mia-acciones { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; }
+
+/* Formulario */
+.bolsa-tipos-form { display: flex; }
+.bolsa-tipos-form .bolsa-tipo-btn { flex: 1; }
+.bolsa-form-fila { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+.bolsa-form-fila > [hidden] { display: none; }
+.bolsa-form-fila:has(> [hidden]) { grid-template-columns: 1fr; }
+.field-opcional { font-weight: var(--fw-semi); color: var(--text-soft); }
+.bolsa-datos { border: 0; margin: 0; padding: var(--sp-4); border-radius: 14px; background: var(--surface-2); display: grid; gap: var(--sp-2); }
+.bolsa-datos[hidden] { display: none; }
+.bolsa-datos legend { float: left; width: 100%; padding: 0; font-weight: var(--fw-bold); font-size: var(--fs-sm); }
+.bolsa-datos p { font-size: var(--fs-xs); color: var(--text-muted); }
+.bolsa-form-aviso { font-size: var(--fs-xs); color: var(--text-muted); }
+
+/* Administración */
+.admin-cantidad { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 11px; font-weight: var(--fw-bold); }
+.admin-cantidad[hidden] { display: none; }
+.admin-bolsa-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-3); }
+.admin-bolsa-lista > li { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto; gap: var(--sp-4); align-items: start; background: var(--surface); border-radius: var(--radius-xl); box-shadow: var(--shadow-md); padding: var(--sp-4) var(--sp-5); }
+.admin-bolsa-pub p { font-size: var(--fs-sm); color: var(--text-muted); margin-top: 4px; }
+.admin-bolsa-desc { white-space: pre-line; }
+.admin-bolsa-autor { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-2) var(--sp-3); margin: 0; font-size: var(--fs-sm); }
+.admin-bolsa-autor dt { font-size: var(--fs-xs); color: var(--text-soft); }
+.admin-bolsa-autor dd { margin: 0; font-weight: var(--fw-semi); overflow-wrap: anywhere; }
+.admin-bolsa-autor .admin-correo { display: block; font-weight: normal; }
+.admin-bolsa-acciones { display: grid; gap: var(--sp-2); }
+
+@media (max-width: 900px) {
+  .admin-bolsa-lista > li { grid-template-columns: 1fr; }
+  .admin-bolsa-acciones { display: flex; }
+}
+@media (max-width: 768px) {
+  .bolsa-cabecera .bolsa-tipos { flex: 1 1 100%; }
+  .bolsa-cabecera .bolsa-tipo-btn { flex: 1; }
+  .bolsa-cabecera > .btn { flex: 1 1 100%; justify-content: center; }
+  .bolsa-form-fila { grid-template-columns: 1fr; }
+  .bolsa-item { padding: var(--sp-4); }
+}

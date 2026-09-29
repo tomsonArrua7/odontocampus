@@ -1,7 +1,7 @@
 -- ==========================================================================
 -- OdontoCampus — Pruebas de seguridad del esquema (RLS y permisos)
 --
--- Correr DESPUÉS de aplicar todas las migraciones (001 a 008, ...), y otra
+-- Correr DESPUÉS de aplicar todas las migraciones (001 a 009, ...), y otra
 -- vez después de cualquier cambio:
 --
 --   cd /opt/supabase
@@ -433,9 +433,10 @@ exception when insufficient_privilege then
   raise notice 'OK     36. Una cuenta recién creada no puede publicar en las primeras 24 h';
 end $$;
 
--- Pasan las 24 horas (lo simula postgres)
+-- Pasan las 24 horas (lo simula postgres). Desde 009 publicar pide además
+-- legajo y teléfono: A ya cargó el teléfono en la prueba 10.
 reset role;
-update public.perfiles set puede_publicar_desde = now() - interval '1 day'
+update public.perfiles set puede_publicar_desde = now() - interval '1 day', legajo = '26778/6'
 where id = '00000000-0000-4000-8000-00000000000a';
 set local role authenticated;
 
@@ -1022,8 +1023,147 @@ end $$;
 
 reset role;
 
+-- ==========================================================================
+-- BOLSA MODERADA (009)
+-- G publica; B es otra cuenta común; D administra.
+-- ==========================================================================
+update public.perfiles set puede_publicar_desde = now() - interval '1 day' where id in ('00000000-0000-4000-8000-000000000011', '00000000-0000-4000-8000-00000000000b');
+
+set local role authenticated;
+do $$ begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-000000000011","role":"authenticated"}', true);
+end $$;
+
+do $$ begin
+  insert into public.publicaciones_bolsa (usuario_id, tipo, titulo, categoria, precio_texto, estado_uso, ubicacion)
+  values ('00000000-0000-4000-8000-000000000011', 'venta', 'Turbina Kavo', 'Instrumental', '$50.000', 'Usada', 'Facultad');
+  raise notice 'FALLA  91. Se publica sin legajo ni teléfono';
+exception when insufficient_privilege then
+  raise notice 'OK     91. Sin legajo y teléfono no se publica';
+end $$;
+
+do $$ begin
+  update public.perfiles set legajo = '12345' where id = '00000000-0000-4000-8000-000000000011';
+  raise notice 'FALLA  92. Se guardó un legajo con formato inválido';
+exception when check_violation then
+  raise notice 'OK     92. El legajo tiene que tener el formato de la UNLP (12345/6)';
+end $$;
+
+do $$ declare est text; v1 uuid; v2 uuid; begin
+  update public.perfiles set legajo = '31234/5', whatsapp = '2215551234' where id = '00000000-0000-4000-8000-000000000011';
+  -- El id lo pone la base (no se puede elegir): se guarda para las pruebas siguientes.
+  insert into public.publicaciones_bolsa (usuario_id, tipo, titulo, categoria, precio_texto, estado_uso, ubicacion)
+  values ('00000000-0000-4000-8000-000000000011', 'venta', 'Turbina Kavo', 'Instrumental', '$50.000', 'Usada', 'Facultad')
+  returning id into v1;
+  insert into public.publicaciones_bolsa (usuario_id, tipo, titulo, categoria, precio_texto, ubicacion)
+  values ('00000000-0000-4000-8000-000000000011', 'compra', 'Busco articulador', 'Instrumental', 'Hasta $30.000', 'Facultad')
+  returning id into v2;
+  perform set_config('odontocampus.p1', v1::text, false);
+  perform set_config('odontocampus.p2', v2::text, false);
+  select estado into est from public.publicaciones_bolsa where id = current_setting('odontocampus.p1')::uuid;
+  if est = 'pendiente' then raise notice 'OK     93. Con legajo y teléfono se publica, y queda pendiente de aprobación';
+  else raise notice 'FALLA  93. La publicación quedó %', est; end if;
+exception when others then
+  raise notice 'FALLA  93. No se pudo publicar con los datos completos: %', sqlerrm;
+end $$;
+
+do $$ begin
+  update public.publicaciones_bolsa set estado = 'activa' where id = current_setting('odontocampus.p1')::uuid;
+  raise notice 'FALLA  94. Quien publica se aprueba solo';
+exception when insufficient_privilege then
+  raise notice 'OK     94. Quien publica no se aprueba solo';
+end $$;
+
+do $$ begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-00000000000b","role":"authenticated"}', true);
+end $$;
+
+do $$ declare n int; begin
+  select count(*) into n from public.publicaciones_bolsa where usuario_id = '00000000-0000-4000-8000-000000000011';
+  if n = 0 then raise notice 'OK     95. Las pendientes no las ve nadie más';
+  else raise notice 'FALLA  95. Otra cuenta ve % publicaciones pendientes', n; end if;
+end $$;
+
+do $$ begin
+  perform public.admin_bolsa_pendientes();
+  raise notice 'FALLA  96. Una cuenta común ve las pendientes de moderación';
+exception when insufficient_privilege then
+  raise notice 'OK     96. Una cuenta común no ve la cola de moderación';
+end $$;
+
+do $$ begin
+  perform public.contacto_bolsa(current_setting('odontocampus.p1')::uuid);
+  raise notice 'FALLA  97. Se obtiene el teléfono de una publicación sin aprobar';
+exception when no_data_found then
+  raise notice 'OK     97. El teléfono no se entrega mientras no esté aprobada';
+end $$;
+
+do $$ begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-00000000000d","role":"authenticated"}', true);
+end $$;
+
+do $$ declare leg text; begin
+  select autor_legajo into leg from public.admin_bolsa_pendientes() where id = current_setting('odontocampus.p1')::uuid;
+  if leg = '31234/5' then raise notice 'OK     98. Un admin ve las pendientes con el legajo para verificar';
+  else raise notice 'FALLA  98. El listado de pendientes no trae el legajo (%)', leg; end if;
+exception when others then
+  raise notice 'FALLA  98. Un admin no pudo ver las pendientes: %', sqlerrm;
+end $$;
+
+do $$ begin
+  perform public.admin_moderar_bolsa(current_setting('odontocampus.p2')::uuid, false, 'no');
+  raise notice 'FALLA  99. Se rechaza sin motivo';
+exception when check_violation then
+  raise notice 'OK     99. Rechazar pide un motivo';
+end $$;
+
+do $$ declare est text; begin
+  perform public.admin_moderar_bolsa(current_setting('odontocampus.p1')::uuid, true);
+  perform public.admin_moderar_bolsa(current_setting('odontocampus.p2')::uuid, false, 'Falta el precio máximo');
+  select estado into est from public.publicaciones_bolsa where id = current_setting('odontocampus.p1')::uuid;
+  if est = 'activa' then raise notice 'OK     100. Un admin aprueba y rechaza publicaciones';
+  else raise notice 'FALLA  100. La aprobada quedó %', est; end if;
+exception when others then
+  raise notice 'FALLA  100. No se pudo moderar: %', sqlerrm;
+end $$;
+
+do $$ begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-00000000000b","role":"authenticated"}', true);
+end $$;
+
+do $$ declare n int; tel text; begin
+  select count(*) into n from public.publicaciones_bolsa where usuario_id = '00000000-0000-4000-8000-000000000011';
+  tel := public.contacto_bolsa(current_setting('odontocampus.p1')::uuid);
+  if n = 1 and tel = '2215551234' then raise notice 'OK     101. La aprobada se ve y se puede contactar; la rechazada no se ve';
+  else raise notice 'FALLA  101. Se ven % y el contacto dio %', n, tel; end if;
+exception when others then
+  raise notice 'FALLA  101. No se pudo ver o contactar la aprobada: %', sqlerrm;
+end $$;
+
+do $$ declare leg text; begin
+  select legajo into leg from public.perfiles where id = '00000000-0000-4000-8000-000000000011';
+  raise notice 'FALLA  102. Se lee el legajo de otra persona';
+exception when insufficient_privilege then
+  raise notice 'OK     102. El legajo de otra persona no se lee';
+end $$;
+
+do $$ begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-000000000011","role":"authenticated"}', true);
+end $$;
+
+do $$ declare est text; begin
+  update public.publicaciones_bolsa set precio_texto = '$1' where id = current_setting('odontocampus.p1')::uuid;
+  select estado into est from public.publicaciones_bolsa where id = current_setting('odontocampus.p1')::uuid;
+  if est = 'pendiente' then raise notice 'OK     103. Cambiar el contenido la vuelve a revisión';
+  else raise notice 'FALLA  103. Después de editarla quedó %', est; end if;
+exception when others then
+  raise notice 'FALLA  103. No se pudo editar la propia: %', sqlerrm;
+end $$;
+
+reset role;
+
 rollback;
 
 \echo
-\echo 'Pruebas terminadas (00 a 90). Todo se deshizo con ROLLBACK: no quedó nada en la base.'
+\echo 'Pruebas terminadas (00 a 103). Todo se deshizo con ROLLBACK: no quedó nada en la base.'
 \echo 'Si alguna línea dice FALLA, no publiques el cambio en el sitio.'

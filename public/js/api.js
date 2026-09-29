@@ -419,6 +419,15 @@
     });
   }
 
+  /** Cambia columnas de las filas que cumplen la consulta (PATCH). */
+  function actualizar(tabla, consulta, cambios) {
+    return pedirAutenticado("/rest/v1/" + tabla + "?" + consulta, {
+      metodo: "PATCH",
+      cuerpo: cambios,
+      cabeceras: { "Prefer": "return=minimal" }
+    });
+  }
+
   function borrar(tabla, consulta) {
     return pedirAutenticado("/rest/v1/" + tabla + "?" + consulta, { metodo: "DELETE" });
   }
@@ -449,6 +458,7 @@
     seleccionarPublico: seleccionarPublico,
     guardar: guardar,
     insertar: insertar,
+    actualizar: actualizar,
     borrar: borrar,
     rpc: rpc
   };

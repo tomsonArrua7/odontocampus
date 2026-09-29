@@ -814,6 +814,7 @@ docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < /hom
 docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/006_agenda_y_preguntas.sql
 docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/007_consultas_del_bot.sql
 docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/008_planilla_biblioteca.sql
+docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < /home/odontocampus/htdocs/odontocampus.com.ar/infra/supabase/sql/009_bolsa_moderada.sql
 ```
 
 La primera persona administradora se carga desde el servidor, con su correo
