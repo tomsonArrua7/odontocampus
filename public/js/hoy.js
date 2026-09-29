@@ -413,7 +413,7 @@
       cont.innerHTML =
         '<p class="hoy-anio-resumen">' +
           "<b>" + materias.length + "</b> materias" +
-          (conClases ? " · <b>" + conClases + "</b> con clases grabadas de FOE" : "") +
+          (conClases ? " · <b>" + conClases + "</b> con clases grabadas" : "") +
         "</p>" +
         avance +
         '<div class="hoy-anio-acciones">' +

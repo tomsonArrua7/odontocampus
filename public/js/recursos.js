@@ -47,7 +47,7 @@
       ] }
     ],
 
-    /* Por año: las clases grabadas de FOE (listas de YouTube, con el nombre
+    /* Por año: las clases grabadas del canal de FOE (listas de YouTube, con el nombre
        de la materia del plan) y las cuentas de cada cátedra. De 2.°, 4.° y
        5.° faltan las cátedras: las páginas de 4.° y 5.° estaban en Bento, que
        cerró, y la de 2.° no las tenía. */
@@ -179,7 +179,7 @@
       var delAnio = RECURSOS.anios[this.anio];
 
       var clases = delAnio.clases.map(function (c) {
-        return { titulo: c[0], detalle: "Clases grabadas por FOE", url: YT + c[1], icono: "video" };
+        return { titulo: c[0], detalle: "Clases grabadas", url: YT + c[1], icono: "video" };
       }).filter(function (c) { return self.coincide(c); });
       var catedras = delAnio.catedras.filter(function (c) { return self.coincide(c); });
 
