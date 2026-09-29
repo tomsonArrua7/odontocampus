@@ -12,11 +12,11 @@
   <!-- Marca: un diente geométrico en blanco sobre el magenta de FOE. Se lee a
        16 px en una pestaña, que es la única prueba que importa para un ícono. -->
   <link rel="icon" href="favicon.ico" sizes="32x32">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260929c">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260929c">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260929d">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260929d">
   <!-- Instalable: "Agregar a pantalla de inicio" la abre sin barra del
        navegador, como una app. -->
-  <link rel="manifest" href="manifest.json?v=20260929c">
+  <link rel="manifest" href="manifest.json?v=20260929d">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="OdontoCampus">
@@ -29,7 +29,7 @@
   <meta property="og:locale" content="es_AR">
   <!-- Imagen del enlace (WhatsApp, Instagram, Twitter). Tiene que ser una URL
        absoluta y un archivo rasterizado: ninguna de esas apps lee SVG. -->
-  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260929c">
+  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260929d">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="OdontoCampus · FOE Odontología UNLP">
@@ -64,17 +64,17 @@
        LÍNEAS (y en las plantillas de correo del override de Supabase).
        Pasó de verdad: el sitio nuevo quedó cargando el config.js viejo, con la
        clave en PENDIENTE, y las cuentas no aparecían por ningún lado. -->
-  <link rel="stylesheet" href="css/01-tokens.css?v=20260929c">
-  <link rel="stylesheet" href="css/02-base.css?v=20260929c">
-  <link rel="stylesheet" href="css/03-components.css?v=20260929c">
-  <link rel="stylesheet" href="css/04-sections.css?v=20260929c">
-  <link rel="stylesheet" href="css/05-responsive.css?v=20260929c">
-  <link rel="stylesheet" href="css/06-cuentas.css?v=20260929c">
-  <link rel="stylesheet" href="css/08-agenda-juego.css?v=20260929c">
-  <link rel="stylesheet" href="css/07-movimiento.css?v=20260929c">
-  <link rel="stylesheet" href="css/09-app.css?v=20260929c">
-  <link rel="stylesheet" href="css/10-recursos.css?v=20260929c">
-  <link rel="stylesheet" href="css/11-consultorio.css?v=20260929c">
+  <link rel="stylesheet" href="css/01-tokens.css?v=20260929d">
+  <link rel="stylesheet" href="css/02-base.css?v=20260929d">
+  <link rel="stylesheet" href="css/03-components.css?v=20260929d">
+  <link rel="stylesheet" href="css/04-sections.css?v=20260929d">
+  <link rel="stylesheet" href="css/05-responsive.css?v=20260929d">
+  <link rel="stylesheet" href="css/06-cuentas.css?v=20260929d">
+  <link rel="stylesheet" href="css/08-agenda-juego.css?v=20260929d">
+  <link rel="stylesheet" href="css/07-movimiento.css?v=20260929d">
+  <link rel="stylesheet" href="css/09-app.css?v=20260929d">
+  <link rel="stylesheet" href="css/10-recursos.css?v=20260929d">
+  <link rel="stylesheet" href="css/11-consultorio.css?v=20260929d">
 </head>
 <body>
 
@@ -172,6 +172,40 @@
 <!-- FIN ICONOS -->
 
 <a class="skip-link" href="#contenido-principal">Saltar al contenido</a>
+
+<!-- ==========================================================================
+     BIENVENIDA — sólo la primera vez, sin cuenta y entrando por el inicio.
+     Una idea y un botón: el tablero de "Hoy" tiene mucho para leer de golpe.
+     La maneja js/hoy.js.
+     ========================================================================== -->
+<div class="bienvenida" id="bienvenida" role="dialog" aria-modal="true"
+     aria-labelledby="bienvenida-titulo" aria-describedby="bienvenida-bajada" hidden>
+  <div class="bienvenida-caja">
+    <img src="FOE.jpg" alt="" class="bienvenida-logo" width="72" height="72">
+    <p class="bienvenida-marca">Odonto<span>Campus</span></p>
+    <h2 class="bienvenida-titulo" id="bienvenida-titulo">Tu carrera, en un solo lugar</h2>
+    <p class="bienvenida-bajada" id="bienvenida-bajada">
+      Mesas de finales, tu agenda, clases grabadas y preguntas para practicar.
+      Hecho por FOE para estudiantes de Odontología de la UNLP.
+    </p>
+
+    <div class="bienvenida-anio">
+      <p class="bienvenida-pregunta" id="bienvenida-pregunta">¿En qué año estás? <span>(opcional)</span></p>
+      <div class="chips-anio" role="group" aria-labelledby="bienvenida-pregunta">
+          <button type="button" class="chip-anio" data-action="bienvenidaAnio" data-anio="1" aria-pressed="false">1.º</button>
+          <button type="button" class="chip-anio" data-action="bienvenidaAnio" data-anio="2" aria-pressed="false">2.º</button>
+          <button type="button" class="chip-anio" data-action="bienvenidaAnio" data-anio="3" aria-pressed="false">3.º</button>
+          <button type="button" class="chip-anio" data-action="bienvenidaAnio" data-anio="4" aria-pressed="false">4.º</button>
+          <button type="button" class="chip-anio" data-action="bienvenidaAnio" data-anio="5" aria-pressed="false">5.º</button>
+      </div>
+    </div>
+
+    <button type="button" class="btn btn-magenta btn-lg bienvenida-empezar" data-action="bienvenidaEntrar">
+      Empezar <svg class="ic" aria-hidden="true"><use href="#ic-flecha-der"></use></svg>
+    </button>
+    <button type="button" class="bienvenida-cuenta" data-action="bienvenidaIngresar">Ya tengo cuenta</button>
+  </div>
+</div>
 
 <!-- ==========================================================================
      ENCABEZADO
@@ -1477,21 +1511,21 @@
 </footer>
 
 <!-- Scripts: configuración y núcleo primero, módulos después, controlador al final -->
-<script src="js/config.js?v=20260929c"></script>
-<script src="js/core.js?v=20260929c"></script>
-<script src="js/api.js?v=20260929c"></script>
-<script src="js/data.js?v=20260929c"></script>
-<script src="js/planes.js?v=20260929c"></script>
-<script src="js/live_sheets.js?v=20260929c"></script>
-<script src="js/calculator.js?v=20260929c"></script>
-<script src="js/carrera.js?v=20260929c"></script>
-<script src="js/agenda.js?v=20260929c"></script>
-<script src="js/juego.js?v=20260929c"></script>
-<script src="js/recursos.js?v=20260929c"></script>
-<script src="js/hoy.js?v=20260929c"></script>
-<script src="js/auth.js?v=20260929c"></script>
-<script src="js/admin.js?v=20260929c"></script>
-<script src="js/chatbot.js?v=20260929c"></script>
-<script src="js/app.js?v=20260929c"></script>
+<script src="js/config.js?v=20260929d"></script>
+<script src="js/core.js?v=20260929d"></script>
+<script src="js/api.js?v=20260929d"></script>
+<script src="js/data.js?v=20260929d"></script>
+<script src="js/planes.js?v=20260929d"></script>
+<script src="js/live_sheets.js?v=20260929d"></script>
+<script src="js/calculator.js?v=20260929d"></script>
+<script src="js/carrera.js?v=20260929d"></script>
+<script src="js/agenda.js?v=20260929d"></script>
+<script src="js/juego.js?v=20260929d"></script>
+<script src="js/recursos.js?v=20260929d"></script>
+<script src="js/hoy.js?v=20260929d"></script>
+<script src="js/auth.js?v=20260929d"></script>
+<script src="js/admin.js?v=20260929d"></script>
+<script src="js/chatbot.js?v=20260929d"></script>
+<script src="js/app.js?v=20260929d"></script>
 </body>
 </html>

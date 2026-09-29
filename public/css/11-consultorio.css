@@ -439,3 +439,112 @@ h1, h2, h3, h4 { letter-spacing: -0.01em; }
   .hoy-barra span { animation: oc-crecer 900ms 200ms var(--ease-entrada) both; transform-origin: left; }
   @keyframes oc-crecer { from { transform: scaleX(0); } to { transform: none; } }
 }
+
+
+/* ==========================================================================
+   5. BIENVENIDA (sólo la primera vez)
+   Una pantalla, una idea, un botón. Cubre todo, barra lateral incluida.
+   ========================================================================== */
+.bienvenida {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-modal) + 10);
+  display: grid;
+  place-items: center;
+  padding: calc(var(--sp-8) + var(--zona-arriba, 0px)) var(--sp-5) calc(var(--sp-8) + var(--zona-abajo, 0px));
+  overflow-y: auto;
+  color: #fff;
+  background:
+    radial-gradient(90% 70% at 85% 0%, rgba(230, 0, 126, 0.28) 0%, rgba(230, 0, 126, 0) 60%),
+    radial-gradient(120% 100% at 0% 100%, #1F3A66 0%, rgba(31, 58, 102, 0) 55%),
+    var(--brand-navy-800);
+}
+.bienvenida[hidden] { display: none; }
+.con-bienvenida, .con-bienvenida body { overflow: hidden; }
+
+.bienvenida-caja {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.bienvenida-logo { width: 72px; height: 72px; border-radius: 22px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); }
+.bienvenida-marca {
+  margin-top: var(--sp-4);
+  font-family: var(--font-heading);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-black);
+}
+.bienvenida-marca span { color: var(--brand-magenta-400); }
+
+.bienvenida-titulo {
+  margin-top: var(--sp-6);
+  font-family: var(--font-heading);
+  font-size: clamp(1.9rem, 1.4rem + 2.4vw, 2.6rem);
+  font-weight: var(--fw-black);
+  line-height: 1.12;
+  color: #fff;
+  text-wrap: balance;
+}
+.bienvenida-bajada { margin-top: var(--sp-3); color: #C3CEDB; font-size: var(--fs-md); text-wrap: balance; }
+
+.bienvenida-anio {
+  width: 100%;
+  margin-top: var(--sp-8);
+  padding: var(--sp-4);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.06);
+}
+.bienvenida-pregunta { font-weight: var(--fw-semi); margin-bottom: var(--sp-3); }
+.bienvenida-pregunta span { color: #8FA1B5; font-weight: var(--fw-normal); font-size: var(--fs-sm); }
+.bienvenida .chips-anio { justify-content: center; flex-wrap: nowrap; }
+.bienvenida .chip-anio {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-weight: var(--fw-bold);
+}
+.bienvenida .chip-anio:hover { border-color: rgba(255, 255, 255, 0.4); }
+.bienvenida .chip-anio.es-activo { background: #fff; border-color: #fff; color: var(--brand-navy-800); }
+
+.bienvenida-empezar { width: 100%; margin-top: var(--sp-6); min-height: 54px; font-size: var(--fs-md); }
+.bienvenida-cuenta {
+  margin-top: var(--sp-3);
+  padding: var(--sp-3);
+  background: none;
+  border: 0;
+  color: #C3CEDB;
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semi);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.bienvenida-cuenta:hover { color: #fff; }
+.bienvenida :focus-visible { outline-color: #fff; }
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes oc-bienvenida { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  .bienvenida-caja > * { animation: oc-bienvenida 560ms var(--ease-entrada) both; }
+  .bienvenida-caja > :nth-child(2) { animation-delay: 60ms; }
+  .bienvenida-caja > :nth-child(3) { animation-delay: 140ms; }
+  .bienvenida-caja > :nth-child(4) { animation-delay: 200ms; }
+  .bienvenida-caja > :nth-child(5) { animation-delay: 300ms; }
+  .bienvenida-caja > :nth-child(n+6) { animation-delay: 380ms; }
+  .bienvenida-logo { animation-name: oc-logo; }
+  @keyframes oc-logo { from { opacity: 0; transform: scale(0.7) rotate(-8deg); } to { opacity: 1; transform: none; } }
+
+  .bienvenida { transition: opacity 360ms var(--ease), transform 360ms var(--ease); }
+  .bienvenida.saliendo { opacity: 0; transform: scale(1.04); }
+  .bienvenida .chip-anio { transition: background-color 160ms var(--ease), color 160ms var(--ease), transform 120ms var(--ease); }
+  .bienvenida .chip-anio:active { transform: scale(0.94); }
+}

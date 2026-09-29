@@ -20,6 +20,7 @@
   var esc = UI.esc, escAttr = UI.escAttr;
 
   var CLAVE_ANIO = "odontocampus_recursos_anio"; // el mismo que usa Recursos
+  var CLAVE_BIENVENIDA = "odontocampus_bienvenida_v1";
   var DIAS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
   var MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
                "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
@@ -70,13 +71,80 @@
       if (guardado >= 1 && guardado <= 5) this.anio = guardado;
 
       UI.registerActions({
-        hoyAnio: function (data) { self.elegirAnio(Number(data.anio)); }
+        hoyAnio: function (data) { self.elegirAnio(Number(data.anio)); },
+        bienvenidaAnio: function (data, el) { self.marcarAnioBienvenida(Number(data.anio), el); },
+        bienvenidaEntrar: function () { self.cerrarBienvenida(); },
+        bienvenidaIngresar: function () {
+          self.cerrarBienvenida();
+          if (global.OdontoAuth) global.OdontoAuth.abrir("ingresar");
+        }
       });
 
       var api = Api();
       if (api) api.alCambiarSesion(function () { self.pintar(); });
 
       this.pintar();
+      this.quizasBienvenida();
+    },
+
+    /* ====================================================================
+       BIENVENIDA
+       Sólo la primera vez. No aparece si:
+       · ya la vio (queda anotado en este navegador);
+       · tiene la sesión iniciada (ya conoce el sitio);
+       · entró con un enlace a otra sección (el de las mesas que pasaron por
+         WhatsApp): esa persona vino a buscar algo puntual.
+       ==================================================================== */
+    quizasBienvenida: function () {
+      var vista = false;
+      try { vista = localStorage.getItem(CLAVE_BIENVENIDA) === "1"; } catch (e) { vista = true; }
+      var hash = String(global.location.hash || "").replace(/^#/, "");
+      var alInicio = !hash || hash === "inicio";
+      if (vista || usuario() || !alInicio) return;
+
+      var capa = document.getElementById("bienvenida");
+      if (!capa) return;
+      capa.hidden = false;
+      document.documentElement.classList.add("con-bienvenida");
+      this.anioBienvenida = null;
+      global.setTimeout(function () {
+        var boton = capa.querySelector(".bienvenida-empezar");
+        if (boton) boton.focus();
+      }, 60);
+    },
+
+    marcarAnioBienvenida: function (anio, boton) {
+      var capa = document.getElementById("bienvenida");
+      if (!capa || !(anio >= 1 && anio <= 5)) return;
+      // Tocar el año elegido otra vez lo desmarca: es opcional.
+      this.anioBienvenida = this.anioBienvenida === anio ? null : anio;
+      var elegido = this.anioBienvenida;
+      Array.prototype.forEach.call(capa.querySelectorAll(".chip-anio"), function (b) {
+        var activo = Number(b.getAttribute("data-anio")) === elegido;
+        b.classList.toggle("es-activo", activo);
+        b.setAttribute("aria-pressed", activo ? "true" : "false");
+      });
+      UI.vibrar(6);
+    },
+
+    cerrarBienvenida: function () {
+      var capa = document.getElementById("bienvenida");
+      try { localStorage.setItem(CLAVE_BIENVENIDA, "1"); } catch (e) { /* modo privado */ }
+      if (this.anioBienvenida) this.elegirAnio(this.anioBienvenida);
+      if (!capa || capa.hidden) return;
+
+      function quitar() {
+        capa.hidden = true;
+        capa.classList.remove("saliendo");
+        document.documentElement.classList.remove("con-bienvenida");
+        var main = document.getElementById("contenido-principal");
+        if (main) main.focus({ preventScroll: true });
+      }
+
+      var quieto = global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (quieto) { quitar(); return; }
+      capa.classList.add("saliendo");
+      global.setTimeout(quitar, 380);
     },
 
     visible: function () {
