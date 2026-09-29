@@ -485,7 +485,7 @@
         "</div>" +
         '<div class="modal-card-footer" style="border:0;background:none;padding-inline:0">' +
           '<span class="filter-note"><svg class="ic" aria-hidden="true"><use href="#ic-persona-ok"></use></svg> ' + esc(n.autor) + "</span>" +
-          '<a href="https://instagram.com/foe_odontounlp" target="_blank" rel="noopener noreferrer" class="btn btn-magenta btn-sm">' +
+          '<a href="https://instagram.com/foe.odontologia/" target="_blank" rel="noopener noreferrer" class="btn btn-magenta btn-sm">' +
             '<svg class="ic" aria-hidden="true"><use href="#ic-instagram"></use></svg> Instagram de FOE' +
           "</a>" +
         "</div>"

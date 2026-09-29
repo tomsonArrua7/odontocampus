@@ -10,7 +10,7 @@ const ODONTO_DATA = {
     lema: "Compromiso, gestión y acompañamiento estudiantil en cada paso de tu carrera.",
     contacto: {
       whatsapp: "2215550192",
-      instagram: "@foe_odontounlp",
+      instagram: "@foe.odontologia",
       email: "contacto@foe-unlp.org.ar",
       sede: "Mesa de FOE - Hall Central de la Facultad (50 entre 1 y 115)"
     }
@@ -404,7 +404,7 @@ Somos la agrupación gremial y académica de los estudiantes de Odontología de 
   • Biblioteca virtual de resúmenes y modelos de examen.
   • Calculadora de promedios y modelos de historias clínicas.
   • Asesoría académica y defensa de los derechos estudiantiles en el Consejo Directivo.
-- **Encontranos en**: Hall Central de la Facultad (calle 50 entre 1 y 115) o por Instagram **@foe_odontounlp**.`
+- **Encontranos en**: Hall Central de la Facultad (calle 50 entre 1 y 115) o por Instagram **@foe.odontologia**.`
     }
   ]
 };
