@@ -285,7 +285,7 @@
         return {
           texto: "Encontré **" + ultimo.materiaOriginal + "** en la planilla, pero las fechas cargadas " +
                  "ya pasaron (la última fue el " + ultimo.dia + ").\n\n" +
-                 "Cuando la cátedra publique el turno nuevo aparece acá y en Cuándo rindo.",
+                 "Cuando la cátedra publique el turno nuevo aparece acá y en Mesas y reválidas.",
           acciones: [{ texto: "Ver la planilla", destino: "fechas/mesas" }]
         };
       }

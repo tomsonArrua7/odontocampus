@@ -6,16 +6,15 @@
    texto ni un espaciado "a mano". Todo sale de acá.
 
    --------------------------------------------------------------------------
-   DIRECCIÓN VISUAL: "CARTEL DE FACULTAD"  (septiembre de 2026)
+   DIRECCIÓN VISUAL: "CONSULTORIO"  (septiembre de 2026)
 
-   El lenguaje de la plataforma es el del hall: carteles de tinta plana,
-   fotocopias, tipografía condensada, papel que amarillea. Tres consecuencias
-   que atraviesan todos los tokens:
+   Reemplaza a "cartel de facultad", que se sentía de afiche gremial y no de
+   herramienta de todos los días. El lenguaje ahora es el de una app:
 
-   1. El fondo es PAPEL, no blanco de aplicación. Un crema tibio, el de la
-      fotocopia de cátedra. Baja el brillo en la lectura nocturna.
-   2. Las esquinas son casi rectas y las sombras casi planas. El afiche no
-      tiene relieve: separa con bloques, reglas y color, no con elevación.
+   1. Fondo gris frío y claro; las tarjetas, blancas, flotan con una sombra
+      suave. El azul de FOE queda para las franjas de arriba y la navegación.
+   2. Esquinas redondeadas y nada en mayúsculas salvo abreviaturas cortas
+      (días de la semana). Los títulos se escriben como se dicen.
    3. El magenta TIENE DOS VALORES y no se mezclan:
         --accent       sólo como FONDO, con texto blanco encima   (4,6:1)
         --accent-text  sólo para TEXTO sobre papel                (5,8:1)
@@ -42,17 +41,18 @@
   --brand-navy-600: #1E3E62;
   --brand-navy-500: #254B77;
 
-  /* Papel: la escala neutra del tema claro. Cálida a propósito. */
-  --papel-50:  #FBF9F5;
-  --papel-100: #F4F1E9;
-  --papel-200: #EDE8DE;
-  --papel-300: #D8D2C6;
-  --papel-400: #BDB5A6;
+  /* Neutros fríos del tema claro (antes "papel", cálido). Los nombres se
+     conservan para no tocar cada archivo que los usa. */
+  --papel-50:  #F9FAFB;
+  --papel-100: #F2F4F7;
+  --papel-200: #EAECF0;
+  --papel-300: #E4E7EC;
+  --papel-400: #D0D5DD;
 
-  /* Tinta: casi negro azulado. El negro puro vibra sobre papel cálido. */
-  --tinta-900: #0A1524;
-  --tinta-700: #45525F;
-  --tinta-500: #77838F;
+  /* Tinta: casi negro azulado. */
+  --tinta-900: #101828;
+  --tinta-700: #475467;
+  --tinta-500: #667085;
 
   /* Grises fríos: se conservan para superficies de marca y compatibilidad. */
   --gray-50:  #F8FAFC;
@@ -151,7 +151,7 @@
   --fs-4xl:  clamp(1.75rem, 1.2rem + 2.4vw, 2.5rem);
   --fs-5xl:  clamp(2.125rem, 1.2rem + 4vw, 3.375rem);
 
-  --lh-tight: 1.08;      /* títulos de afiche: líneas casi pegadas */
+  --lh-tight: 1.15;
   --lh-snug:  1.3;
   --lh-base:  1.6;
   --lh-loose: 1.75;
@@ -163,8 +163,8 @@
   --fw-black:  800;
 
   --tracking-titulo: -0.02em;   /* títulos grandes, letras juntas */
-  --tracking-caps: 0.06em;
-  --tracking-etiqueta: 0.14em;  /* etiquetas chicas en mayúscula */
+  --tracking-caps: 0.01em;
+  --tracking-etiqueta: 0.01em;
 
   /* Ancho de línea cómodo para lectura (60–75 caracteres) */
   --measure: 68ch;
@@ -188,17 +188,19 @@
   /* ---- 6. Forma y elevación ---------------------------------------------
      Esquinas casi rectas: es lo que más aporta al carácter de afiche. 3px
      alcanza para que un botón no se sienta agresivo bajo el pulgar. */
-  --radius-xs: 2px;
-  --radius-sm: 3px;
-  --radius-md: 4px;
-  --radius-lg: 6px;
-  --radius-xl: 10px;
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 22px;
   --radius-full: 9999px;
 
-  --shadow-sm: 0 1px 0 rgba(10, 21, 36, 0.05);
-  --shadow-md: 0 2px 6px rgba(10, 21, 36, 0.07);
-  --shadow-lg: 0 12px 28px -12px rgba(10, 21, 36, 0.22);
-  --shadow-xl: 0 24px 48px -16px rgba(10, 21, 36, 0.30);
+  /* Sombras en capas, suaves: separan la tarjeta del fondo sin dibujarle un
+     borde. */
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-lg: 0 10px 30px rgba(16, 24, 40, 0.08), 0 2px 6px rgba(16, 24, 40, 0.04);
+  --shadow-xl: 0 24px 48px -12px rgba(16, 24, 40, 0.22);
   --shadow-accent: 0 6px 16px -6px rgba(230, 0, 126, 0.45);
 
   /* ---- 7. Movimiento ----------------------------------------------------
@@ -227,7 +229,7 @@
      Va como capa de `background-image` del propio elemento, nunca con
      `opacity` ni `mix-blend-mode`: las dos crean una capa compuesta aparte y,
      dentro de un `position: sticky`, el encabezado queda pintado corrido. */
-  --grano: url("../textura-grano.png?v=20260929a");
+  --grano: none; /* la textura de papel se fue con el estilo de afiche */
   --rejilla: rgba(255, 143, 197, 0.12);
 
   /* ---- 9. Capas (z-index nombrado) -------------------------------------- */
@@ -283,12 +285,12 @@
   :root:not([data-theme="light"]) {
     color-scheme: dark;
 
-    --bg:            #0E1621;
-    --bg-elevated:   #131E2B;
-    --surface:       #131E2B;
-    --surface-2:     #182433;
-    --surface-3:     #1F2D3F;
-    --surface-hover: #1F2D3F;
+    --bg:            #0B1220;
+    --bg-elevated:   #141D2E;
+    --surface:       #141D2E;
+    --surface-2:     #1A2438;
+    --surface-3:     #223049;
+    --surface-hover: #223049;
 
     --border:        #2A3848;
     --border-strong: #3A4B5F;
@@ -333,12 +335,12 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --bg:            #0E1621;
-  --bg-elevated:   #131E2B;
-  --surface:       #131E2B;
-  --surface-2:     #182433;
-  --surface-3:     #1F2D3F;
-  --surface-hover: #1F2D3F;
+  --bg:            #0B1220;
+  --bg-elevated:   #141D2E;
+  --surface:       #141D2E;
+  --surface-2:     #1A2438;
+  --surface-3:     #223049;
+  --surface-hover: #223049;
 
   --border:        #2A3848;
   --border-strong: #3A4B5F;

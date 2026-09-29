@@ -15,8 +15,8 @@
      planos. Cada uno declara sus pestañas internas.
      --------------------------------------------------------------------- */
   var RUTAS = {
-    inicio:     { titulo: "Inicio", tabs: null },
-    fechas:     { titulo: "Cuándo rindo", tabs: ["mesas", "revalidas"] },
+    inicio:     { titulo: "Hoy", tabs: null },
+    fechas:     { titulo: "Mesas y reválidas", tabs: ["mesas", "revalidas"] },
     cursada:    { titulo: "Cursada y clínica", tabs: ["historias", "instrumental", "bolsa"] },
     biblioteca: { titulo: "Biblioteca de apuntes", tabs: null },
     recursos:   { titulo: "Recursos", tabs: null },
@@ -78,6 +78,7 @@
       if (global.OdontoAgenda) global.OdontoAgenda.init();
       if (global.OdontoJuego) global.OdontoJuego.init();
       if (global.OdontoRecursos) global.OdontoRecursos.init();
+      if (global.OdontoHoy) global.OdontoHoy.init();
       if (global.OdontoAuth) global.OdontoAuth.init();
       if (global.OdontoAdmin) global.OdontoAdmin.init();
 
@@ -278,13 +279,20 @@
          o si el sistema pide menos movimiento, se cambia directo. */
       var app = this;
       var quieto = global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (cambioDeSeccion && document.startViewTransition && !quieto && !this.enTransicion) {
+      // Con la pestaña en segundo plano no hay nada que animar, y el navegador
+      // aborta la transición: se cambia directo.
+      var visible = document.visibilityState === "visible";
+      if (cambioDeSeccion && document.startViewTransition && !quieto && visible && !this.enTransicion) {
         this.enTransicion = true;
         document.documentElement.classList.add("con-vt");
         var transicion = document.startViewTransition(function () {
           app.aplicarSeccion(destino, forzarFoco, true, seccionEl);
         });
-        transicion.finished.then(function () { app.enTransicion = false; }, function () { app.enTransicion = false; });
+        function listo() { app.enTransicion = false; }
+        // Si se aborta (otra navegación encima, pestaña oculta), el cambio de
+        // sección ya se aplicó igual: sólo se pierde la animación.
+        transicion.ready.catch(function () {});
+        transicion.finished.then(listo, listo);
         return;
       }
       this.aplicarSeccion(destino, forzarFoco, cambioDeSeccion, seccionEl);
@@ -340,9 +348,26 @@
       if (barra) {
         var enlaces = $$(".barra-app-link", barra);
         var indice = -1;
+        // Primero la ruta exacta (carrera/juego), después la sección, y si
+        // no, cualquier pestaña de la misma sección que no sea el botón del
+        // centro (Agenda cae en "Mi carrera").
         enlaces.forEach(function (link, i) {
+          if (link.getAttribute("data-nav") === rutaCompleta) indice = i;
+        });
+        if (indice === -1) enlaces.forEach(function (link, i) {
           if (link.getAttribute("data-nav") === seccion) indice = i;
         });
+        if (indice === -1) enlaces.forEach(function (link, i) {
+          var v = link.getAttribute("data-nav");
+          if (indice === -1 && v.indexOf(seccion + "/") === 0 && !link.classList.contains("barra-app-centro")) indice = i;
+        });
+        enlaces.forEach(function (link, i) {
+          link.classList.toggle("active", i === indice);
+          if (i === indice) link.setAttribute("aria-current", "page");
+          else link.removeAttribute("aria-current");
+        });
+        // El botón del centro tiene su propio aspecto: la pastilla no lo marca.
+        if (indice !== -1 && enlaces[indice].classList.contains("barra-app-centro")) indice = -1;
         if (indice === -1) barra.setAttribute("data-sin-activo", "");
         else {
           barra.removeAttribute("data-sin-activo");
@@ -356,6 +381,8 @@
       if (seccion === "fechas" && global.OdontoLiveSheets) {
         if (tab === "revalidas") global.OdontoLiveSheets.renderRevalidas();
         else global.OdontoLiveSheets.renderMesasExamen();
+      } else if (seccion === "inicio" && global.OdontoHoy) {
+        global.OdontoHoy.pintar();
       } else if (seccion === "carrera") {
         // Cada pestaña decide si necesita cuenta y qué pedir.
         if (tab === "agenda" && global.OdontoAgenda) global.OdontoAgenda.mostrar();
@@ -418,33 +445,9 @@
      * finales. Va en una línea y no en una ficha aparte: informa sin sumar
      * otra cosa para mirar. Lo llama js/live_sheets.js al traer la planilla.
      */
+    /** La planilla se actualizó: el tablero "Hoy" vuelve a mirar la próxima mesa. */
     renderProximasFechas: function () {
-      var cont = document.getElementById("atajo-proxima");
-      if (!cont) return;
-
-      var sheets = global.OdontoLiveSheets;
-      var items = sheets && sheets.cachedItems ? sheets.cachedItems : [];
-
-      var proxima = items
-        .map(function (item) {
-          return { item: item, fecha: UI.parseFechaTexto(item.dia) };
-        })
-        .filter(function (entry) {
-          var d = UI.diasHasta(entry.fecha);
-          return d !== null && d >= 0;
-        })
-        .sort(function (a, b) { return a.fecha - b.fecha; })[0];
-
-      if (!proxima) { cont.hidden = true; return; }
-
-      var it = proxima.item;
-      var corta = UI.fechaCorta(proxima.fecha);
-      var dias = UI.diasHasta(proxima.fecha);
-      var cuando = dias === 0 ? "es hoy" : (dias === 1 ? "es mañana" : "faltan " + dias + " días");
-
-      cont.textContent = "Próxima: " + (it.materiaOriginal || it.materia) + " · " +
-        corta.dia + " " + corta.mes.toLowerCase() + ", " + cuando;
-      cont.hidden = false;
+      if (global.OdontoHoy) global.OdontoHoy.pintarMesa();
     },
 
     /* ======================================================================

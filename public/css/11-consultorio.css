@@ -1,0 +1,441 @@
+/* ==========================================================================
+   ODONTOCAMPUS — 11 · CONSULTORIO
+   --------------------------------------------------------------------------
+   La dirección visual elegida en septiembre de 2026 (propuesta 2): un tablero
+   de app. Fondo gris claro, tarjetas blancas que flotan, el azul de FOE en la
+   navegación y en las franjas de arriba, el magenta para lo que se toca.
+
+   Va último a propósito: se apoya en los componentes de siempre y cambia
+   cómo se ven. Los colores, radios y sombras vienen de 01-tokens.css.
+
+   Estructura:
+   1. Base y tipografía
+   2. Navegación: barra lateral en la compu, encabezado y barra flotante en
+      el celular
+   3. Componentes: títulos, pestañas, botones, tarjetas, campos
+   4. Hoy (el inicio)
+   ========================================================================== */
+
+:root { --lado-ancho: 248px; }
+
+/* ==========================================================================
+   1. BASE
+   ========================================================================== */
+body { background: var(--bg); }
+
+h1, h2, h3, h4 { letter-spacing: -0.01em; }
+
+/* ==========================================================================
+   2. NAVEGACIÓN
+   ========================================================================== */
+.main-header {
+  background-color: var(--brand-surface);
+  background-image: none;
+  border-bottom: 0;
+  box-shadow: none;
+}
+
+.brand-logo-img { border: 0; border-radius: 12px; }
+.brand-title { font-weight: var(--fw-black); }
+.brand-subtitle { letter-spacing: 0; }
+
+.nav-link {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semi);
+  letter-spacing: 0;
+  border-radius: 12px;
+}
+.nav-link .ic { font-size: 1.1rem; flex-shrink: 0; }
+.nav-link.active,
+.nav-link[aria-current="page"] {
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.lado-dudas { display: none; }
+
+/* --- Compu: barra lateral --------------------------------------------------- */
+@media (min-width: 1025px) {
+  .main-header {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: var(--lado-ancho);
+    padding: var(--sp-6) var(--sp-4);
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .main-header::-webkit-scrollbar { display: none; }
+  .main-header > .container { padding: 0; max-width: none; height: 100%; }
+
+  .navbar,
+  .main-header.desplazado .navbar {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: var(--sp-5);
+    min-height: 100%;
+  }
+
+  .brand-container { padding: 0 var(--sp-2); }
+
+  .nav-utils { order: 1; flex-wrap: wrap; }
+  .btn-search-trigger { flex: 1 1 100%; justify-content: flex-start; border-radius: 12px; }
+  .btn-search-trigger .kbd-shortcut { margin-left: auto; }
+
+  .nav-menu {
+    order: 2;
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 2px;
+  }
+  .nav-link { min-height: 42px; padding: var(--sp-2) var(--sp-3); gap: var(--sp-3); }
+
+  .lado-dudas {
+    display: block;
+    order: 3;
+    margin-top: auto;
+    padding: var(--sp-3) var(--sp-4);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--on-brand-muted);
+    font-size: var(--fs-xs);
+    line-height: 1.5;
+  }
+  .lado-dudas b { display: block; color: #fff; font-size: var(--fs-sm); margin-bottom: 2px; }
+  .lado-dudas a { color: var(--brand-magenta-300); }
+
+  main#contenido-principal,
+  .main-footer { margin-left: var(--lado-ancho); }
+
+  /* Con la barra al costado, el contenido tiene menos ancho útil. */
+  .container { max-width: 1120px; }
+  .main-header .container { max-width: none; }
+}
+
+/* --- Celular: barra flotante ------------------------------------------------ */
+@media (max-width: 768px) {
+  :root { --barra-app-alto: 66px; }
+
+  .barra-app {
+    left: 12px;
+    right: 12px;
+    bottom: calc(10px + var(--zona-abajo));
+    padding-bottom: 0;
+    border-top: 0;
+    border-radius: 24px;
+    background-color: var(--brand-surface);
+    background-image: none;
+    box-shadow: 0 12px 30px rgba(11, 25, 44, 0.35);
+  }
+  .barra-app ul { padding: 0 var(--sp-2); }
+
+  .barra-app-link { padding-top: 11px; color: #93A4BF; font-weight: var(--fw-semi); }
+  .barra-app-link.active { color: #fff; }
+
+  .barra-app-indicador { top: 7px; height: 34px; }
+  .barra-app-indicador::before { width: 52px; background: rgba(255, 255, 255, 0.10); }
+
+  /* El botón del centro: practicar, levantado sobre la barra. */
+  .barra-app-link.barra-app-centro { padding-top: 0; justify-content: center; }
+  .barra-app-centro .ic {
+    width: 54px;
+    height: 54px;
+    padding: 14px;
+    margin-top: -28px;
+    border-radius: 18px;
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(230, 0, 126, 0.45);
+  }
+  .barra-app-centro.active .ic { box-shadow: 0 0 0 3px #fff, 0 8px 18px rgba(230, 0, 126, 0.45); }
+
+  body { padding-bottom: calc(var(--barra-app-alto) + var(--zona-abajo) + 22px); }
+  .odontobot-fab { bottom: calc(var(--barra-app-alto) + var(--zona-abajo) + 26px); }
+  .toast-container { bottom: calc(var(--barra-app-alto) + var(--zona-abajo) + 96px); }
+
+  .main-header .navbar { min-height: 60px; }
+}
+
+/* ==========================================================================
+   3. COMPONENTES
+   ========================================================================== */
+
+/* --- Títulos de sección: como se dicen, sin regla de afiche ---------------- */
+.section-title-wrap h2 {
+  border-top: 0;
+  padding-top: 0;
+  font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.1rem);
+  font-weight: var(--fw-black);
+  line-height: 1.15;
+}
+.section-title-wrap p { font-size: var(--fs-md); }
+.subsection-title { letter-spacing: -0.01em; }
+
+/* --- Pestañas: control segmentado ------------------------------------------ */
+.tabs {
+  gap: var(--sp-2);
+  border-bottom: 0;
+  padding: 4px;
+  background: var(--surface-3);
+  border-radius: 16px;
+  width: fit-content;
+  max-width: 100%;
+}
+.tab {
+  min-height: 40px;
+  padding: var(--sp-2) var(--sp-4);
+  border: 0;
+  margin: 0;
+  border-radius: 12px;
+  letter-spacing: 0;
+  font-weight: var(--fw-semi);
+  color: var(--text-muted);
+}
+.tab:hover { background: rgba(255, 255, 255, 0.55); }
+.tab[aria-selected="true"] {
+  background: var(--surface);
+  color: var(--text-strong);
+  box-shadow: var(--shadow-md);
+}
+.tab[aria-selected="true"] .ic { color: var(--accent-text); }
+
+/* --- Botones --------------------------------------------------------------- */
+.btn { border-radius: 12px; letter-spacing: 0; }
+.btn-lg { border-radius: 14px; }
+.btn-magenta { box-shadow: 0 6px 16px -6px rgba(230, 0, 126, 0.55); }
+
+/* --- Tarjetas: flotan con sombra, sin borde marcado ------------------------ */
+.card, .hc-card, .biblio-card, .bolsa-card, .guia-card,
+.calculator-year-card, .puerta-carrera, .recursos-anio, .admin-planilla,
+.agenda-calendario-caja, .agenda-dia, .agenda-proximos-caja, .form-recordatorio,
+.juego-caja, .odontograma, .filter-bar, .live-sync-banner, .modal-card {
+  border-color: transparent;
+  box-shadow: var(--shadow-md);
+}
+.card:hover, .hc-card:hover, .biblio-card:hover, .bolsa-card:hover, .guia-card:hover {
+  border-color: transparent;
+  box-shadow: var(--shadow-lg);
+}
+.recurso { border-color: transparent; box-shadow: var(--shadow-sm); }
+.recurso:hover { border-color: transparent; box-shadow: var(--shadow-lg); }
+.juego-opcion:hover:not([disabled]) { box-shadow: var(--shadow-lg); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .card:hover, .hc-card:hover, .biblio-card:hover, .bolsa-card:hover,
+  .guia-card:hover, .recurso:hover { transform: translateY(-2px); }
+}
+
+.modal-card { border: 0; border-radius: var(--radius-xl); }
+
+/* --- Campos ---------------------------------------------------------------- */
+.form-control, .form-select { border-radius: 12px; }
+
+/* --- Etiquetas chicas: sin mayúsculas, con peso ---------------------------- */
+.news-tag, .badge-materia-anio, .etiqueta-modalidad { letter-spacing: 0; }
+
+/* --- Pie: con la barra al costado ya no hace falta repetir el menú -------- */
+.main-footer { border-top: 0; }
+
+/* ==========================================================================
+   4. HOY
+   ========================================================================== */
+.hoy-banda {
+  background:
+    radial-gradient(120% 140% at 100% 0%, #1F3A66 0%, rgba(31, 58, 102, 0) 60%),
+    var(--brand-surface);
+  color: #fff;
+  padding: var(--sp-8) 0 88px;
+}
+.hoy-fecha { color: #A9B7CC; font-size: var(--fs-sm); font-weight: var(--fw-semi); }
+.hoy-saludo {
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 1.3rem + 2vw, 2.4rem);
+  font-weight: var(--fw-black);
+  color: #fff;
+  margin: 2px 0 var(--sp-4);
+}
+.hoy-progreso { max-width: 520px; }
+.hoy-bajada { color: #CBD5E1; margin-bottom: var(--sp-4); }
+.hoy-acciones { display: flex; gap: var(--sp-3); flex-wrap: wrap; }
+.hoy-progreso-fila {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  font-size: var(--fs-sm);
+  color: #CBD5E1;
+  margin-bottom: var(--sp-2);
+}
+.hoy-progreso-fila b { color: #fff; }
+.hoy-barra { height: 8px; border-radius: 99px; background: rgba(255, 255, 255, 0.14); overflow: hidden; }
+.hoy-barra span {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #FF5CB3, var(--accent));
+}
+
+.hoy-grilla {
+  margin-top: -64px;
+  padding-bottom: var(--sp-12);
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: var(--sp-5);
+  align-items: start;
+  position: relative;
+}
+.hoy-col { display: grid; gap: var(--sp-5); min-width: 0; }
+
+.hoy-tarjeta {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  padding: var(--sp-5);
+  box-shadow: var(--shadow-lg);
+}
+
+.hoy-bloque { display: grid; gap: var(--sp-3); }
+.hoy-bloque-cab { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+.hoy-bloque-cab h2 { font-family: var(--font-heading); font-size: var(--fs-lg); font-weight: var(--fw-bold); }
+.hoy-bloque-cab > a { color: var(--accent-text); font-size: var(--fs-sm); font-weight: var(--fw-bold); }
+
+.hoy-vacio { color: var(--text-muted); font-size: var(--fs-sm); }
+.hoy-enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  margin-top: var(--sp-3);
+  color: var(--accent-text);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+}
+
+/* --- Próxima mesa --- */
+.hoy-mesa-cab { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-3); flex-wrap: wrap; margin-bottom: var(--sp-3); }
+.hoy-mesa-cab small { color: var(--text-muted); font-size: var(--fs-xs); font-weight: var(--fw-semi); }
+.hoy-pastilla {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: var(--accent-soft);
+  color: var(--accent-soft-text);
+}
+.hoy-mesa-materia { font-family: var(--font-heading); font-size: var(--fs-xl); font-weight: var(--fw-bold); line-height: 1.25; }
+.hoy-mesa-meta { display: flex; gap: var(--sp-3); flex-wrap: wrap; margin: var(--sp-1) 0 var(--sp-4); color: var(--text-muted); font-size: var(--fs-sm); }
+.hoy-cuenta { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-2); }
+.hoy-cuenta div { background: var(--surface-2); border-radius: 14px; text-align: center; padding: var(--sp-3) 0; }
+.hoy-cuenta b { display: block; font-family: var(--font-heading); font-size: 1.6rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.hoy-cuenta b .ic { font-size: 1.4rem; color: var(--accent-text); }
+.hoy-cuenta small { color: var(--text-muted); font-size: var(--fs-xs); font-weight: var(--fw-semi); }
+
+/* --- Accesos --- */
+.hoy-accesos { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-2); padding: var(--sp-4); }
+.hoy-accesos a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semi);
+  color: var(--text);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.hoy-accesos a > span:first-child {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  font-size: 1.5rem;
+  background: var(--surface-2);
+  transition: var(--transition);
+}
+.hoy-accesos a:hover > span:first-child { background: var(--surface-3); }
+.acc-azul { color: #2E90FA; }
+.acc-verde { color: #12B76A; }
+.acc-naranja { color: #F79009; }
+.acc-magenta { color: var(--accent-text); }
+
+/* --- Esta semana --- */
+.hoy-lista { list-style: none; padding: 0; margin: 0; }
+.hoy-lista li { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) 0; border-top: 1px solid var(--border); }
+.hoy-lista li:first-child { border-top: 0; padding-top: 0; }
+.hoy-dia { width: 44px; text-align: center; flex-shrink: 0; }
+.hoy-dia b { display: block; font-family: var(--font-heading); font-size: 1.2rem; line-height: 1; }
+.hoy-dia small { color: var(--text-muted); font-size: 11px; font-weight: var(--fw-bold); text-transform: uppercase; }
+.hoy-lista-texto { display: grid; min-width: 0; }
+.hoy-lista-texto strong { font-size: var(--fs-sm); }
+.hoy-lista-texto small { color: var(--text-muted); font-size: var(--fs-xs); }
+
+/* --- Tu año --- */
+.hoy-materias { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-3); }
+.hoy-materia {
+  background: var(--surface);
+  border-radius: 18px;
+  padding: var(--sp-3) var(--sp-4) var(--sp-4);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.hoy-materia > i { width: 32px; height: 4px; border-radius: 99px; background: var(--basicas, #2E90FA); }
+.hoy-materia.area-basicas > i { background: #2E90FA; }
+.hoy-materia.area-clinicas > i { background: #12B76A; }
+.hoy-materia.area-ops > i { background: #F79009; }
+.hoy-materia h3 { font-size: var(--fs-sm); font-weight: var(--fw-bold); line-height: 1.3; }
+.hoy-materia-pie { margin-top: auto; font-size: var(--fs-xs); }
+.hoy-materia-pie a { display: inline-flex; align-items: center; gap: 4px; color: var(--text-muted); font-weight: var(--fw-semi); }
+.hoy-materia-pie a:hover { color: var(--accent-text); }
+.hoy-estado {
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: var(--fw-bold);
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+.hoy-estado.es-aprobada { background: var(--success-bg); color: var(--success); }
+.hoy-estado.es-regular { background: var(--accent-soft); color: var(--accent-soft-text); }
+
+.hoy-bloque .chips-anio .chip-anio { min-height: 32px; padding: 0 var(--sp-3); }
+
+/* --- Novedades dentro de una tarjeta --- */
+.novedades-lista.hoy-tarjeta { border-top: 0; padding: var(--sp-2) var(--sp-4); }
+.novedades-lista.hoy-tarjeta li:last-child .novedad { border-bottom: 0; }
+.hoy-col .novedad { grid-template-columns: minmax(0, 1fr) auto; padding: var(--sp-3) 0; }
+.hoy-col .novedad-meta { flex-direction: row; gap: var(--sp-2); grid-column: 1; }
+.hoy-col .novedad-titulo { grid-column: 1; font-size: var(--fs-sm); }
+.hoy-col .novedad-flecha { grid-column: 2; grid-row: 1 / span 2; }
+.hoy-col .novedad:hover { background: none; }
+
+@media (max-width: 1024px) {
+  .hoy-grilla { grid-template-columns: 1fr; }
+  /* En una sola columna, primero lo del día (mesa, accesos, semana) y
+     después lo largo (las materias del año, las novedades). */
+  .hoy-col { display: contents; }
+  #hoy-mesa { order: 1; }
+  .hoy-accesos { order: 2; }
+  [aria-labelledby="hoy-semana-titulo"] { order: 3; }
+  [aria-labelledby="hoy-anio-titulo"] { order: 4; }
+  [aria-labelledby="titulo-novedades"] { order: 5; }
+}
+@media (max-width: 768px) {
+  .hoy-banda { padding: var(--sp-6) 0 80px; }
+  .hoy-materias { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hoy-tarjeta { padding: var(--sp-4); }
+  .hoy-accesos a > span:first-child { width: 52px; height: 52px; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hoy-col > * { animation: oc-subir 420ms var(--ease-entrada) both; }
+  .hoy-col > :nth-child(2) { animation-delay: 70ms; }
+  .hoy-col > :nth-child(3) { animation-delay: 140ms; }
+  .hoy-barra span { animation: oc-crecer 900ms 200ms var(--ease-entrada) both; transform-origin: left; }
+  @keyframes oc-crecer { from { transform: scaleX(0); } to { transform: none; } }
+}

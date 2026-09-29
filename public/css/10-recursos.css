@@ -9,7 +9,7 @@
 /* --- Por año --------------------------------------------------------------- */
 .recursos-anio {
   background: var(--surface);
-  border: 2px solid var(--text);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: var(--sp-5);
   margin-bottom: var(--sp-8);
@@ -59,7 +59,6 @@
   gap: var(--sp-2);
   font-size: var(--fs-sm);
   font-weight: var(--fw-bold);
-  text-transform: uppercase;
   letter-spacing: var(--tracking-etiqueta);
   color: var(--text-muted);
   margin-bottom: var(--sp-3);
@@ -90,7 +89,7 @@
   transition: var(--transition);
   -webkit-tap-highlight-color: transparent;
 }
-.recurso:hover { border-color: var(--text); text-decoration: none; box-shadow: 3px 3px 0 var(--text); }
+.recurso:hover { border-color: var(--text); text-decoration: none; box-shadow: var(--shadow-lg); }
 
 .recurso-icono {
   display: grid;

@@ -38,7 +38,6 @@
   font-family: var(--font-heading);
   font-size: var(--fs-lg);
   font-weight: var(--fw-bold);
-  text-transform: uppercase;
   letter-spacing: 0.01em;
 }
 .agenda-botones { display: flex; gap: var(--sp-2); }
@@ -49,7 +48,6 @@
   padding-bottom: var(--sp-2);
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
-  text-transform: uppercase;
   letter-spacing: var(--tracking-caps);
   color: var(--text-muted);
 }
@@ -113,7 +111,6 @@
   font-family: var(--font-body);
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
-  text-transform: uppercase;
   letter-spacing: var(--tracking-etiqueta);
   color: var(--accent-text);
 }
@@ -157,7 +154,6 @@
 .agenda-proximos-caja h3 {
   font-family: var(--font-heading);
   font-size: var(--fs-md);
-  text-transform: uppercase;
   letter-spacing: 0.01em;
   margin-bottom: var(--sp-3);
 }
@@ -168,7 +164,6 @@
 .agenda-cuando {
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
-  text-transform: uppercase;
   letter-spacing: var(--tracking-etiqueta);
   color: var(--accent-text);
 }
@@ -178,7 +173,6 @@
 .form-recordatorio h3 {
   font-family: var(--font-heading);
   font-size: var(--fs-lg);
-  text-transform: uppercase;
   letter-spacing: 0.01em;
   margin-bottom: var(--sp-4);
 }
@@ -197,7 +191,7 @@
 
 .juego-caja {
   background: var(--surface);
-  border: 2px solid var(--text);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: var(--sp-6);
   min-height: 320px;
@@ -219,7 +213,6 @@
 .juego-materia {
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
-  text-transform: uppercase;
   letter-spacing: var(--tracking-etiqueta);
   color: var(--text-muted);
   margin-bottom: var(--sp-2);
@@ -249,7 +242,7 @@
   cursor: pointer;
   transition: var(--transition);
 }
-.juego-opcion:hover:not([disabled]) { border-color: var(--text); box-shadow: 3px 3px 0 var(--text); }
+.juego-opcion:hover:not([disabled]) { border-color: var(--text); box-shadow: var(--shadow-lg); }
 .juego-opcion[disabled] { cursor: default; }
 
 /* La respuesta no se marca sólo con color: la correcta lleva borde grueso y

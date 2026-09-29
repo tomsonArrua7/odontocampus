@@ -125,27 +125,35 @@ Si necesitás un valor nuevo, agregá un token; no escribas un `#hex` suelto en
 otro archivo. Es la única forma de que el tema oscuro siga funcionando y de que
 el conjunto no se desarme con el tiempo.
 
-La dirección visual es **"cartel de facultad"**: el lenguaje del hall —tinta
-plana, fotocopia, tipografía condensada— puesto en un sistema.
+La dirección visual es **"Consultorio"** (septiembre de 2026, propuesta 2
+elegida entre dos maquetas): un tablero de app. Fondo gris claro, tarjetas
+blancas que flotan con sombra suave, el azul de FOE en la navegación y en la
+franja de arriba del inicio, el magenta para lo que se toca. Reemplazó a
+"cartel de facultad", que se sentía de afiche gremial y no de herramienta
+diaria.
+
+La capa que define el aspecto es `css/11-consultorio.css`, cargada al final:
+navegación (barra lateral en la compu, barra flotante con "Practicar" al
+centro en el celular), pestañas como control segmentado, tarjetas, y el
+inicio "Hoy" (`js/hoy.js`).
 
 ### Color
 
-- El fondo es **papel** (`--papel-100`, un crema tibio), no blanco de
-  aplicación. Baja el brillo en la lectura nocturna y saca la sensación de
-  plantilla.
+- El fondo es gris frío y claro (`--papel-100`, #F2F4F7: el nombre quedó de
+  la versión anterior). Las tarjetas son blancas.
 - El magenta tiene **dos valores y no se mezclan**: `--accent` (#E6007E) sólo
   como **fondo** con texto blanco encima (4,6:1), y `--accent-text` (#B8005F)
   sólo para **texto** sobre papel (5,8:1). Sobre azul va
   `--on-brand-accent` (#FF8FC5, 8:1). El magenta pleno como texto sobre blanco
   no alcanza el mínimo de contraste: era el error de la versión anterior.
-- `--brand-surface` para las superficies oscuras de marca (encabezado,
-  portada, pie, panel del promedio). Siguen oscuras en ambos temas: son la
-  firma visual.
+- `--brand-surface` para las superficies oscuras de marca (barra lateral,
+  franja del inicio, barra flotante, pie). Siguen oscuras en ambos temas.
 - Estados apagados a propósito: `--success`, `--warning`, `--danger`, `--info`,
   cada uno con su `-bg`. **Un aplazo no se pinta de rojo**: es información, no
   una emergencia. El rojo queda para lo irreversible.
-- Las esquinas son casi rectas (`--radius-sm` = 3px) y las sombras casi planas:
-  el afiche separa con bloques y reglas, no con relieve.
+- Esquinas redondeadas (de 6 a 22 px) y sombras en capas, suaves. Sin
+  mayúsculas salvo abreviaturas cortas (días de la semana), sin bordes de
+  tinta ni textura de papel.
 
 ### Tipografía
 

@@ -302,7 +302,6 @@
   color: var(--surface);
   font-size: var(--fs-xs);
   padding: 3px 9px;
-  text-transform: uppercase;
   letter-spacing: var(--tracking-caps);
 }
 
@@ -319,7 +318,6 @@
   padding: 3px 9px;
   border-radius: var(--radius-xs);
   letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
 }
 .tipo-revalida { background: var(--accent-soft); color: var(--accent-soft-text); }
 .tipo-actualizacion { background: var(--warning-bg); color: var(--warning); }
@@ -329,7 +327,6 @@
   color: inherit;
   padding: 0;
   font-size: var(--fs-xs);
-  text-transform: uppercase;
   letter-spacing: var(--tracking-etiqueta);
 }
 
@@ -355,7 +352,6 @@
   font-size: var(--fs-xs);
   padding: 3px 10px;
   margin-bottom: var(--sp-2);
-  text-transform: uppercase;
   letter-spacing: var(--tracking-caps);
   align-self: flex-start;
 }
@@ -411,7 +407,7 @@
 .hc-card:hover, .biblio-card:hover, .bolsa-card:hover,
 .guia-card:hover {
   border-color: var(--text);
-  box-shadow: 4px 4px 0 var(--text);
+  box-shadow: var(--shadow-lg);
 }
 
 .card-head {
@@ -470,7 +466,6 @@
   padding: var(--sp-3) var(--sp-4);
   font-size: var(--fs-sm);
   font-weight: var(--fw-bold);
-  text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-muted);
   background: none;
@@ -622,7 +617,7 @@
    css/07-movimiento.css, que la apaga si el sistema pide menos movimiento. */
 .modal-card {
   background: var(--surface);
-  border: 2px solid var(--text);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   max-width: 640px;
   width: 100%;
@@ -768,7 +763,6 @@
   color: var(--text-strong);
   border-bottom: 1px solid var(--border);
   font-size: var(--fs-xs);
-  text-transform: uppercase;
   letter-spacing: var(--tracking-caps);
   position: sticky;
   top: 0;

@@ -196,7 +196,6 @@
 }
 .datos-cuenta dt {
   font-size: var(--fs-xs);
-  text-transform: uppercase;
   letter-spacing: var(--tracking-caps);
   color: var(--text-muted);
   font-weight: var(--fw-bold);
@@ -245,7 +244,7 @@
   /* Afiche: borde de tinta y una franja magenta arriba. Es lo primero que ve
      quien entra a Mi carrera sin cuenta, así que se comporta como un cartel
      y no como una tarjeta más. */
-  border: 2px solid var(--text);
+  border: 1px solid var(--border);
   border-top: 6px solid var(--accent);
   border-radius: var(--radius-md);
   box-shadow: none;
@@ -255,7 +254,6 @@
   font-family: var(--font-heading);
   font-size: var(--fs-2xl);
   font-weight: var(--fw-black);
-  text-transform: uppercase;
   letter-spacing: var(--tracking-titulo);
   line-height: var(--lh-tight);
   color: var(--text-strong);
@@ -379,7 +377,7 @@
   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: 0;
   margin: 0 0 var(--sp-6);
-  border: 2px solid var(--text);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   overflow: hidden;
   background: var(--surface);
@@ -389,7 +387,6 @@
 .admin-resumen dt {
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
-  text-transform: uppercase;
   letter-spacing: var(--tracking-etiqueta);
   color: var(--text-muted);
 }
@@ -418,7 +415,6 @@
   border-radius: var(--radius-xs);
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
-  text-transform: uppercase;
   letter-spacing: var(--tracking-etiqueta);
   white-space: nowrap;
 }
@@ -458,7 +454,7 @@
 .admin-resultado.es-ok { color: var(--success); font-weight: var(--fw-semi); }
 .admin-resultado.es-error { color: var(--danger); font-weight: var(--fw-semi); }
 
-.admin-equipo-lista { list-style: none; padding: 0; margin: 0 0 var(--sp-6); border-top: 2px solid var(--text); }
+.admin-equipo-lista { list-style: none; padding: 0; margin: 0 0 var(--sp-6); border-top: 1px solid var(--border); }
 .admin-equipo-lista li {
   display: flex;
   align-items: center;
@@ -470,7 +466,7 @@
 .admin-otorgar { display: flex; align-items: flex-end; gap: var(--sp-3); flex-wrap: wrap; max-width: 640px; }
 .admin-otorgar .field { flex: 1 1 280px; }
 
-.admin-registro-lista { list-style: none; padding: 0; border-top: 2px solid var(--text); }
+.admin-registro-lista { list-style: none; padding: 0; border-top: 1px solid var(--border); }
 .admin-registro-lista li {
   display: grid;
   grid-template-columns: 11rem minmax(0, 1fr);
@@ -501,7 +497,7 @@
 }
 
 /* --- Consultas que el bot no supo responder --- */
-.admin-consultas { list-style: none; padding: 0; border-top: 2px solid var(--text); }
+.admin-consultas { list-style: none; padding: 0; border-top: 1px solid var(--border); }
 .admin-consultas li {
   display: grid;
   grid-template-columns: 3.5rem minmax(0, 1fr) auto;

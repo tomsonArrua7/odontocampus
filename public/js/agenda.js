@@ -166,6 +166,8 @@
           self.cargando = false;
           self.cargado = true;
           self.abrir();
+          // El tablero "Hoy" muestra la semana: se entera cuando llega.
+          if (global.OdontoHoy) global.OdontoHoy.pintarSemana();
         }, function (error) {
           self.cargando = false;
           self.pintarAcceso("error", error.message);
@@ -199,7 +201,7 @@
       if (estado === "sin-backend") {
         acceso.innerHTML = this.puerta("herramientas", "La agenda todavía no está disponible",
           "<p class=\"puerta-lead\">Estamos terminando de preparar las cuentas. Las mesas de finales " +
-          "siguen publicadas en <strong>Cuándo rindo</strong>.</p>");
+          "siguen publicadas en <strong>Mesas y reválidas</strong>.</p>");
         return;
       }
 
