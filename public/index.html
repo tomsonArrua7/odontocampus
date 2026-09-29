@@ -12,11 +12,11 @@
   <!-- Marca: un diente geométrico en blanco sobre el magenta de FOE. Se lee a
        16 px en una pestaña, que es la única prueba que importa para un ícono. -->
   <link rel="icon" href="favicon.ico" sizes="32x32">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260928e">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260928e">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260929a">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260929a">
   <!-- Instalable: "Agregar a pantalla de inicio" la abre sin barra del
        navegador, como una app. -->
-  <link rel="manifest" href="manifest.json?v=20260928e">
+  <link rel="manifest" href="manifest.json?v=20260929a">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="OdontoCampus">
@@ -29,7 +29,7 @@
   <meta property="og:locale" content="es_AR">
   <!-- Imagen del enlace (WhatsApp, Instagram, Twitter). Tiene que ser una URL
        absoluta y un archivo rasterizado: ninguna de esas apps lee SVG. -->
-  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260928e">
+  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260929a">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="OdontoCampus · FOE Odontología UNLP">
@@ -64,15 +64,16 @@
        LÍNEAS (y en las plantillas de correo del override de Supabase).
        Pasó de verdad: el sitio nuevo quedó cargando el config.js viejo, con la
        clave en PENDIENTE, y las cuentas no aparecían por ningún lado. -->
-  <link rel="stylesheet" href="css/01-tokens.css?v=20260928e">
-  <link rel="stylesheet" href="css/02-base.css?v=20260928e">
-  <link rel="stylesheet" href="css/03-components.css?v=20260928e">
-  <link rel="stylesheet" href="css/04-sections.css?v=20260928e">
-  <link rel="stylesheet" href="css/05-responsive.css?v=20260928e">
-  <link rel="stylesheet" href="css/06-cuentas.css?v=20260928e">
-  <link rel="stylesheet" href="css/08-agenda-juego.css?v=20260928e">
-  <link rel="stylesheet" href="css/07-movimiento.css?v=20260928e">
-  <link rel="stylesheet" href="css/09-app.css?v=20260928e">
+  <link rel="stylesheet" href="css/01-tokens.css?v=20260929a">
+  <link rel="stylesheet" href="css/02-base.css?v=20260929a">
+  <link rel="stylesheet" href="css/03-components.css?v=20260929a">
+  <link rel="stylesheet" href="css/04-sections.css?v=20260929a">
+  <link rel="stylesheet" href="css/05-responsive.css?v=20260929a">
+  <link rel="stylesheet" href="css/06-cuentas.css?v=20260929a">
+  <link rel="stylesheet" href="css/08-agenda-juego.css?v=20260929a">
+  <link rel="stylesheet" href="css/07-movimiento.css?v=20260929a">
+  <link rel="stylesheet" href="css/09-app.css?v=20260929a">
+  <link rel="stylesheet" href="css/10-recursos.css?v=20260929a">
 </head>
 <body>
 
@@ -192,6 +193,7 @@
         <li><a href="#fechas" class="nav-link" data-nav="fechas">Cuándo rindo</a></li>
         <li><a href="#cursada" class="nav-link" data-nav="cursada">Cursada y clínica</a></li>
         <li><a href="#biblioteca" class="nav-link" data-nav="biblioteca">Biblioteca</a></li>
+        <li><a href="#recursos" class="nav-link" data-nav="recursos">Recursos</a></li>
         <li><a href="#carrera" class="nav-link" data-nav="carrera">Mi carrera</a></li>
       </ul>
 
@@ -241,6 +243,7 @@
         <li><a href="#cursada/instrumental" class="nav-link" data-nav="cursada/instrumental">Instrumental por cátedra</a></li>
         <li><a href="#cursada/bolsa" class="nav-link" data-nav="cursada/bolsa">Bolsa de compra y venta</a></li>
         <li><a href="#biblioteca" class="nav-link" data-nav="biblioteca">Biblioteca de apuntes</a></li>
+        <li><a href="#recursos" class="nav-link" data-nav="recursos">Recursos y enlaces</a></li>
         <li><a href="#carrera" class="nav-link" data-nav="carrera">Mi carrera</a></li>
       </ul>
       </nav>
@@ -540,6 +543,30 @@
         <p class="results-summary" id="bolsa-summary" role="status" aria-live="polite"></p>
         <div class="bolsa-grid" id="bolsa-grid"></div>
       </div>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       RECURSOS — lo que estaba en el Linktree de FOE. Lo dibuja
+       js/recursos.js, donde también están los enlaces.
+       ====================================================================== -->
+  <section id="seccion-recursos" class="app-section" aria-labelledby="titulo-recursos">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2 id="titulo-recursos">Recursos</h2>
+          <p>Clases grabadas, cátedras, trámites, redes y todo lo que antes estaba en el Linktree de FOE, en un solo lugar.</p>
+        </div>
+      </div>
+
+      <div class="field recursos-buscador">
+        <label class="field-label" for="recursos-buscar">Buscar un enlace</label>
+        <input type="search" class="form-control" id="recursos-buscar" autocomplete="off"
+               placeholder="Anatomía, SIU, comedor, Discord…">
+      </div>
+
+      <div class="recursos-anio" id="recursos-anio"></div>
+      <div class="recursos-grupos" id="recursos-grupos"></div>
     </div>
   </section>
 
@@ -1027,7 +1054,7 @@
     <li><a href="#inicio" class="barra-app-link" data-nav="inicio"><svg class="ic" aria-hidden="true"><use href="#ic-casa"></use></svg><span>Inicio</span></a></li>
     <li><a href="#fechas" class="barra-app-link" data-nav="fechas"><svg class="ic" aria-hidden="true"><use href="#ic-calendario"></use></svg><span>Rindo</span></a></li>
     <li><a href="#cursada" class="barra-app-link" data-nav="cursada"><svg class="ic" aria-hidden="true"><use href="#ic-maletin"></use></svg><span>Clínica</span></a></li>
-    <li><a href="#biblioteca" class="barra-app-link" data-nav="biblioteca"><svg class="ic" aria-hidden="true"><use href="#ic-libro"></use></svg><span>Apuntes</span></a></li>
+    <li><a href="#recursos" class="barra-app-link" data-nav="recursos"><svg class="ic" aria-hidden="true"><use href="#ic-marcador"></use></svg><span>Recursos</span></a></li>
     <li><a href="#carrera" class="barra-app-link" data-nav="carrera"><svg class="ic" aria-hidden="true"><use href="#ic-diente"></use></svg><span>Mi carrera</span></a></li>
   </ul>
 </nav>
@@ -1410,9 +1437,13 @@
              class="btn btn-icon" aria-label="Instagram de FOE (se abre en una pestaña nueva)">
             <svg class="ic" aria-hidden="true"><use href="#ic-instagram"></use></svg>
           </a>
-          <a href="https://wa.me/5492215550192" target="_blank" rel="noopener noreferrer"
-             class="btn btn-icon" aria-label="WhatsApp de FOE (se abre en una pestaña nueva)">
-            <svg class="ic" aria-hidden="true"><use href="#ic-chat"></use></svg>
+          <a href="https://www.youtube.com/@Foe.odontologia" target="_blank" rel="noopener noreferrer"
+             class="btn btn-icon" aria-label="YouTube de FOE (se abre en una pestaña nueva)">
+            <svg class="ic" aria-hidden="true"><use href="#ic-video"></use></svg>
+          </a>
+          <a href="https://tiktok.com/@foe.odontologia" target="_blank" rel="noopener noreferrer"
+             class="btn btn-icon" aria-label="TikTok de FOE (se abre en una pestaña nueva)">
+            <svg class="ic" aria-hidden="true"><use href="#ic-celular"></use></svg>
           </a>
         </div>
       </div>
@@ -1431,7 +1462,9 @@
       <div class="footer-col">
         <h4>Facultad</h4>
         <ul class="footer-links">
-          <li><a href="https://guarani.unlp.edu.ar" target="_blank" rel="noopener noreferrer">SIU Guaraní</a></li>
+          <li><a href="https://autogestion.guarani.unlp.edu.ar/" target="_blank" rel="noopener noreferrer">SIU Guaraní</a></li>
+          <li><a href="https://grado.folp.unlp.edu.ar/login/index.php" target="_blank" rel="noopener noreferrer">Aulas virtuales</a></li>
+          <li><a href="#recursos" data-nav="recursos">Todos los recursos</a></li>
           <li><a href="https://www.folp.unlp.edu.ar" target="_blank" rel="noopener noreferrer">Portal FOLP UNLP</a></li>
           <li><a href="#biblioteca" data-nav="biblioteca">Biblioteca de apuntes</a></li>
         </ul>
@@ -1441,8 +1474,8 @@
         <h4>Contacto FOE</h4>
         <p class="footer-contact">
           <strong>Sede:</strong> mesa de FOE, hall central de la facultad (calle 50 entre 1 y 115, La Plata).<br>
-          <strong>WhatsApp:</strong> <a href="https://wa.me/5492215550192" target="_blank" rel="noopener noreferrer">221 555-0192</a><br>
-          <strong>Email:</strong> <a href="mailto:contacto@foe-unlp.org.ar">contacto@foe-unlp.org.ar</a>
+          <strong>Consultas:</strong> por mensaje directo en
+          <a href="https://instagram.com/foe.odontologia/" target="_blank" rel="noopener noreferrer">Instagram @foe.odontologia</a>.
         </p>
       </div>
     </div>
@@ -1455,19 +1488,20 @@
 </footer>
 
 <!-- Scripts: configuración y núcleo primero, módulos después, controlador al final -->
-<script src="js/config.js?v=20260928e"></script>
-<script src="js/core.js?v=20260928e"></script>
-<script src="js/api.js?v=20260928e"></script>
-<script src="js/data.js?v=20260928e"></script>
-<script src="js/planes.js?v=20260928e"></script>
-<script src="js/live_sheets.js?v=20260928e"></script>
-<script src="js/calculator.js?v=20260928e"></script>
-<script src="js/carrera.js?v=20260928e"></script>
-<script src="js/agenda.js?v=20260928e"></script>
-<script src="js/juego.js?v=20260928e"></script>
-<script src="js/auth.js?v=20260928e"></script>
-<script src="js/admin.js?v=20260928e"></script>
-<script src="js/chatbot.js?v=20260928e"></script>
-<script src="js/app.js?v=20260928e"></script>
+<script src="js/config.js?v=20260929a"></script>
+<script src="js/core.js?v=20260929a"></script>
+<script src="js/api.js?v=20260929a"></script>
+<script src="js/data.js?v=20260929a"></script>
+<script src="js/planes.js?v=20260929a"></script>
+<script src="js/live_sheets.js?v=20260929a"></script>
+<script src="js/calculator.js?v=20260929a"></script>
+<script src="js/carrera.js?v=20260929a"></script>
+<script src="js/agenda.js?v=20260929a"></script>
+<script src="js/juego.js?v=20260929a"></script>
+<script src="js/recursos.js?v=20260929a"></script>
+<script src="js/auth.js?v=20260929a"></script>
+<script src="js/admin.js?v=20260929a"></script>
+<script src="js/chatbot.js?v=20260929a"></script>
+<script src="js/app.js?v=20260929a"></script>
 </body>
 </html>

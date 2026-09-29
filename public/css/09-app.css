@@ -113,7 +113,7 @@
 
   /* Los cinco destinos ya están abajo: el menú de arriba no los repite. */
   .mobile-nav-list > li:has(> a[data-nav="inicio"]),
-  .mobile-nav-list > li:has(> a[data-nav="biblioteca"]),
+  .mobile-nav-list > li:has(> a[data-nav="recursos"]),
   .mobile-nav-list > li:has(> a[data-nav="carrera"]) { display: none; }
 
   /* ------------------------------------------------------------------------

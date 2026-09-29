@@ -9,9 +9,11 @@ const ODONTO_DATA = {
     plataforma: "OdontoCampus",
     lema: "Compromiso, gestión y acompañamiento estudiantil en cada paso de tu carrera.",
     contacto: {
-      whatsapp: "2215550192",
+      // Sin WhatsApp ni correo hasta tener los reales: los de antes eran de
+      // ejemplo. El Linktree de FOE indica consultar por Instagram.
+      whatsapp: "",
       instagram: "@foe.odontologia",
-      email: "contacto@foe-unlp.org.ar",
+      email: "",
       sede: "Mesa de FOE - Hall Central de la Facultad (50 entre 1 y 115)"
     }
   },

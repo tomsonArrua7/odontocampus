@@ -19,6 +19,7 @@
     fechas:     { titulo: "Cuándo rindo", tabs: ["mesas", "revalidas"] },
     cursada:    { titulo: "Cursada y clínica", tabs: ["historias", "instrumental", "bolsa"] },
     biblioteca: { titulo: "Biblioteca de apuntes", tabs: null },
+    recursos:   { titulo: "Recursos", tabs: null },
     carrera:    { titulo: "Mi carrera", tabs: ["plan", "agenda", "juego"] },
     // No figura en el menú: se llega desde Mi cuenta, y sólo si es admin.
     admin:      { titulo: "Administración", tabs: ["cuentas", "planillas", "bot", "equipo", "registro"] }
@@ -32,6 +33,8 @@
     historias: "cursada/historias",
     instrumental: "cursada/instrumental",
     bolsa: "cursada/bolsa",
+    enlaces: "recursos",
+    linktree: "recursos",
     calculadora: "carrera/plan",
     promedio: "carrera/plan",
     // Enlaces viejos a las permutas: llevan al promedio en vez de a un 404.
@@ -74,6 +77,7 @@
       if (global.OdontoCarrera) global.OdontoCarrera.init();
       if (global.OdontoAgenda) global.OdontoAgenda.init();
       if (global.OdontoJuego) global.OdontoJuego.init();
+      if (global.OdontoRecursos) global.OdontoRecursos.init();
       if (global.OdontoAuth) global.OdontoAuth.init();
       if (global.OdontoAdmin) global.OdontoAdmin.init();
 
