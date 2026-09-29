@@ -321,7 +321,7 @@
       var periodo = { anual: "anual", "1c": "1.° cuatrimestre", "2c": "2.° cuatrimestre", bimestral: "bimestral" };
 
       return {
-        texto: "**" + materia.nombre + "** (código " + materia.codigo + ") es de **" + materia.anio +
+        texto: "**" + materia.nombre + "** es de **" + materia.anio +
                ".° año**, " + (periodo[materia.periodo] || materia.periodo) + ".\n\n" +
                (requisitos.length
                  ? "Correlativas:\n" + requisitos.map(function (r) { return "• " + r; }).join("\n")

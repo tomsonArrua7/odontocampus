@@ -309,7 +309,7 @@
 
       var plan = this.getPlan();
       var rotulo = document.getElementById("calc-plan-nombre");
-      if (rotulo && plan) rotulo.textContent = "Plan " + plan.id + " · " + plan.nombre;
+      if (rotulo && plan) rotulo.textContent = plan.carrera + " · " + plan.nombre;
 
       var niveles = this.getNiveles().filter(function (nivel) {
         return filtro === "todos" || String(filtro) === String(nivel.anio);
@@ -334,8 +334,7 @@
               '<table class="odonto-table">' +
                 "<caption>" + esc(nivel.titulo) + ": marcá el estado de cada materia y, si la aprobaste, su nota.</caption>" +
                 "<thead><tr>" +
-                  "<th>Código</th><th>Materia</th><th>Período</th>" +
-                  "<th>Estado</th><th>Nota final</th><th>Aplazos</th>" +
+                  "<th>Materia</th><th>Estado</th><th>Nota final</th><th>Aplazos</th>" +
                 "</tr></thead>" +
                 "<tbody>" +
                   nivel.materias.map(function (mat) { return self.filaMateria(mat, notas[mat.id]); }).join("") +
@@ -361,17 +360,27 @@
          escribe tal cual lo dice el plan. */
       var requisitos = mat.correlativas.map(function (c) { return nombres[c] || c; });
       if (mat.condicion) requisitos.push(mat.condicion);
-      var textoCorrelativas = requisitos.length ? requisitos.join(" · ") : "Sin correlativas";
+
+      /* Las correlativas van plegadas: con cinco o seis nombres por fila, la
+         tabla era una pared de texto. Se ve cuántas pide y se abren si hacen
+         falta. El código del SIU no se muestra: sirve para importar, no
+         para leer. */
+      var correlativas = !requisitos.length
+        ? '<span class="correlativas-nada">Sin correlativas</span>'
+        : (mat.correlativas.length === 0
+            ? '<span class="correlativas-nada">' + esc(mat.condicion) + "</span>"
+            : '<details class="correlativas"><summary>Correlativas (' + requisitos.length + ")</summary>" +
+                "<ul>" + requisitos.map(function (r) { return "<li>" + esc(r) + "</li>"; }).join("") + "</ul>" +
+              "</details>");
 
       return (
         '<tr class="materia-row' + (aprobada ? " row-aprobada" : "") + '" data-materia-id="' + escAttr(mat.id) + '">' +
-          '<td><span class="code-tag">' + esc(mat.codigo) + "</span></td>" +
-          "<td>" +
+          '<td class="celda-materia">' +
             '<span class="materia-title">' + esc(mat.nombre) + "</span>" +
-            '<small class="correlativa-info">Correlativas: ' + esc(textoCorrelativas) + "</small>" +
+            '<span class="materia-periodo">' + esc(PERIODOS[mat.periodo] || mat.periodo) + "</span>" +
+            correlativas +
           "</td>" +
-          '<td><span class="regimen-tag">' + esc(PERIODOS[mat.periodo] || mat.periodo) + "</span></td>" +
-          "<td>" +
+          '<td data-rotulo="Estado">' +
             '<label class="visually-hidden" for="estado-' + escAttr(mat.id) + '">Estado de ' + nombreSeguro + "</label>" +
             '<select class="form-select status-select" id="estado-' + escAttr(mat.id) + '">' +
               ESTADOS.map(function (op) {
@@ -380,14 +389,14 @@
               }).join("") +
             "</select>" +
           "</td>" +
-          "<td>" +
+          '<td data-rotulo="Nota">' +
             '<label class="visually-hidden" for="nota-' + escAttr(mat.id) + '">Nota final de ' + nombreSeguro + "</label>" +
             '<input type="number" inputmode="decimal" min="4" max="10" step="0.5" ' +
                    'class="form-control nota-input' + (aprobada ? " active" : "") + '" ' +
                    'id="nota-' + escAttr(mat.id) + '" placeholder="4 a 10" ' +
                    'value="' + escAttr(registro.nota || "") + '"' + (aprobada ? "" : " disabled") + ">" +
           "</td>" +
-          "<td>" +
+          '<td data-rotulo="Aplazos">' +
             '<label class="visually-hidden" for="aplazos-' + escAttr(mat.id) + '">Aplazos en ' + nombreSeguro + "</label>" +
             '<input type="number" inputmode="numeric" min="0" max="' + MAX_APLAZOS + '" ' +
                    'class="form-control aplazos-input" id="aplazos-' + escAttr(mat.id) + '" ' +
@@ -484,6 +493,14 @@
      * viene. La grilla está oculta para lectores de pantalla (es un resumen
      * visual); el equivalente accesible es la línea de resumen y la tabla.
      */
+    /**
+     * Mapa de avance: una fila por año, un casillero por materia.
+     *
+     * Antes cada casillero llevaba el código del SIU ("2A", "3C"): no le
+     * decía nada a nadie. Ahora el casillero es sólo color y el nombre está
+     * al pasar el dedo o el mouse. Cada fila dice cuántas van aprobadas de
+     * ese año. Oculto para lectores de pantalla: la tabla tiene el detalle.
+     */
     renderOdontograma: function () {
       var cont = document.getElementById("odonto-piezas");
       var resumen = document.getElementById("odonto-resumen");
@@ -492,24 +509,29 @@
       var notas = this.getNotas();
       var conteo = { aprobada: 0, regular: 0, cursando: 0, pendiente: 0 };
 
-      cont.innerHTML = this.getTodasLasMaterias().map(function (mat) {
-        var registro = notas[mat.id] || {};
-        var estado = NOMBRE_ESTADO[registro.estado] ? registro.estado : "pendiente";
-        conteo[estado]++;
+      cont.innerHTML = this.getNiveles().map(function (nivel) {
+        var aprobadas = 0;
+        var piezas = nivel.materias.map(function (mat) {
+          var registro = notas[mat.id] || {};
+          var estado = NOMBRE_ESTADO[registro.estado] ? registro.estado : "pendiente";
+          conteo[estado]++;
+          if (estado === "aprobada") aprobadas++;
+          var conAplazo = registro.aplazos > 0;
 
-        // "00011" se muestra como "11" y "0002A" como "2A": los ceros de
-        // adelante son iguales en las sesenta y sólo ocupan lugar.
-        var numero = String(mat.codigo || mat.id).replace(/^0+(?=.)/, "");
-        var conAplazo = registro.aplazos > 0;
+          var detalle = mat.nombre + " — " + NOMBRE_ESTADO[estado];
+          if (estado === "aprobada" && registro.nota) detalle += " con " + formatear(registro.nota, 2);
+          if (conAplazo) detalle += " · " + UI.plural(registro.aplazos, "aplazo");
 
-        var detalle = mat.nombre + " — " + NOMBRE_ESTADO[estado];
-        if (estado === "aprobada" && registro.nota) {
-          detalle += " con " + formatear(registro.nota, 2);
-        }
-        if (conAplazo) detalle += " · " + UI.plural(registro.aplazos, "aplazo");
+          return '<li class="pieza es-' + estado + (conAplazo ? " con-aplazo" : "") + '" title="' + escAttr(detalle) + '"></li>';
+        }).join("");
 
-        return '<li class="pieza es-' + estado + (conAplazo ? " con-aplazo" : "") + '" ' +
-               'title="' + escAttr(detalle) + '">' + esc(numero) + "</li>";
+        return (
+          '<li class="odonto-anio">' +
+            '<span class="odonto-anio-rotulo">' + nivel.anio + ".º año</span>" +
+            '<ol class="odonto-fila">' + piezas + "</ol>" +
+            '<span class="odonto-anio-cuenta">' + aprobadas + "/" + nivel.materias.length + "</span>" +
+          "</li>"
+        );
       }).join("");
 
       if (resumen) {

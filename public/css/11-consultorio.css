@@ -548,3 +548,136 @@ h1, h2, h3, h4 { letter-spacing: -0.01em; }
   .bienvenida .chip-anio { transition: background-color 160ms var(--ease), color 160ms var(--ease), transform 120ms var(--ease); }
   .bienvenida .chip-anio:active { transform: scale(0.94); }
 }
+
+/* ==========================================================================
+   6. PLAN DE ESTUDIOS
+   Sin códigos a la vista: el nombre, el período y las correlativas plegadas.
+   ========================================================================== */
+.odonto-table .celda-materia { min-width: 240px; }
+.materia-title { display: block; font-size: var(--fs-base); }
+.materia-periodo { display: block; margin-top: 2px; font-size: var(--fs-xs); color: var(--text-muted); }
+.correlativas-nada { display: block; margin-top: var(--sp-1); font-size: var(--fs-xs); color: var(--text-soft); }
+
+.correlativas { margin-top: var(--sp-1); font-size: var(--fs-xs); }
+.correlativas summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: var(--accent-text);
+  font-weight: var(--fw-semi);
+  list-style: none;
+}
+.correlativas summary::-webkit-details-marker { display: none; }
+.correlativas summary::after { content: "▾"; font-size: 0.9em; transition: transform var(--dur) var(--ease); }
+.correlativas[open] summary::after { transform: rotate(180deg); }
+.correlativas ul { margin: var(--sp-2) 0 0; padding-left: var(--sp-4); color: var(--text-muted); display: grid; gap: 2px; }
+
+.materia-row.row-aprobada { background: color-mix(in srgb, var(--success-bg) 55%, transparent); }
+.odonto-table th { background: none; color: var(--text-muted); font-weight: var(--fw-semi); letter-spacing: 0; }
+.odonto-table td { border-bottom-color: var(--surface-3); }
+
+/* --- Mapa de avance: una fila por año --- */
+.odonto-piezas { display: grid; grid-template-columns: 1fr; gap: var(--sp-2); }
+.odonto-anio { display: grid; grid-template-columns: 4rem minmax(0, 1fr) 2.6rem; align-items: center; gap: var(--sp-3); }
+.odonto-anio-rotulo { font-size: var(--fs-xs); font-weight: var(--fw-semi); color: var(--text-muted); }
+.odonto-anio-cuenta { font-size: var(--fs-xs); font-weight: var(--fw-bold); text-align: right; font-variant-numeric: tabular-nums; }
+.odonto-fila { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 5px; }
+.odonto-fila .pieza {
+  width: 22px;
+  height: 22px;
+  aspect-ratio: auto;
+  border-radius: 7px;
+  font-size: 0;
+}
+.odonto-ayuda { margin-top: var(--sp-3); font-size: var(--fs-xs); color: var(--text-soft); }
+
+/* En el celular, cada materia es una ficha: nombre arriba, los tres
+   controles en una fila. La tabla de seis columnas no entraba. */
+@media (max-width: 768px) {
+  .odonto-table { min-width: 0; }
+  .odonto-table thead { display: none; }
+  .odonto-table, .odonto-table tbody { display: block; }
+  .odonto-table caption { display: block; }
+  .odonto-table tr.materia-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 0.8fr);
+    gap: var(--sp-2) var(--sp-3);
+    padding: var(--sp-4);
+    border-bottom: 1px solid var(--surface-3);
+  }
+  .odonto-table tr.materia-row td { display: block; padding: 0; border: 0; }
+  .odonto-table .celda-materia { grid-column: 1 / -1; min-width: 0; }
+  .odonto-table td[data-rotulo]::before {
+    content: attr(data-rotulo);
+    display: block;
+    margin-bottom: 4px;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semi);
+    color: var(--text-muted);
+  }
+  .odonto-table .form-select, .odonto-table .form-control { width: 100%; min-width: 0; }
+  .odonto-anio { grid-template-columns: 3.4rem minmax(0, 1fr) 2.4rem; }
+  .odonto-fila .pieza { width: 20px; height: 20px; }
+}
+
+/* ==========================================================================
+   7. HOY, MÁS LIVIANO
+   ========================================================================== */
+.hoy-anio { display: grid; gap: var(--sp-3); }
+.hoy-anio-resumen { color: var(--text-muted); font-size: var(--fs-sm); }
+.hoy-anio-resumen b { color: var(--text-strong); font-family: var(--font-heading); font-size: var(--fs-md); }
+.hoy-anio-avance { display: grid; gap: var(--sp-1); }
+.hoy-anio-avance small { color: var(--text-muted); font-size: var(--fs-xs); }
+.hoy-barra-clara { background: var(--surface-3); height: 6px; }
+.hoy-anio-acciones { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+
+.novedades-mas { display: flex; justify-content: center; padding: var(--sp-3) 0 var(--sp-2); }
+
+
+/* ==========================================================================
+   8. ODONTOPREGUNTADOS (aviso de la facultad)
+   ========================================================================== */
+.odp-tarjeta {
+  max-width: 620px;
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: var(--sp-8) var(--sp-6);
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-2);
+}
+.odp-icono {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 28px;
+  box-shadow: 0 8px 18px rgba(230, 0, 126, 0.35);
+  margin-bottom: var(--sp-2);
+}
+.odp-rotulo { font-size: var(--fs-xs); font-weight: var(--fw-bold); color: var(--accent-text); }
+.odp-tarjeta h3 { font-family: var(--font-heading); font-size: var(--fs-2xl); font-weight: var(--fw-black); line-height: 1.2; }
+.odp-falta { font-size: var(--fs-md); color: var(--text-muted); }
+.odp-falta b { color: var(--text-strong); }
+.odp-tarjeta.es-urgente .odp-falta b { color: var(--accent-text); }
+.odp-texto { max-width: 46ch; color: var(--text-muted); font-size: var(--fs-sm); margin-bottom: var(--sp-3); }
+.odp-boton { width: 100%; max-width: 380px; }
+
+.hoy-odp {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border: 1.5px solid var(--accent);
+}
+.hoy-odp[hidden] { display: none; }
+.hoy-odp .odp-icono { width: 42px; height: 42px; font-size: 20px; border-radius: 14px; margin: 0; flex-shrink: 0; box-shadow: none; }
+.hoy-odp-texto { flex: 1; min-width: 0; display: grid; }
+.hoy-odp-texto strong { font-size: var(--fs-sm); }
+.hoy-odp-texto small { color: var(--text-muted); font-size: var(--fs-xs); }

@@ -108,6 +108,11 @@
         cerrarBusqueda: function () { UI.closeModal("modal-search-global"); },
         cerrarModal: function () { UI.closeModal("modal-generico"); },
         verNoticia: function (data) { app.verDetalleNoticia(Number(data.id)); },
+        verMasNovedades: function (data, boton) {
+          $$(".novedad-extra").forEach(function (li) { li.hidden = false; });
+          var fila = boton && boton.closest("li");
+          if (fila) fila.remove();
+        },
         verHC: function (data) { app.verVistaPreviaHC(data.id); },
         imprimirHC: function (data) { app.imprimirHC(data.id); },
         descargarApunte: function (data) { app.descargarApunte(data.titulo); },
@@ -386,7 +391,7 @@
       } else if (seccion === "carrera") {
         // Cada pestaña decide si necesita cuenta y qué pedir.
         if (tab === "agenda" && global.OdontoAgenda) global.OdontoAgenda.mostrar();
-        else if (tab === "juego" && global.OdontoJuego) global.OdontoJuego.mostrar();
+        else if (tab === "juego" && global.OdontoHoy) global.OdontoHoy.pintarOdontopreguntados();
         else if (global.OdontoCarrera) global.OdontoCarrera.mostrar();
       } else if (seccion === "admin" && global.OdontoAdmin) {
         global.OdontoAdmin.mostrar(tab);
@@ -460,9 +465,11 @@
       /* Una línea por novedad: de qué tipo es, cuándo y el título. El resumen
          se lee al abrirla. En la portada importa saber que hay algo nuevo,
          no leerlo entero. */
-      cont.innerHTML = global.ODONTO_DATA.noticias.map(function (n) {
+      var MAX_A_LA_VISTA = 2;
+      var noticias = global.ODONTO_DATA.noticias;
+      cont.innerHTML = noticias.map(function (n, i) {
         return (
-          "<li>" +
+          "<li" + (i >= MAX_A_LA_VISTA ? ' class="novedad-extra" hidden' : "") + ">" +
             '<button type="button" class="novedad' + (n.destacado ? " novedad-destacada" : "") + '"' +
                     ' data-action="verNoticia" data-id="' + esc(n.id) + '">' +
               '<span class="novedad-meta">' +
@@ -474,7 +481,11 @@
             "</button>" +
           "</li>"
         );
-      }).join("");
+      }).join("") +
+      (noticias.length > MAX_A_LA_VISTA
+        ? '<li class="novedades-mas"><button type="button" class="btn btn-secondary btn-sm" data-action="verMasNovedades">' +
+            "Ver " + (noticias.length - MAX_A_LA_VISTA) + " más</button></li>"
+        : "");
     },
 
     verDetalleNoticia: function (id) {

@@ -26,6 +26,32 @@
                "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
   var ORDINAL = ["", "1.er", "2.º", "3.er", "4.º", "5.º", "6.º"];
 
+  var AULAS = "https://grado.folp.unlp.edu.ar/login/index.php";
+
+  /**
+   * Odontopreguntados cierra cada lunes a las 23:59. Devuelve el próximo
+   * cierre: si hoy es lunes y todavía no pasó, es hoy.
+   */
+  function proximoCierre(ahora) {
+    ahora = ahora || new Date();
+    var dias = (1 - ahora.getDay() + 7) % 7;
+    var cierre = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate() + dias, 23, 59, 0);
+    if (cierre <= ahora) cierre = new Date(cierre.getFullYear(), cierre.getMonth(), cierre.getDate() + 7, 23, 59, 0);
+    return cierre;
+  }
+
+  /** "2 días y 5 horas", "5 horas y 20 minutos", "40 minutos". */
+  function cuantoFalta(cierre) {
+    var ms = cierre - Date.now();
+    var dias = Math.floor(ms / 86400000);
+    var horas = Math.floor((ms % 86400000) / 3600000);
+    var minutos = Math.max(1, Math.floor((ms % 3600000) / 60000));
+    function n(x, uno, varios) { return x + " " + (x === 1 ? uno : varios); }
+    if (dias >= 1) return n(dias, "día", "días") + (horas ? " y " + n(horas, "hora", "horas") : "");
+    if (horas >= 1) return n(horas, "hora", "horas") + " y " + n(minutos, "minuto", "minutos");
+    return n(minutos, "minuto", "minutos");
+  }
+
   var ESTADO = {
     aprobada: { texto: "Aprobada", clase: "es-aprobada" },
     regular: { texto: "Regular", clase: "es-regular" },
@@ -72,6 +98,7 @@
 
       UI.registerActions({
         hoyAnio: function (data) { self.elegirAnio(Number(data.anio)); },
+        hoyVerMaterias: function () { self.verMaterias(); },
         bienvenidaAnio: function (data, el) { self.marcarAnioBienvenida(Number(data.anio), el); },
         bienvenidaEntrar: function () { self.cerrarBienvenida(); },
         bienvenidaIngresar: function () {
@@ -162,6 +189,7 @@
     },
 
     pintar: function () {
+      this.pintarRecordatorioOdp();
       this.pintarBanda();
       this.pintarMesa();
       this.pintarSemana();
@@ -338,6 +366,11 @@
     /* ====================================================================
        TU AÑO
        ==================================================================== */
+    /**
+     * Tu año, en una tarjeta chica: cuántas materias, cuántas tienen clases
+     * grabadas y, con cuenta, cómo venís. Antes estaban las doce materias en
+     * una grilla: era la mitad del inicio. El detalle está a un toque.
+     */
     pintarAnio: function () {
       var chips = document.getElementById("hoy-anio-chips");
       var cont = document.getElementById("hoy-materias");
@@ -354,29 +387,93 @@
 
       var calc = global.OdontoCalculator;
       var materias = calc ? calc.getTodasLasMaterias().filter(function (m) { return m.anio === self.anio; }) : [];
-      var notas = usuario() && calc ? calc.getNotas() : {};
       var recursos = global.OdontoRecursos;
+      var conClases = materias.filter(function (m) {
+        return recursos && recursos.clasesDe && recursos.clasesDe(m.nombre);
+      }).length;
 
-      cont.innerHTML = materias.map(function (m) {
-        var clases = recursos && recursos.clasesDe ? recursos.clasesDe(m.nombre) : null;
-        var registro = notas[m.codigo];
-        var estado = registro && ESTADO[registro.estado];
+      var avance = "";
+      if (usuario() && calc) {
+        var notas = calc.getNotas();
+        var aprobadas = 0, regulares = 0;
+        materias.forEach(function (m) {
+          var r = notas[m.codigo];
+          if (r && r.estado === "aprobada") aprobadas++;
+          else if (r && r.estado === "regular") regulares++;
+        });
+        var pct = materias.length ? Math.round((aprobadas / materias.length) * 100) : 0;
+        avance =
+          '<div class="hoy-anio-avance">' +
+            '<div class="hoy-barra hoy-barra-clara"><span style="width:' + pct + '%"></span></div>' +
+            "<small>" + aprobadas + " de " + materias.length + " aprobadas" +
+              (regulares ? " · " + regulares + " regular" + (regulares === 1 ? "" : "es") : "") + "</small>" +
+          "</div>";
+      }
 
-        var pie = clases
-          ? '<a href="' + escAttr(clases.url) + '" target="_blank" rel="noopener noreferrer">' +
-              UI.icono("video") + " Clases grabadas" +
-              '<span class="visually-hidden"> de ' + esc(m.nombre) + " (se abre en una pestaña nueva)</span></a>"
-          : '<a href="#carrera/plan" data-nav="carrera/plan">Ver en el plan</a>';
+      cont.innerHTML =
+        '<p class="hoy-anio-resumen">' +
+          "<b>" + materias.length + "</b> materias" +
+          (conClases ? " · <b>" + conClases + "</b> con clases grabadas de FOE" : "") +
+        "</p>" +
+        avance +
+        '<div class="hoy-anio-acciones">' +
+          '<button type="button" class="btn btn-secondary btn-sm" data-action="hoyVerMaterias">' +
+            UI.icono("birrete") + " Ver mis materias</button>" +
+          '<a class="btn btn-secondary btn-sm" href="#recursos" data-nav="recursos">' +
+            UI.icono("video") + " Clases y cátedras</a>" +
+        "</div>";
+    },
 
-        return (
-          '<article class="hoy-materia area-' + area(m) + '">' +
-            '<i aria-hidden="true"></i>' +
-            "<h3>" + esc(m.nombre) + "</h3>" +
-            (estado ? '<span class="hoy-estado ' + estado.clase + '">' + estado.texto + "</span>" : "") +
-            '<p class="hoy-materia-pie">' + pie + "</p>" +
-          "</article>"
-        );
-      }).join("");
+    /** Abre el plan de estudios ya filtrado por el año elegido. */
+    verMaterias: function () {
+      var calc = global.OdontoCalculator;
+      if (calc) calc.filtroAnio = String(this.anio);
+      var filtro = document.getElementById("calc-filter-anio");
+      if (filtro) filtro.value = String(this.anio);
+      if (global.OdontoApp) global.OdontoApp.navegarA("carrera/plan");
+    },
+
+    /* ====================================================================
+       ODONTOPREGUNTADOS (de la facultad)
+       ==================================================================== */
+    pintarOdontopreguntados: function () {
+      var cont = document.getElementById("odp-aviso");
+      if (!cont) return;
+      var cierre = proximoCierre();
+      var d = cierre;
+      var fecha = DIAS[d.getDay()] + " " + d.getDate() + " de " + MESES[d.getMonth()];
+      var urgente = cierre - Date.now() < 36 * 3600000;
+
+      cont.innerHTML =
+        '<div class="odp-tarjeta' + (urgente ? " es-urgente" : "") + '">' +
+          '<span class="odp-icono" aria-hidden="true">' + UI.icono("diente") + "</span>" +
+          '<p class="odp-rotulo">Odontopreguntados · de la facultad</p>' +
+          "<h3>Tenés tiempo hasta el " + esc(fecha) + " a las 23:59</h3>" +
+          '<p class="odp-falta" role="status">Quedan <b>' + esc(cuantoFalta(cierre)) + "</b></p>" +
+          '<p class="odp-texto">Se completa en las aulas virtuales de la FOLP, con tu usuario de la facultad. ' +
+            "Cierra todos los lunes a las 23:59.</p>" +
+          '<a class="btn btn-magenta btn-lg odp-boton" href="' + AULAS + '" target="_blank" rel="noopener noreferrer">' +
+            "Completarlo en las aulas virtuales " + UI.icono("externo") +
+            '<span class="visually-hidden"> (se abre en una pestaña nueva)</span></a>' +
+        "</div>";
+    },
+
+    /** En "Hoy", desde el domingo hasta el cierre del lunes. */
+    pintarRecordatorioOdp: function () {
+      var cont = document.getElementById("hoy-odp");
+      if (!cont) return;
+      var hoy = new Date().getDay();
+      if (hoy !== 0 && hoy !== 1) { cont.hidden = true; return; }
+
+      var cierre = proximoCierre();
+      var cuando = cierre.getDay() === new Date().getDay() ? "hoy" : "mañana";
+      cont.hidden = false;
+      cont.innerHTML =
+        '<span class="odp-icono" aria-hidden="true">' + UI.icono("diente") + "</span>" +
+        '<div class="hoy-odp-texto"><strong>Odontopreguntados cierra ' + cuando + " a las 23:59</strong>" +
+          "<small>Quedan " + esc(cuantoFalta(cierre)) + "</small></div>" +
+        '<a class="btn btn-magenta btn-sm" href="' + AULAS + '" target="_blank" rel="noopener noreferrer">' +
+          "Completar" + '<span class="visually-hidden"> Odontopreguntados en las aulas virtuales (se abre en una pestaña nueva)</span></a>';
     }
   };
 
