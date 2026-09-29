@@ -62,7 +62,6 @@
 
       this.initNoticias();
       this.initHistoriasClinicas();
-      this.initBiblioteca();
       this.initBolsaInstrumental();
       this.initGuiaInstrumental();
       this.initBuscadorGlobal();
@@ -78,6 +77,7 @@
       if (global.OdontoAgenda) global.OdontoAgenda.init();
       if (global.OdontoJuego) global.OdontoJuego.init();
       if (global.OdontoRecursos) global.OdontoRecursos.init();
+      if (global.OdontoBiblioteca) global.OdontoBiblioteca.init();
       if (global.OdontoHoy) global.OdontoHoy.init();
       if (global.OdontoAuth) global.OdontoAuth.init();
       if (global.OdontoAdmin) global.OdontoAdmin.init();
@@ -912,10 +912,11 @@
           });
         });
 
-        (global.ODONTO_DATA.biblioteca || []).forEach(function (ap) {
+        ((global.OdontoBiblioteca && global.OdontoBiblioteca.filas) || []).forEach(function (ap) {
+          if (ap.tipo === "bibliografia" || ap.tipo === "carpeta") return;
           if (UI.normalizar(ap.titulo + " " + ap.materia).indexOf(q) === -1) return;
           resultados.push({
-            tipo: "Apunte · " + ap.materia,
+            tipo: "Biblioteca · " + ap.materia,
             titulo: ap.titulo,
             icono: "libro",
             destino: "biblioteca"

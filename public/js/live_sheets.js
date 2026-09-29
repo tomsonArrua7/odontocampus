@@ -31,6 +31,9 @@
     // La de Odontopreguntados arranca vacía: el juego avisa que no hay preguntas.
     sheetIdPreguntas: "",
     gidPreguntas: "0",
+    // La de la biblioteca: vacía, se usa la copia del Drive (biblioteca-datos.js).
+    sheetIdBiblioteca: "",
+    gidBiblioteca: "0",
 
     lastUpdatedMesas: null,
     lastUpdatedRevalidas: null,
@@ -100,6 +103,7 @@
     planilla: function (clave) {
       if (clave === "planilla_mesas") return { sheetId: this.sheetIdMesas, gid: this.gidMesas };
       if (clave === "planilla_preguntas") return { sheetId: this.sheetIdPreguntas, gid: this.gidPreguntas };
+      if (clave === "planilla_biblioteca") return { sheetId: this.sheetIdBiblioteca, gid: this.gidBiblioteca };
       return { sheetId: this.sheetIdRevalidas, gid: this.gidRevalidas };
     },
 
@@ -109,10 +113,21 @@
       var vacia = (cfg.sheetId || "") === "";
       // Vacío sólo vale para las preguntas: es cómo se apaga el juego.
       if (!vacia && !/^[A-Za-z0-9_-]{20,100}$/.test(cfg.sheetId)) return;
-      if (vacia && clave !== "planilla_preguntas") return;
+      if (vacia && clave !== "planilla_preguntas" && clave !== "planilla_biblioteca") return;
       var gid = /^\d{1,12}$/.test(String(cfg.gid)) ? String(cfg.gid) : "0";
 
-      if (clave === "planilla_preguntas") {
+      if (clave === "planilla_biblioteca") {
+        this.sheetIdBiblioteca = cfg.sheetId;
+        this.gidBiblioteca = gid;
+        if (global.OdontoBiblioteca) {
+          if (!cfg.sheetId) {
+            global.OdontoBiblioteca.filas = global.OdontoBiblioteca.normalizarFilas(global.ODONTO_BIBLIOTECA || []);
+            global.OdontoBiblioteca.pintar();
+          } else {
+            global.OdontoBiblioteca.leerPlanilla();
+          }
+        }
+      } else if (clave === "planilla_preguntas") {
         this.sheetIdPreguntas = cfg.sheetId;
         this.gidPreguntas = gid;
         if (recargar && global.OdontoJuego) {
@@ -142,7 +157,7 @@
     /** Lee una planilla sin usarla: para que un admin la pruebe antes de guardarla. */
     probar: function (clave, sheetId, gid) {
       var self = this;
-      if (clave === "planilla_preguntas" && !sheetId) return Promise.resolve([]);
+      if ((clave === "planilla_preguntas" || clave === "planilla_biblioteca") && !sheetId) return Promise.resolve([]);
       return fetch(this.endpoint(sheetId, gid), { method: "GET" })
         .then(function (res) {
           if (!res.ok) throw new Error("HTTP " + res.status);
@@ -152,6 +167,11 @@
           return res.text();
         })
         .then(function (csv) {
+          if (clave === "planilla_biblioteca") {
+            return (global.OdontoBiblioteca ? global.OdontoBiblioteca.parsear(csv) : []).map(function (f) {
+              return { dia: f.materia, materia: f.titulo };
+            });
+          }
           if (clave === "planilla_preguntas") {
             return (global.OdontoJuego ? global.OdontoJuego.parsear(csv) : []).map(function (p) {
               // El panel muestra el resumen con las mismas palabras para las tres.

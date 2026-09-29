@@ -199,6 +199,15 @@ la base vieja, Mi carrera no puede guardar (pide tablas que no existen).
 - [ ] Panel → OdontoBot: revisar cada tanto qué preguntan y no sabe contestar
 - [ ] 💻 Con esa lista, ampliar `knowledgeBase` en `js/data.js`
 
+### Biblioteca con índice de los militantes (septiembre 2026) 🙋 aplicar en el servidor
+
+- [ ] `git pull` en el sitio
+- [ ] Cargar `008_planilla_biblioteca.sql`
+- [ ] `pruebas_rls.sql`: 93 en OK (de 00 a 90)
+- [ ] Importar `docs/biblioteca-modelo.csv` a una planilla de Google y compartirla con los militantes
+- [ ] Compartirla como "cualquier persona con el enlace puede ver" y cargarla en Panel → Planillas → Biblioteca
+- [ ] Los militantes: sumar apuntes propios, revisar y marcar «sí» lo que se publica
+
 **Principio que no se negocia:** el login suma, no tapa. Mesas, reválidas,
 historias clínicas, instrumental y biblioteca siguen abiertas sin cuenta. Lo
 único que la pide es Mi promedio, porque guarda datos de la persona.

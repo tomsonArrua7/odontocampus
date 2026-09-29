@@ -1,7 +1,7 @@
 -- ==========================================================================
 -- OdontoCampus — Pruebas de seguridad del esquema (RLS y permisos)
 --
--- Correr DESPUÉS de aplicar todas las migraciones (001 a 007, ...), y otra
+-- Correr DESPUÉS de aplicar todas las migraciones (001 a 008, ...), y otra
 -- vez después de cualquier cambio:
 --
 --   cd /opt/supabase
@@ -986,8 +986,44 @@ end $$;
 
 reset role;
 
+-- ==========================================================================
+-- PLANILLA DE LA BIBLIOTECA (008)
+-- ==========================================================================
+set local role authenticated;
+do $$ begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-00000000000d","role":"authenticated"}', true);
+end $$;
+
+do $$ declare v jsonb; begin
+  perform public.admin_guardar_planilla('planilla_biblioteca', '1BibliotecaAbCdEfGhIjKlMnOpQrStUv', '0');
+  select valor into v from public.configuracion_sitio where clave = 'planilla_biblioteca';
+  if v ->> 'sheet_id' = '1BibliotecaAbCdEfGhIjKlMnOpQrStUv' then raise notice 'OK     88. Un admin carga la planilla de la biblioteca';
+  else raise notice 'FALLA  88. La planilla de la biblioteca no cambió: %', v; end if;
+exception when others then
+  raise notice 'FALLA  88. No se pudo cargar la planilla de la biblioteca: %', sqlerrm;
+end $$;
+
+do $$ declare v jsonb; begin
+  perform public.admin_guardar_planilla('planilla_biblioteca', '', '0');
+  select valor into v from public.configuracion_sitio where clave = 'planilla_biblioteca';
+  if v ->> 'sheet_id' = '' then raise notice 'OK     89. La planilla de la biblioteca se puede vaciar (vuelve a la copia del Drive)';
+  else raise notice 'FALLA  89. No se pudo vaciar la planilla de la biblioteca'; end if;
+exception when others then
+  raise notice 'FALLA  89. No se pudo vaciar la planilla de la biblioteca: %', sqlerrm;
+end $$;
+
+do $$ begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-000000000011","role":"authenticated"}', true);
+  perform public.admin_guardar_planilla('planilla_biblioteca', '1BibliotecaAbCdEfGhIjKlMnOpQrStUv', '0');
+  raise notice 'FALLA  90. Una cuenta común cambia la planilla de la biblioteca';
+exception when insufficient_privilege then
+  raise notice 'OK     90. Una cuenta común no cambia la planilla de la biblioteca';
+end $$;
+
+reset role;
+
 rollback;
 
 \echo
-\echo 'Pruebas terminadas (00 a 87). Todo se deshizo con ROLLBACK: no quedó nada en la base.'
+\echo 'Pruebas terminadas (00 a 90). Todo se deshizo con ROLLBACK: no quedó nada en la base.'
 \echo 'Si alguna línea dice FALLA, no publiques el cambio en el sitio.'

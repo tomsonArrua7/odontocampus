@@ -41,7 +41,8 @@
   var NOMBRE_PLANILLA = {
     planilla_mesas: "Mesas de finales",
     planilla_revalidas: "Reválidas y actualizaciones",
-    planilla_preguntas: "Preguntas de Odontopreguntados"
+    planilla_preguntas: "Preguntas de Odontopreguntados",
+    planilla_biblioteca: "Biblioteca"
   };
 
 
@@ -457,7 +458,7 @@
     pintarPlanillas: function () {
       var sheets = global.OdontoLiveSheets;
       if (!sheets) return;
-      ["planilla_mesas", "planilla_revalidas", "planilla_preguntas"].forEach(function (clave) {
+      ["planilla_mesas", "planilla_revalidas", "planilla_preguntas", "planilla_biblioteca"].forEach(function (clave) {
         var cfg = sheets.planilla(clave);
         var actual = document.getElementById("admin-" + clave + "-actual");
         var campo = document.getElementById("admin-" + clave + "-enlace");
@@ -487,11 +488,13 @@
 
       // Guardar el campo vacío apaga el juego: es la única planilla que se
       // puede dejar sin cargar.
-      if (!cfg && clave === "planilla_preguntas" && !campo.value.trim() && guardar) {
+      if (!cfg && (clave === "planilla_preguntas" || clave === "planilla_biblioteca") && !campo.value.trim() && guardar) {
         Api.rpc("admin_guardar_planilla", { p_clave: clave, p_sheet_id: "", p_gid: "0" }).then(function () {
           sheets.aplicarPlanilla(clave, { sheetId: "", gid: "0" }, true);
           salida.className = "admin-resultado es-ok";
-          salida.textContent = "Listo: Odontopreguntados queda sin preguntas hasta que cargues una planilla.";
+          salida.textContent = clave === "planilla_biblioteca"
+            ? "Listo: la Biblioteca vuelve a usar la copia del Drive."
+            : "Listo: Odontopreguntados queda sin preguntas hasta que cargues una planilla.";
           self.pintarPlanillas();
         }, function (error) { UI.toast(error.message, "danger"); });
         return;
@@ -522,7 +525,10 @@
           return;
         }
 
-        var resumen = clave === "planilla_preguntas"
+        var resumen = clave === "planilla_biblioteca"
+          ? "Encontré " + UI.plural(items.length, "material") + " revisado" + (items.length === 1 ? "" : "s") +
+            " de " + UI.plural(cantidadDias, "materia") + " (primero: " + items[0].dia + ", " + items[0].materia + ")."
+          : clave === "planilla_preguntas"
           ? "Encontré " + UI.plural(items.length, "pregunta") + " de " + UI.plural(cantidadDias, "materia") +
             " (primera: " + items[0].materia + ")."
           : "Encontré " + UI.plural(items.length, "llamado") + " en " + UI.plural(cantidadDias, "día") +

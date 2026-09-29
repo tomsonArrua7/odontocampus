@@ -340,6 +340,34 @@ tiene cargados.
   guardarse. El panel las muestra ordenadas por cuántas veces se repitieron,
   para saber qué respuesta falta escribir. El chat lo avisa en pantalla.
 
+### La Biblioteca
+
+Lee un **índice que mantienen los militantes** en una planilla de Google, una
+fila por material: `Materia · Tipo · Título · Enlace · Autor o cátedra ·
+Revisado`. Se configura desde el panel (Planillas → Biblioteca). Sólo se
+muestra lo que dice «sí» en Revisado, y sólo enlaces `https://`.
+
+- "Materia" como en el plan ("Anatomía I") o como asignatura ("Anatomía"),
+  que vale para todas sus materias.
+- Tipo: Apuntes, Cátedra, Material, Bibliografía o Carpeta.
+- La **bibliografía** (libros) va plegada en "Accedé a más bibliografía
+  recomendada": los títulos y un botón a la **carpeta** de la materia en el
+  Drive de FOE. Nunca se enlaza un PDF suelto. Abajo hay un aviso para pedir
+  el retiro de un material.
+- Mientras no haya planilla, el sitio usa una copia generada del Drive:
+  `python infra/biblioteca/generar.py` recorre la carpeta pública y escribe
+  `public/js/biblioteca-datos.js` y `docs/biblioteca-modelo.csv`, que es la
+  planilla modelo para importar a Google Sheets y empezar desde ahí.
+- En Mi carrera, cada materia con carpeta muestra "Apuntes" y, si hay,
+  "Clases" (las listas de YouTube de Recursos).
+
+### Odontopreguntados
+
+Es de la facultad y se completa en las aulas virtuales. La pestaña avisa
+hasta cuándo hay tiempo (**cada lunes a las 23:59**, con cuánto falta) y
+lleva a `grado.folp.unlp.edu.ar`; "Hoy" lo recuerda el domingo y el lunes.
+El juego de práctica propio (`js/juego.js`) quedó guardado sin cargarse.
+
 ### Administración
 
 Hay un rol de administrador (`administradores`) y un panel en `#admin`, al que

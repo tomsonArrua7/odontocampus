@@ -12,11 +12,11 @@
   <!-- Marca: un diente geométrico en blanco sobre el magenta de FOE. Se lee a
        16 px en una pestaña, que es la única prueba que importa para un ícono. -->
   <link rel="icon" href="favicon.ico" sizes="32x32">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260929e">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260929e">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260929f">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260929f">
   <!-- Instalable: "Agregar a pantalla de inicio" la abre sin barra del
        navegador, como una app. -->
-  <link rel="manifest" href="manifest.json?v=20260929e">
+  <link rel="manifest" href="manifest.json?v=20260929f">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="OdontoCampus">
@@ -29,7 +29,7 @@
   <meta property="og:locale" content="es_AR">
   <!-- Imagen del enlace (WhatsApp, Instagram, Twitter). Tiene que ser una URL
        absoluta y un archivo rasterizado: ninguna de esas apps lee SVG. -->
-  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260929e">
+  <meta property="og:image" content="https://odontocampus.com.ar/og-banner.png?v=20260929f">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="OdontoCampus · FOE Odontología UNLP">
@@ -64,17 +64,17 @@
        LÍNEAS (y en las plantillas de correo del override de Supabase).
        Pasó de verdad: el sitio nuevo quedó cargando el config.js viejo, con la
        clave en PENDIENTE, y las cuentas no aparecían por ningún lado. -->
-  <link rel="stylesheet" href="css/01-tokens.css?v=20260929e">
-  <link rel="stylesheet" href="css/02-base.css?v=20260929e">
-  <link rel="stylesheet" href="css/03-components.css?v=20260929e">
-  <link rel="stylesheet" href="css/04-sections.css?v=20260929e">
-  <link rel="stylesheet" href="css/05-responsive.css?v=20260929e">
-  <link rel="stylesheet" href="css/06-cuentas.css?v=20260929e">
-  <link rel="stylesheet" href="css/08-agenda-juego.css?v=20260929e">
-  <link rel="stylesheet" href="css/07-movimiento.css?v=20260929e">
-  <link rel="stylesheet" href="css/09-app.css?v=20260929e">
-  <link rel="stylesheet" href="css/10-recursos.css?v=20260929e">
-  <link rel="stylesheet" href="css/11-consultorio.css?v=20260929e">
+  <link rel="stylesheet" href="css/01-tokens.css?v=20260929f">
+  <link rel="stylesheet" href="css/02-base.css?v=20260929f">
+  <link rel="stylesheet" href="css/03-components.css?v=20260929f">
+  <link rel="stylesheet" href="css/04-sections.css?v=20260929f">
+  <link rel="stylesheet" href="css/05-responsive.css?v=20260929f">
+  <link rel="stylesheet" href="css/06-cuentas.css?v=20260929f">
+  <link rel="stylesheet" href="css/08-agenda-juego.css?v=20260929f">
+  <link rel="stylesheet" href="css/07-movimiento.css?v=20260929f">
+  <link rel="stylesheet" href="css/09-app.css?v=20260929f">
+  <link rel="stylesheet" href="css/10-recursos.css?v=20260929f">
+  <link rel="stylesheet" href="css/11-consultorio.css?v=20260929f">
 </head>
 <body>
 
@@ -601,34 +601,31 @@
     <div class="container">
       <div class="section-header">
         <div class="section-title-wrap">
-          <h2 id="titulo-biblioteca">Biblioteca de apuntes</h2>
-          <p>Resúmenes revisados, guías de trabajos prácticos y pregunteros aportados por estudiantes y la comisión de apuntes.</p>
+          <h2 id="titulo-biblioteca">Biblioteca</h2>
+          <p>Apuntes, material de cátedra y bibliografía de cada materia, de la biblioteca virtual de FOE.</p>
         </div>
       </div>
 
-      <div class="filter-bar">
-        <div class="filter-group">
-          <div class="field">
-            <label class="field-label" for="biblio-filter-anio">Año de la carrera</label>
-            <select id="biblio-filter-anio" class="form-select">
-              <option value="todos">Todos los años</option>
-              <option value="1°">1° año</option>
-              <option value="2°">2° año</option>
-              <option value="3°">3° año</option>
-              <option value="4°">4° año</option>
-              <option value="5°">5° año</option>
-            </select>
-          </div>
-          <div class="field search-field">
-            <label class="field-label" for="biblio-search-input">Buscar por tema, materia o autor</label>
-            <svg class="ic" aria-hidden="true"><use href="#ic-buscar"></use></svg>
-            <input type="search" id="biblio-search-input" class="form-control" placeholder="Huesos, Farmacología, Resinas…">
-          </div>
+      <div class="biblio-controles">
+        <div class="chips-anio" id="biblio-anio" role="group" aria-label="Año de la carrera"></div>
+        <div class="field recursos-buscador">
+          <label class="field-label" for="biblio-buscar">Buscar en toda la carrera</label>
+          <input type="search" class="form-control" id="biblio-buscar" autocomplete="off"
+                 placeholder="Anatomía, Netter, Periodoncia…">
         </div>
       </div>
+      <p class="results-summary" id="biblio-resumen" role="status" aria-live="polite"></p>
 
-      <p class="results-summary" id="biblioteca-summary" role="status" aria-live="polite"></p>
-      <div class="biblio-grid" id="biblioteca-grid"></div>
+      <div class="biblio-grilla" id="biblio-materias"></div>
+
+      <div class="biblio-general" id="biblio-general"></div>
+
+      <p class="biblio-aviso">
+        <svg class="ic" aria-hidden="true"><use href="#ic-escudo"></use></svg>
+        <span>El material lo reúnen estudiantes para estudiar. Si sos autor o editorial y querés que
+        retiremos algo, escribinos a <a href="https://instagram.com/foe.odontologia/" target="_blank"
+        rel="noopener noreferrer">@foe.odontologia</a> y lo sacamos.</span>
+      </p>
     </div>
   </section>
 
@@ -976,6 +973,26 @@
               <button type="button" class="btn btn-magenta" data-action="adminGuardarPlanilla" data-clave="planilla_mesas">Probar y guardar</button>
             </div>
             <p class="admin-resultado" id="admin-planilla_mesas-resultado" role="status"></p>
+          </div>
+
+          <div class="admin-planilla">
+            <h3>Biblioteca</h3>
+            <p class="admin-planilla-actual" id="admin-planilla_biblioteca-actual"></p>
+            <p class="admin-planilla-ayuda">
+              El índice que mantienen los militantes. Una fila por material, con encabezado:
+              <code>Materia · Tipo · Título · Enlace · Autor o cátedra · Revisado</code>.
+              Tipo: Apuntes, Cátedra, Material, Bibliografía o Carpeta. Sólo se muestra lo que dice «sí» en Revisado.
+              Hay un modelo ya completo en <code>docs/biblioteca-modelo.csv</code>. Vacía, el sitio usa la copia del Drive.
+            </p>
+            <div class="field">
+              <label class="field-label" for="admin-planilla_biblioteca-enlace">Enlace nuevo</label>
+              <input type="url" class="form-control" id="admin-planilla_biblioteca-enlace" autocomplete="off">
+            </div>
+            <div class="acciones-inline">
+              <button type="button" class="btn btn-secondary" data-action="adminProbarPlanilla" data-clave="planilla_biblioteca">Probar</button>
+              <button type="button" class="btn btn-magenta" data-action="adminGuardarPlanilla" data-clave="planilla_biblioteca">Probar y guardar</button>
+            </div>
+            <p class="admin-resultado" id="admin-planilla_biblioteca-resultado" role="status"></p>
           </div>
 
           <!-- Guardada para cuando se retome el juego de práctica (js/juego.js). -->
@@ -1510,20 +1527,22 @@
 </footer>
 
 <!-- Scripts: configuración y núcleo primero, módulos después, controlador al final -->
-<script src="js/config.js?v=20260929e"></script>
-<script src="js/core.js?v=20260929e"></script>
-<script src="js/api.js?v=20260929e"></script>
-<script src="js/data.js?v=20260929e"></script>
-<script src="js/planes.js?v=20260929e"></script>
-<script src="js/live_sheets.js?v=20260929e"></script>
-<script src="js/calculator.js?v=20260929e"></script>
-<script src="js/carrera.js?v=20260929e"></script>
-<script src="js/agenda.js?v=20260929e"></script>
-<script src="js/recursos.js?v=20260929e"></script>
-<script src="js/hoy.js?v=20260929e"></script>
-<script src="js/auth.js?v=20260929e"></script>
-<script src="js/admin.js?v=20260929e"></script>
-<script src="js/chatbot.js?v=20260929e"></script>
-<script src="js/app.js?v=20260929e"></script>
+<script src="js/config.js?v=20260929f"></script>
+<script src="js/core.js?v=20260929f"></script>
+<script src="js/api.js?v=20260929f"></script>
+<script src="js/data.js?v=20260929f"></script>
+<script src="js/planes.js?v=20260929f"></script>
+<script src="js/live_sheets.js?v=20260929f"></script>
+<script src="js/calculator.js?v=20260929f"></script>
+<script src="js/carrera.js?v=20260929f"></script>
+<script src="js/agenda.js?v=20260929f"></script>
+<script src="js/recursos.js?v=20260929f"></script>
+<script src="js/biblioteca-datos.js?v=20260929f"></script>
+<script src="js/biblioteca.js?v=20260929f"></script>
+<script src="js/hoy.js?v=20260929f"></script>
+<script src="js/auth.js?v=20260929f"></script>
+<script src="js/admin.js?v=20260929f"></script>
+<script src="js/chatbot.js?v=20260929f"></script>
+<script src="js/app.js?v=20260929f"></script>
 </body>
 </html>

@@ -379,6 +379,7 @@
             '<span class="materia-title">' + esc(mat.nombre) + "</span>" +
             '<span class="materia-periodo">' + esc(PERIODOS[mat.periodo] || mat.periodo) + "</span>" +
             correlativas +
+            this.enlacesDeEstudio(mat) +
           "</td>" +
           '<td data-rotulo="Estado">' +
             '<label class="visually-hidden" for="estado-' + escAttr(mat.id) + '">Estado de ' + nombreSeguro + "</label>" +
@@ -404,6 +405,20 @@
           "</td>" +
         "</tr>"
       );
+    },
+
+    /** Apuntes (Biblioteca) y clases grabadas (Recursos) de una materia, si hay. */
+    enlacesDeEstudio: function (mat) {
+      var partes = [];
+      var apuntes = global.OdontoBiblioteca && global.OdontoBiblioteca.apuntesDe(mat.nombre);
+      var clases = global.OdontoRecursos && global.OdontoRecursos.clasesDe(mat.nombre);
+      function a(url, icono, texto) {
+        return '<a href="' + escAttr(url) + '" target="_blank" rel="noopener noreferrer">' + UI.icono(icono) + " " + texto +
+               '<span class="visually-hidden"> de ' + esc(mat.nombre) + " (se abre en una pestaña nueva)</span></a>";
+      }
+      if (apuntes) partes.push(a(apuntes.enlace, "documento", "Apuntes"));
+      if (clases) partes.push(a(clases.url, "video", "Clases"));
+      return partes.length ? '<span class="materia-enlaces">' + partes.join("") + "</span>" : "";
     },
 
     /* ====================================================================
