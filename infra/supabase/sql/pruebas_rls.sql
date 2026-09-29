@@ -1025,9 +1025,12 @@ reset role;
 
 -- ==========================================================================
 -- BOLSA MODERADA (009)
--- G publica; B es otra cuenta común; D administra.
+-- G publica; H es otra cuenta común, nueva (A, B, E y F ya se eliminaron
+-- en pruebas anteriores); D administra.
 -- ==========================================================================
-update public.perfiles set puede_publicar_desde = now() - interval '1 day' where id in ('00000000-0000-4000-8000-000000000011', '00000000-0000-4000-8000-00000000000b');
+insert into auth.users (id, email, email_confirmed_at, raw_user_meta_data) values
+  ('00000000-0000-4000-8000-000000000012', 'bolsa-h@odontocampus.invalid', now(), '{"nombre_visible":"Bolsa H"}');
+update public.perfiles set puede_publicar_desde = now() - interval '1 day' where id = '00000000-0000-4000-8000-000000000011';
 
 set local role authenticated;
 do $$ begin
@@ -1075,7 +1078,7 @@ exception when insufficient_privilege then
 end $$;
 
 do $$ begin
-  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-00000000000b","role":"authenticated"}', true);
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-000000000012","role":"authenticated"}', true);
 end $$;
 
 do $$ declare n int; begin
@@ -1128,7 +1131,7 @@ exception when others then
 end $$;
 
 do $$ begin
-  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-00000000000b","role":"authenticated"}', true);
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-000000000012","role":"authenticated"}', true);
 end $$;
 
 do $$ declare n int; tel text; begin
