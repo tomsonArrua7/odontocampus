@@ -66,7 +66,17 @@
       this.initBuscadorGlobal();
 
       if (global.OdontoCalculator) global.OdontoCalculator.init();
-      if (global.OdontoBot) global.OdontoBot.init();
+      /* OdontoBot, apagado mientras se rehace (config.js: botActivo). Se
+         sacan el botón y la ventana: esconderlos con CSS dejaría el atajo
+         de teclado y el foco llegando a algo invisible. */
+      if (global.OdontoBot && global.ODONTO_CONFIG.botActivo) {
+        global.OdontoBot.init();
+      } else {
+        ["odontobot-toggle-btn", "odontobot-window"].forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) el.remove();
+        });
+      }
       if (global.OdontoLiveSheets) global.OdontoLiveSheets.init();
 
       /* Cuentas. Se inicializan siempre, pero se apagan solas si el backend
@@ -379,6 +389,13 @@
           barra.style.setProperty("--i", String(indice));
         }
       }
+    },
+
+    /** Vuelve a dibujar lo que se está viendo (por ejemplo, al completar el perfil). */
+    repintarActual: function () {
+      var seccion = this.seccionActual;
+      var tab = document.querySelector("#seccion-" + seccion + " .tabs [aria-selected='true']");
+      this.alCambiarTab(seccion, tab ? tab.getAttribute("data-tab") : null);
     },
 
     /** Cada pestaña reclama su render al mostrarse (evita trabajo invisible). */

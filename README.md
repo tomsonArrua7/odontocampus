@@ -401,6 +401,15 @@ y la `SERVICE_ROLE_KEY`: saltean todas las políticas y viven sólo en el `.env`
 del servidor. `config.js` se niega a encender las cuentas si detecta una clave
 que no empiece con `sb_publishable_`.
 
+### Perfil: nombre, apellido y saludo (010)
+
+- Al crear la cuenta se piden **nombre y apellido**, y opcionalmente cómo
+  saludar («Hola, Tomi»): eso es `nombre_visible`, lo único que ven otros.
+- Nombre y apellido son privados: fuera del grant de lectura de `perfiles`.
+  Los ven la propia persona (`mi_perfil`) y el panel.
+- Sin nombre y apellido, `OdontoAuth.puedePasar()` frena Mi carrera, Agenda
+  y Bolsa y ofrece completarlos. Es comodidad, no seguridad.
+
 ### La bolsa de compra y venta (009)
 
 - **Sólo con cuenta.** Sin sesión, la pestaña muestra la puerta de ingreso.

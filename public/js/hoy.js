@@ -65,10 +65,12 @@
     return api && api.hayBackend() ? api.usuario() : null;
   }
 
-  function primerNombre(u) {
-    var meta = (u && u.user_metadata) || {};
-    var nombre = String(meta.nombre_visible || "").trim().split(/\s+/)[0];
-    return nombre || "";
+  /** Cómo eligió que la saludemos (Mi perfil). */
+  function nombreSaludo(u) {
+    if (!u) return "";
+    if (global.OdontoAuth) return global.OdontoAuth.nombreVisible();
+    var meta = u.user_metadata || {};
+    return String(meta.nombre_visible || "").trim();
   }
 
   /** Área de una materia, para su color: básicas, clínicas u OPS. */
@@ -207,7 +209,7 @@
 
       var hoy = new Date();
       var u = usuario();
-      var nombre = primerNombre(u);
+      var nombre = nombreSaludo(u);
 
       if (fecha) {
         var d = DIAS[hoy.getDay()];
@@ -223,6 +225,14 @@
             '<button type="button" class="btn btn-magenta" data-action="abrirAcceso" data-vista="registro">Crear mi cuenta</button>' +
             '<button type="button" class="btn btn-on-brand" data-action="abrirAcceso" data-vista="ingresar">Ya tengo cuenta</button>' +
           "</div>";
+        return;
+      }
+
+      var auth = global.OdontoAuth;
+      if (auth && auth.estadoPerfil === "incompleto") {
+        progreso.innerHTML =
+          '<p class="hoy-bajada">Completá tu perfil con tu nombre y apellido para usar tu carrera, tu agenda y la bolsa.</p>' +
+          '<div class="hoy-acciones"><button type="button" class="btn btn-magenta" data-action="abrirPerfil">Completar mi perfil</button></div>';
         return;
       }
 

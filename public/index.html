@@ -12,11 +12,11 @@
   <!-- Marca: un diente geométrico en blanco sobre el magenta de FOE. Se lee a
        16 px en una pestaña, que es la única prueba que importa para un ícono. -->
   <link rel="icon" href="favicon.ico" sizes="32x32">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260929h">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260929h">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260930a">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260930a">
   <!-- Instalable: "Agregar a pantalla de inicio" la abre sin barra del
        navegador, como una app. -->
-  <link rel="manifest" href="manifest.json?v=20260929h">
+  <link rel="manifest" href="manifest.json?v=20260930a">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="OdontoCampus">
@@ -64,17 +64,17 @@
        LÍNEAS (y en las plantillas de correo del override de Supabase).
        Pasó de verdad: el sitio nuevo quedó cargando el config.js viejo, con la
        clave en PENDIENTE, y las cuentas no aparecían por ningún lado. -->
-  <link rel="stylesheet" href="css/01-tokens.css?v=20260929h">
-  <link rel="stylesheet" href="css/02-base.css?v=20260929h">
-  <link rel="stylesheet" href="css/03-components.css?v=20260929h">
-  <link rel="stylesheet" href="css/04-sections.css?v=20260929h">
-  <link rel="stylesheet" href="css/05-responsive.css?v=20260929h">
-  <link rel="stylesheet" href="css/06-cuentas.css?v=20260929h">
-  <link rel="stylesheet" href="css/08-agenda-juego.css?v=20260929h">
-  <link rel="stylesheet" href="css/07-movimiento.css?v=20260929h">
-  <link rel="stylesheet" href="css/09-app.css?v=20260929h">
-  <link rel="stylesheet" href="css/10-recursos.css?v=20260929h">
-  <link rel="stylesheet" href="css/11-consultorio.css?v=20260929h">
+  <link rel="stylesheet" href="css/01-tokens.css?v=20260930a">
+  <link rel="stylesheet" href="css/02-base.css?v=20260930a">
+  <link rel="stylesheet" href="css/03-components.css?v=20260930a">
+  <link rel="stylesheet" href="css/04-sections.css?v=20260930a">
+  <link rel="stylesheet" href="css/05-responsive.css?v=20260930a">
+  <link rel="stylesheet" href="css/06-cuentas.css?v=20260930a">
+  <link rel="stylesheet" href="css/08-agenda-juego.css?v=20260930a">
+  <link rel="stylesheet" href="css/07-movimiento.css?v=20260930a">
+  <link rel="stylesheet" href="css/09-app.css?v=20260930a">
+  <link rel="stylesheet" href="css/10-recursos.css?v=20260930a">
+  <link rel="stylesheet" href="css/11-consultorio.css?v=20260930a">
 </head>
 <body>
 
@@ -1348,10 +1348,22 @@
         <p class="modal-lead">Te lleva un minuto. Después confirmás tu correo tocando un botón, una sola vez.</p>
 
         <form id="form-registro" class="stack" style="margin-top:1.25rem" novalidate>
+          <div class="perfil-fila">
+            <div class="field">
+              <label class="field-label" for="registro-nombre">Nombre</label>
+              <input type="text" id="registro-nombre" class="form-control" required
+                     minlength="2" maxlength="60" autocomplete="given-name">
+            </div>
+            <div class="field">
+              <label class="field-label" for="registro-apellido">Apellido</label>
+              <input type="text" id="registro-apellido" class="form-control" required
+                     minlength="2" maxlength="60" autocomplete="family-name">
+            </div>
+          </div>
           <div class="field">
-            <label class="field-label" for="registro-nombre">¿Cómo querés que te llamemos?</label>
-            <input type="text" id="registro-nombre" class="form-control" required
-                   minlength="2" maxlength="60" autocomplete="nickname" placeholder="Tu nombre o apodo">
+            <label class="field-label" for="registro-apodo">¿Cómo querés que te saludemos? <span class="field-opcional">(opcional)</span></label>
+            <input type="text" id="registro-apodo" class="form-control"
+                   maxlength="60" autocomplete="nickname" placeholder="Si lo dejás vacío, usamos tu nombre">
           </div>
           <div class="field">
             <label class="field-label" for="registro-email">Correo electrónico</label>
@@ -1374,7 +1386,7 @@
           </div>
 
           <div class="resumen-terminos">
-            <p>Guardamos tu nombre, tu correo y las materias que cargues, sólo para mostrarte tu promedio.</p>
+            <p>Guardamos tu nombre y apellido, tu correo y las materias que cargues, sólo para mostrarte tu promedio.</p>
             <details>
               <summary>Ver qué se guarda y quién lo ve</summary>
               <!-- Lo completa js/auth.js con el texto de js/carrera.js: hay uno solo. -->
@@ -1452,6 +1464,40 @@
 <!-- ==========================================================================
      MI CUENTA
      ========================================================================== -->
+<!-- ==========================================================================
+     MI PERFIL — nombre, apellido y cómo saludar (js/auth.js). Sin nombre y
+     apellido no se entra a lo que pide cuenta (010_perfil_completo.sql).
+     ========================================================================== -->
+<div class="modal-overlay" id="modal-perfil" role="dialog" aria-modal="true" aria-labelledby="perfil-titulo" aria-hidden="true">
+  <div class="modal-card modal-angosto">
+    <div class="modal-card-header">
+      <h2 id="perfil-titulo">Completá tu perfil</h2>
+      <button type="button" class="btn btn-icon btn-secondary" data-action="cerrarPerfil" aria-label="Cerrar">
+        <svg class="ic" aria-hidden="true"><use href="#ic-cerrar"></use></svg>
+      </button>
+    </div>
+    <form class="modal-card-body stack" id="form-perfil" novalidate>
+      <p class="modal-lead" id="perfil-bajada">Antes de seguir, contanos quién sos. Tu nombre y apellido no los ven otros estudiantes.</p>
+      <div class="perfil-fila">
+        <div class="field">
+          <label class="field-label" for="perfil-nombre">Nombre</label>
+          <input type="text" id="perfil-nombre" class="form-control" required minlength="2" maxlength="60" autocomplete="given-name">
+        </div>
+        <div class="field">
+          <label class="field-label" for="perfil-apellido">Apellido</label>
+          <input type="text" id="perfil-apellido" class="form-control" required minlength="2" maxlength="60" autocomplete="family-name">
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label" for="perfil-apodo">¿Cómo querés que te saludemos? <span class="field-opcional">(opcional)</span></label>
+        <input type="text" id="perfil-apodo" class="form-control" maxlength="60" autocomplete="nickname" placeholder="Si lo dejás vacío, usamos tu nombre">
+        <p class="field-hint">Es lo que aparece en «Hola, …» y junto a tus publicaciones de la bolsa.</p>
+      </div>
+      <button type="submit" class="btn btn-magenta btn-block" id="btn-perfil">Guardar</button>
+    </form>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-cuenta" role="dialog" aria-modal="true" aria-labelledby="cuenta-titulo" aria-hidden="true">
   <div class="modal-card modal-angosto">
     <div class="modal-card-header">
@@ -1468,6 +1514,10 @@
           <dd id="cuenta-nombre"></dd>
         </div>
         <div>
+          <dt>Te saludamos como</dt>
+          <dd id="cuenta-apodo"></dd>
+        </div>
+        <div>
           <dt>Correo</dt>
           <dd id="cuenta-email"></dd>
         </div>
@@ -1476,6 +1526,10 @@
       <!-- Sólo para el equipo de administración: lo muestra js/admin.js. -->
       <button type="button" class="btn btn-magenta btn-block" id="cuenta-admin" data-action="irAlPanelAdmin" hidden>
         <svg class="ic" aria-hidden="true"><use href="#ic-escudo"></use></svg> Panel de administración
+      </button>
+
+      <button type="button" class="btn btn-secondary btn-block" data-action="abrirPerfil">
+        <svg class="ic" aria-hidden="true"><use href="#ic-persona"></use></svg> Editar mi perfil
       </button>
 
       <button type="button" class="btn btn-secondary btn-block" data-action="abrirCambioClave">
@@ -1636,23 +1690,23 @@
 </footer>
 
 <!-- Scripts: configuración y núcleo primero, módulos después, controlador al final -->
-<script src="js/config.js?v=20260929h"></script>
-<script src="js/core.js?v=20260929h"></script>
-<script src="js/api.js?v=20260929h"></script>
-<script src="js/data.js?v=20260929h"></script>
-<script src="js/planes.js?v=20260929h"></script>
-<script src="js/live_sheets.js?v=20260929h"></script>
-<script src="js/calculator.js?v=20260929h"></script>
-<script src="js/carrera.js?v=20260929h"></script>
-<script src="js/agenda.js?v=20260929h"></script>
-<script src="js/recursos.js?v=20260929h"></script>
-<script src="js/biblioteca-datos.js?v=20260929h"></script>
-<script src="js/biblioteca.js?v=20260929h"></script>
-<script src="js/hoy.js?v=20260929h"></script>
-<script src="js/bolsa.js?v=20260929h"></script>
-<script src="js/auth.js?v=20260929h"></script>
-<script src="js/admin.js?v=20260929h"></script>
-<script src="js/chatbot.js?v=20260929h"></script>
-<script src="js/app.js?v=20260929h"></script>
+<script src="js/config.js?v=20260930a"></script>
+<script src="js/core.js?v=20260930a"></script>
+<script src="js/api.js?v=20260930a"></script>
+<script src="js/data.js?v=20260930a"></script>
+<script src="js/planes.js?v=20260930a"></script>
+<script src="js/live_sheets.js?v=20260930a"></script>
+<script src="js/calculator.js?v=20260930a"></script>
+<script src="js/carrera.js?v=20260930a"></script>
+<script src="js/agenda.js?v=20260930a"></script>
+<script src="js/recursos.js?v=20260930a"></script>
+<script src="js/biblioteca-datos.js?v=20260930a"></script>
+<script src="js/biblioteca.js?v=20260930a"></script>
+<script src="js/hoy.js?v=20260930a"></script>
+<script src="js/bolsa.js?v=20260930a"></script>
+<script src="js/auth.js?v=20260930a"></script>
+<script src="js/admin.js?v=20260930a"></script>
+<script src="js/chatbot.js?v=20260930a"></script>
+<script src="js/app.js?v=20260930a"></script>
 </body>
 </html>

@@ -820,3 +820,10 @@ h1, h2, h3, h4 { letter-spacing: -0.01em; }
   .bolsa-form-fila { grid-template-columns: 1fr; }
   .bolsa-item { padding: var(--sp-4); }
 }
+
+
+/* ==========================================================================
+   11. PERFIL: nombre y apellido (registro y Mi perfil)
+   ========================================================================== */
+.perfil-fila { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+@media (max-width: 480px) { .perfil-fila { grid-template-columns: 1fr; } }

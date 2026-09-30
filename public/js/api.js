@@ -299,7 +299,10 @@
         email: limpiarEmail(datos.email),
         password: datos.clave,
         data: {
-          nombre_visible: String(datos.nombre || "").trim(),
+          nombre_visible: String(datos.apodo || datos.nombre || "").trim(),
+          // Nombre y apellido reales: la base los copia al perfil (010).
+          nombre: String(datos.nombre || "").trim(),
+          apellido: String(datos.apellido || "").trim(),
           // La base registra el consentimiento con esta versión al crear la
           // cuenta (003_cuentas_con_contrasena.sql).
           version_terminos: CONFIG.versionTerminos

@@ -221,6 +221,18 @@ la base vieja, Mi carrera no puede guardar (pide tablas que no existen).
 - [ ] `pruebas_rls.sql`: todo en OK (de 00 a 103)
 - [ ] Panel → Bolsa: revisar las pendientes (el número aparece en la pestaña)
 
+### Perfil con nombre y apellido, y OdontoBot apagado (septiembre 2026) 🙋 aplicar en el servidor
+
+- [x] 💻 Registro con nombre, apellido y cómo saludar (opcional)
+- [x] 💻 «Hola, …» con el saludo elegido; Mi cuenta → Editar mi perfil
+- [x] 💻 Sin nombre y apellido no se entra a Mi carrera, Agenda ni Bolsa (las cuentas viejas lo completan al entrar)
+- [x] 💻 Nombre y apellido privados: los ve cada quien y el panel (listado de cuentas y cola de la bolsa)
+- [x] 💻 Texto de «qué se guarda» con nombre y apellido: versión de términos 2026-09-3 (se vuelve a aceptar al entrar a Mi carrera)
+- [x] 💻 OdontoBot apagado (`botActivo: false` en `js/config.js`) hasta rehacerlo
+- [ ] `git pull` en el sitio
+- [ ] Cargar `010_perfil_completo.sql`
+- [ ] `pruebas_rls.sql`: todo en OK (de 00 a 110)
+
 **Principio que no se negocia:** el login suma, no tapa. Mesas, reválidas,
 historias clínicas, instrumental y biblioteca siguen abiertas sin cuenta. Lo
 único que la pide es Mi promedio, porque guarda datos de la persona.

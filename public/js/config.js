@@ -39,12 +39,16 @@
        número: a quien aceptó una versión anterior se le vuelve a pedir antes
        de entrar a Mi carrera. Queda en la tabla `consentimientos`.
        Máximo 20 caracteres: la base corta lo que sobre. */
-    versionTerminos: "2026-09-2",
+    versionTerminos: "2026-09-3",
 
     /* Largo mínimo de la contraseña. TIENE que ser igual a
        GOTRUE_PASSWORD_MIN_LENGTH en infra/supabase/docker-compose.override.yml:
        si el sitio pide menos, deja pasar contraseñas que el servidor rechaza. */
-    minLargoClave: 8
+    minLargoClave: 8,
+
+    /* OdontoBot. Apagado (septiembre de 2026) hasta que responda bien: por
+       ahora es impreciso y confunde. Con true vuelve a aparecer el botón. */
+    botActivo: false
   };
 
   /**

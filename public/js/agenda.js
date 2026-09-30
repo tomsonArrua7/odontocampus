@@ -142,6 +142,8 @@
 
       if (!Api.hayBackend()) { this.pintarAcceso("sin-backend"); return; }
       if (!Api.usuario()) { this.pintarAcceso("sin-sesion"); return; }
+      var auth = global.OdontoAuth;
+      if (auth && !auth.puedePasar(acceso, panel)) return;
       if (this.cargado) { this.abrir(); return; }
       if (!this.cargando) this.traer();
     },

@@ -60,6 +60,12 @@
 
   function nada() {}
 
+  /** Sin nombre y apellido en el perfil no se entra (js/auth.js). */
+  function puedePasar(idAcceso, idPanel) {
+    var auth = global.OdontoAuth;
+    return !auth || auth.puedePasar(document.getElementById(idAcceso), document.getElementById(idPanel));
+  }
+
   var PLANES = global.ODONTO_PLANES || { porDefecto: null, planes: {} };
 
   /** Códigos de materia de un plan, como conjunto. */
@@ -378,6 +384,7 @@
 
       if (!Api.hayBackend()) { this.pintarAcceso("sin-backend"); return; }
       if (!this.usuarioId) { this.pintarAcceso("sin-sesion"); return; }
+      if (!puedePasar("carrera-acceso", "panel-promedio")) return;
       if (this.preparado) { this.abrirPanel(); return; }
       if (!this.cargando) this.preparar();
     },
@@ -495,7 +502,7 @@
       return (
         '<ul class="check-list lista-terminos">' +
           '<li><svg class="ic" aria-hidden="true"><use href="#ic-base-datos"></use></svg><span>' +
-            "<strong>Qué se guarda:</strong> tu nombre, tu correo y las materias, notas y " +
+            "<strong>Qué se guarda:</strong> tu nombre y apellido, tu correo y las materias, notas y " +
             "aplazos que cargues.</span></li>" +
           '<li><svg class="ic" aria-hidden="true"><use href="#ic-diana"></use></svg><span>' +
             "<strong>Para qué:</strong> sólo para mostrarte tu promedio y tu avance. No se usa " +

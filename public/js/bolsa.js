@@ -158,6 +158,9 @@
         return;
       }
 
+      var auth = global.OdontoAuth;
+      if (auth && !auth.puedePasar(acceso, panel)) return;
+
       acceso.hidden = true;
       panel.hidden = false;
       if (!this.cargado && !this.cargando) this.traer();

@@ -64,8 +64,20 @@
 
   function nombreDe(usuario) {
     if (!usuario) return "";
+    // Lo que la persona eligió en su perfil manda sobre lo que mandó al
+    // registrarse: user_metadata no se actualiza al editar el perfil.
+    var perfil = OdontoAuth.perfil;
+    if (perfil && perfil.id === usuario.id && perfil.nombre_visible) return perfil.nombre_visible;
     return (usuario.user_metadata && usuario.user_metadata.nombre_visible) ||
            (usuario.email || "").split("@")[0];
+  }
+
+  function textoValido(texto) {
+    return texto.length >= 2 && texto.length <= 60;
+  }
+
+  function limpio(id) {
+    return valor(id).replace(/\s+/g, " ").trim();
   }
 
   /** Pone un botón en espera y devuelve la función que lo restituye. */
@@ -119,6 +131,16 @@
     recuperacionCanjeada: false,
     modoClaveNueva: "cambiar",
 
+    /* El perfil propio (mi_perfil). estadoPerfil:
+         null          sin sesión
+         "cargando"    pidiéndolo
+         "completo"    tiene nombre y apellido
+         "incompleto"  le faltan: no entra a lo que pide cuenta
+         "error"       no se pudo leer (sin conexión): no se bloquea por eso */
+    perfil: null,
+    estadoPerfil: null,
+    perfilDe: null,
+
     /* ====================================================================
        ARRANQUE
        ==================================================================== */
@@ -138,13 +160,16 @@
         cerrarSesion: function () { self.salir(); },
         exportarDatos: function () { self.exportar(); },
         eliminarCuenta: function () { self.eliminar(); },
-        confirmarEliminarCuenta: function () { self.confirmarEliminacion(); }
+        confirmarEliminarCuenta: function () { self.confirmarEliminacion(); },
+        abrirPerfil: function () { self.abrirPerfil(); },
+        cerrarPerfil: function () { UI.closeModal("modal-perfil"); }
       });
 
       this.alEnviar("form-ingresar", function () { self.ingresar(); });
       this.alEnviar("form-registro", function () { self.registrar(); });
       this.alEnviar("form-olvide", function () { self.pedirRecuperacion(); });
       this.alEnviar("form-clave-nueva", function () { self.guardarClaveNueva(); });
+      this.alEnviar("form-perfil", function () { self.guardarPerfil(); });
 
       this.medirClave("registro-clave", "registro-clave-fuerza");
       this.medirClave("clave-nueva", "clave-nueva-fuerza");
@@ -153,8 +178,141 @@
       var terminos = campo("registro-terminos");
       if (terminos && global.OdontoCarrera) terminos.innerHTML = global.OdontoCarrera.htmlTerminos();
 
-      Api.alCambiarSesion(function () { self.pintarEncabezado(); });
+      Api.alCambiarSesion(function () {
+        self.pintarEncabezado();
+        self.cargarPerfil();
+      });
       this.pintarEncabezado();
+      this.cargarPerfil();
+    },
+
+    /* ====================================================================
+       PERFIL: nombre, apellido y cómo saludar
+       ==================================================================== */
+    cargarPerfil: function () {
+      var self = this;
+      var usuario = Api.hayBackend() ? Api.usuario() : null;
+      var uid = usuario ? usuario.id : null;
+
+      // La sesión se reescribe al renovar el token: sólo importa si cambió la persona.
+      if (uid === this.perfilDe && this.estadoPerfil !== "error") return;
+      this.perfilDe = uid;
+      this.perfil = null;
+
+      if (!uid) { this.estadoPerfil = null; return; }
+      this.estadoPerfil = "cargando";
+
+      Api.rpc("mi_perfil").then(function (filas) {
+        if (self.perfilDe !== uid) return;
+        self.perfil = (Array.isArray(filas) ? filas[0] : filas) || { id: uid };
+        // Base sin la migración 010 (no hay columna nombre): no se bloquea a nadie.
+        self.estadoPerfil = !("nombre" in self.perfil) ? "error"
+          : self.perfilCompleto() ? "completo" : "incompleto";
+        self.alCambiarPerfil();
+        // Recién creada o de antes de 010: se pide una vez, al entrar.
+        if (self.estadoPerfil === "incompleto") self.abrirPerfil();
+      }, function () {
+        if (self.perfilDe !== uid) return;
+        self.estadoPerfil = "error";
+        self.alCambiarPerfil();
+      });
+    },
+
+    perfilCompleto: function () {
+      var p = this.perfil || {};
+      return textoValido(String(p.nombre || "").trim()) && textoValido(String(p.apellido || "").trim());
+    },
+
+    /** "Hola, …": cómo eligió que la saludemos. */
+    nombreVisible: function () {
+      return nombreDe(Api.usuario());
+    },
+
+    /** Todo lo que muestra el nombre o depende del perfil se vuelve a dibujar. */
+    alCambiarPerfil: function () {
+      this.pintarEncabezado();
+      if (global.OdontoHoy) global.OdontoHoy.pintarBanda();
+      if (global.OdontoApp && global.OdontoApp.repintarActual) global.OdontoApp.repintarActual();
+    },
+
+    /**
+     * Puerta para las secciones que piden cuenta (Mi carrera, Agenda, Bolsa).
+     * Devuelve true si se puede pasar; si no, dibuja en `acceso` por qué no
+     * y esconde `panel`. Se llama después de comprobar que hay sesión.
+     * Es comodidad, no seguridad: los datos los cuida la base.
+     */
+    puedePasar: function (acceso, panel) {
+      if (!Api.usuario() || this.estadoPerfil === "completo" || this.estadoPerfil === "error") return true;
+      if (this.estadoPerfil === null) this.cargarPerfil();
+      if (!acceso) return false;
+
+      if (panel) panel.hidden = true;
+      acceso.hidden = false;
+      if (this.estadoPerfil === "cargando") {
+        acceso.innerHTML = '<div class="puerta-carrera puerta-cargando">' +
+          UI.icono("cargando", "ic-gira") + "<p>Un momento…</p></div>";
+        return false;
+      }
+      acceso.innerHTML =
+        '<div class="puerta-carrera">' +
+          '<span class="puerta-icono" aria-hidden="true">' + UI.icono("persona") + "</span>" +
+          "<h3>Completá tu perfil para seguir</h3>" +
+          '<p class="puerta-lead">Necesitamos tu nombre y apellido. Es una sola vez, y otros estudiantes no los ven.</p>' +
+          '<div class="puerta-acciones">' +
+            '<button type="button" class="btn btn-magenta btn-lg" data-action="abrirPerfil">Completar mi perfil</button>' +
+          "</div>" +
+        "</div>";
+      return false;
+    },
+
+    abrirPerfil: function () {
+      if (!Api.usuario()) return;
+      var p = this.perfil || {};
+      var completo = this.perfilCompleto();
+      campo("perfil-nombre").value = p.nombre || "";
+      campo("perfil-apellido").value = p.apellido || "";
+      // El saludo se muestra sólo si es distinto del nombre: vacío = "usar el nombre".
+      // Tampoco si es el que puso la base con el principio del correo.
+      var apodo = p.nombre_visible || "";
+      var delCorreo = String(Api.usuario().email || "").split("@")[0];
+      campo("perfil-apodo").value = apodo && apodo !== p.nombre && apodo !== delCorreo ? apodo : "";
+      campo("perfil-titulo").textContent = completo ? "Mi perfil" : "Completá tu perfil";
+      campo("perfil-bajada").textContent = completo
+        ? "Tu nombre y apellido no los ven otros estudiantes. El saludo sí: aparece junto a tus publicaciones de la bolsa."
+        : "Antes de seguir, contanos quién sos. Tu nombre y apellido no los ven otros estudiantes.";
+      UI.closeModal("modal-cuenta");
+      UI.openModal("modal-perfil", completo ? "#perfil-apodo" : "#perfil-nombre");
+    },
+
+    guardarPerfil: function () {
+      var self = this;
+      var usuario = Api.usuario();
+      if (!usuario) return;
+
+      var nombre = limpio("perfil-nombre");
+      var apellido = limpio("perfil-apellido");
+      var apodo = limpio("perfil-apodo") || nombre;
+
+      if (!textoValido(nombre)) { UI.toast("Escribí tu nombre", "warning"); campo("perfil-nombre").focus(); return; }
+      if (!textoValido(apellido)) { UI.toast("Escribí tu apellido", "warning"); campo("perfil-apellido").focus(); return; }
+      if (!textoValido(apodo)) { UI.toast("El saludo necesita al menos 2 letras", "warning"); campo("perfil-apodo").focus(); return; }
+
+      var liberar = ocupar(campo("btn-perfil"), "Guardando…");
+      Api.actualizar("perfiles", "id=eq." + encodeURIComponent(usuario.id),
+        { nombre: nombre, apellido: apellido, nombre_visible: apodo })
+        .then(function () {
+          liberar();
+          self.perfil = Object.assign({}, self.perfil || { id: usuario.id },
+            { nombre: nombre, apellido: apellido, nombre_visible: apodo });
+          var antes = self.estadoPerfil;
+          self.estadoPerfil = "completo";
+          UI.closeModal("modal-perfil");
+          UI.toast(antes === "completo" ? "Listo, guardamos los cambios" : "¡Listo, " + apodo + "!", "success");
+          self.alCambiarPerfil();
+        }, function (error) {
+          liberar();
+          UI.toast(error.message, "danger");
+        });
     },
 
     alEnviar: function (idForm, fn) {
@@ -357,14 +515,26 @@
        ==================================================================== */
     registrar: function () {
       var self = this;
-      var nombre = valor("registro-nombre").trim();
+      var nombre = limpio("registro-nombre");
+      var apellido = limpio("registro-apellido");
+      var apodo = limpio("registro-apodo");
       var email = valor("registro-email").trim().toLowerCase();
       var clave = campo("registro-clave");
       var acepta = campo("registro-acepto");
 
-      if (nombre.length < 2 || nombre.length > 60) {
-        this.mostrarAviso("Contanos cómo querés que te llamemos (entre 2 y 60 letras).");
+      if (!textoValido(nombre)) {
+        this.mostrarAviso("Escribí tu nombre (entre 2 y 60 letras).");
         campo("registro-nombre").focus();
+        return;
+      }
+      if (!textoValido(apellido)) {
+        this.mostrarAviso("Escribí tu apellido (entre 2 y 60 letras).");
+        campo("registro-apellido").focus();
+        return;
+      }
+      if (apodo && !textoValido(apodo)) {
+        this.mostrarAviso("El saludo necesita entre 2 y 60 letras, o dejalo vacío.");
+        campo("registro-apodo").focus();
         return;
       }
       if (!EMAIL_VALIDO.test(email)) {
@@ -385,7 +555,7 @@
 
       var liberar = ocupar(campo("btn-registro"), "Creando tu cuenta…");
 
-      Api.registrarse({ nombre: nombre, email: email, clave: clave.value })
+      Api.registrarse({ nombre: nombre, apellido: apellido, apodo: apodo, email: email, clave: clave.value })
         .then(function (resultado) {
           clave.value = "";
           acepta.checked = false;
@@ -394,7 +564,7 @@
 
           if (resultado.conSesion) {
             UI.closeModal("modal-acceso");
-            UI.toast("¡Bienvenida/o, " + nombre + "!", "success");
+            UI.toast("¡Bienvenida/o, " + (apodo || nombre) + "!", "success");
             return;
           }
           self.mostrarCorreoEnviado("confirmacion", email);
@@ -695,8 +865,11 @@
       var usuario = Api.usuario();
       if (!usuario) return;
 
+      var p = this.perfil || {};
       var nombre = campo("cuenta-nombre");
-      if (nombre) nombre.textContent = nombreDe(usuario);
+      if (nombre) nombre.textContent = [p.nombre, p.apellido].filter(Boolean).join(" ") || "Sin completar";
+      var apodo = campo("cuenta-apodo");
+      if (apodo) apodo.textContent = nombreDe(usuario);
       var correo = campo("cuenta-email");
       if (correo) correo.textContent = usuario.email || "";
 

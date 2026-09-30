@@ -1,7 +1,7 @@
 -- ==========================================================================
 -- OdontoCampus — Pruebas de seguridad del esquema (RLS y permisos)
 --
--- Correr DESPUÉS de aplicar todas las migraciones (001 a 009, ...), y otra
+-- Correr DESPUÉS de aplicar todas las migraciones (001 a 010, ...), y otra
 -- vez después de cualquier cambio:
 --
 --   cd /opt/supabase
@@ -1165,8 +1165,87 @@ end $$;
 
 reset role;
 
+-- ==========================================================================
+-- NOMBRE Y APELLIDO (010)
+-- I se registra con nombre y apellido; H (común) intenta leerlos; D administra.
+-- ==========================================================================
+insert into auth.users (id, email, email_confirmed_at, raw_user_meta_data) values
+  ('00000000-0000-4000-8000-000000000013', 'perfil-i@odontocampus.invalid', now(),
+   '{"nombre_visible":"Tomi","nombre":"Tomás","apellido":"Zapiola"}'),
+  ('00000000-0000-4000-8000-000000000014', 'perfil-j@odontocampus.invalid', now(),
+   '{"nombre_visible":"Juli","nombre":"J","apellido":""}');
+
+do $$ declare n text; a text; v text; begin
+  select nombre, apellido, nombre_visible into n, a, v from public.perfiles where id = '00000000-0000-4000-8000-000000000013';
+  if n = 'Tomás' and a = 'Zapiola' and v = 'Tomi' then raise notice 'OK     104. Al registrarse quedan el nombre, el apellido y cómo quiere que la llamen';
+  else raise notice 'FALLA  104. El perfil quedó con % / % / %', n, a, v; end if;
+end $$;
+
+do $$ declare n text; a text; begin
+  select nombre, apellido into n, a from public.perfiles where id = '00000000-0000-4000-8000-000000000014';
+  if n is null and a is null then raise notice 'OK     105. Un nombre o apellido inválido no frena el alta: queda vacío y se pide después';
+  else raise notice 'FALLA  105. Quedaron % / %', n, a; end if;
+end $$;
+
+set local role authenticated;
+do $$ begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-000000000012","role":"authenticated"}', true);
+end $$;
+
+do $$ declare a text; begin
+  select apellido into a from public.perfiles where id = '00000000-0000-4000-8000-000000000013';
+  raise notice 'FALLA  106. Se lee el apellido de otra persona';
+exception when insufficient_privilege then
+  raise notice 'OK     106. El nombre y apellido de otra persona no se leen';
+end $$;
+
+do $$ begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-000000000014","role":"authenticated"}', true);
+end $$;
+
+do $$ begin
+  update public.perfiles set nombre = 'J' where id = '00000000-0000-4000-8000-000000000014';
+  raise notice 'FALLA  107. Se guardó un nombre de una letra';
+exception when check_violation then
+  raise notice 'OK     107. El nombre necesita al menos 2 letras';
+end $$;
+
+do $$ declare n int; r jsonb; begin
+  update public.perfiles set nombre = 'Julieta', apellido = 'Ferreyra', nombre_visible = 'Juli'
+  where id = '00000000-0000-4000-8000-000000000014';
+  get diagnostics n = row_count;
+  select to_jsonb(m) into r from public.mi_perfil() m;
+  if n = 1 and r ->> 'apellido' = 'Ferreyra' then raise notice 'OK     108. Cada quien completa su nombre y apellido, y los ve en mi_perfil';
+  else raise notice 'FALLA  108. No se completó el perfil (% filas, %)', n, r ->> 'apellido'; end if;
+exception when others then
+  raise notice 'FALLA  108. No se pudo completar el perfil: %', sqlerrm;
+end $$;
+
+do $$ declare n int; begin
+  update public.perfiles set apellido = 'Otro' where id = '00000000-0000-4000-8000-000000000013';
+  get diagnostics n = row_count;
+  if n = 0 then raise notice 'OK     109. No se cambia el nombre de otra persona';
+  else raise notice 'FALLA  109. Se cambió el apellido de otra persona'; end if;
+exception when insufficient_privilege then
+  raise notice 'OK     109. No se cambia el nombre de otra persona';
+end $$;
+
+do $$ begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-00000000000d","role":"authenticated"}', true);
+end $$;
+
+do $$ declare n text; begin
+  select nombre into n from public.admin_listar_usuarios('Zapiola', 10, 0) limit 1;
+  if n = 'Tomás Zapiola' then raise notice 'OK     110. El panel busca por apellido y muestra nombre y apellido';
+  else raise notice 'FALLA  110. El panel devolvió %', n; end if;
+exception when others then
+  raise notice 'FALLA  110. El panel no pudo listar: %', sqlerrm;
+end $$;
+
+reset role;
+
 rollback;
 
 \echo
-\echo 'Pruebas terminadas (00 a 103). Todo se deshizo con ROLLBACK: no quedó nada en la base.'
+\echo 'Pruebas terminadas (00 a 110). Todo se deshizo con ROLLBACK: no quedó nada en la base.'
 \echo 'Si alguna línea dice FALLA, no publiques el cambio en el sitio.'
