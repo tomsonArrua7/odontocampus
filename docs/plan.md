@@ -233,6 +233,15 @@ la base vieja, Mi carrera no puede guardar (pide tablas que no existen).
 - [ ] Cargar `010_perfil_completo.sql`
 - [ ] `pruebas_rls.sql`: todo en OK (de 00 a 110)
 
+### Exportar cuentas a Excel (septiembre 2026) 🙋 aplicar en el servidor
+
+- [x] 💻 Panel → Cuentas → «Descargar Excel»: nombre, apellido, correo, WhatsApp, legajo, saludo, alta y estado
+- [x] 💻 .xlsx armado en el navegador (`js/excel.js`), todo como texto: el legajo no se vuelve fecha
+- [x] 💻 Sólo admins, y cada descarga queda en el registro (`admin_exportar_cuentas`, 011)
+- [ ] `git pull` en el sitio
+- [ ] Cargar `011_exportar_cuentas.sql`
+- [ ] `pruebas_rls.sql`: todo en OK (de 00 a 112)
+
 **Principio que no se negocia:** el login suma, no tapa. Mesas, reválidas,
 historias clínicas, instrumental y biblioteca siguen abiertas sin cuenta. Lo
 único que la pide es Mi promedio, porque guarda datos de la persona.

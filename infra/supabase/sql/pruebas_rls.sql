@@ -1,7 +1,7 @@
 -- ==========================================================================
 -- OdontoCampus — Pruebas de seguridad del esquema (RLS y permisos)
 --
--- Correr DESPUÉS de aplicar todas las migraciones (001 a 010, ...), y otra
+-- Correr DESPUÉS de aplicar todas las migraciones (001 a 011, ...), y otra
 -- vez después de cualquier cambio:
 --
 --   cd /opt/supabase
@@ -1244,8 +1244,40 @@ end $$;
 
 reset role;
 
+-- ==========================================================================
+-- EXPORTAR CUENTAS (011)
+-- ==========================================================================
+set local role authenticated;
+do $$ begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-000000000012","role":"authenticated"}', true);
+end $$;
+
+do $$ begin
+  perform public.admin_exportar_cuentas();
+  raise notice 'FALLA  111. Una cuenta común exporta los datos de todas';
+exception when insufficient_privilege then
+  raise notice 'OK     111. Una cuenta común no puede exportar las cuentas';
+end $$;
+
+do $$ begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-00000000000d","role":"authenticated"}', true);
+end $$;
+
+do $$ declare correo text; n int; begin
+  select e.email into correo from public.admin_exportar_cuentas() e
+  where e.nombre = 'Tomás' and e.apellido = 'Zapiola';
+  select count(*) into n from public.admin_registro(50) r where r.accion = 'exportar_cuentas';
+  if correo = 'perfil-i@odontocampus.invalid' and n >= 1 then
+    raise notice 'OK     112. Un admin exporta nombre, apellido y correo, y queda en el registro';
+  else raise notice 'FALLA  112. Exportó % y el registro tiene % descargas', correo, n; end if;
+exception when others then
+  raise notice 'FALLA  112. Un admin no pudo exportar: %', sqlerrm;
+end $$;
+
+reset role;
+
 rollback;
 
 \echo
-\echo 'Pruebas terminadas (00 a 110). Todo se deshizo con ROLLBACK: no quedó nada en la base.'
+\echo 'Pruebas terminadas (00 a 112). Todo se deshizo con ROLLBACK: no quedó nada en la base.'
 \echo 'Si alguna línea dice FALLA, no publiques el cambio en el sitio.'

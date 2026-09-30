@@ -827,3 +827,7 @@ h1, h2, h3, h4 { letter-spacing: -0.01em; }
    ========================================================================== */
 .perfil-fila { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
 @media (max-width: 480px) { .perfil-fila { grid-template-columns: 1fr; } }
+
+/* Panel → Cuentas: buscador y «Descargar Excel» en una fila */
+.admin-cuentas-barra { display: flex; align-items: flex-end; gap: var(--sp-3); flex-wrap: wrap; margin-bottom: var(--sp-4); }
+.admin-cuentas-barra .admin-buscador { flex: 1 1 280px; margin-bottom: 0; }

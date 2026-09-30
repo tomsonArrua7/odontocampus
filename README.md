@@ -77,6 +77,7 @@ public/               EL SITIO. Es exactamente lo que se copia a htdocs/
     agenda.js         Agenda: entregas y finales propios sobre el calendario
     juego.js          Odontopreguntados: preguntas de una planilla de FOE
     auth.js           Registro, ingreso con contraseña, recuperación, Mi cuenta
+    excel.js          Arma un .xlsx en el navegador (exportar cuentas del panel)
     bolsa.js          Bolsa de compra y venta: sólo con cuenta, vendo/busco, moderada
     admin.js          Panel de administración (la seguridad está en la base)
     chatbot.js        OdontoBot (buscador de preguntas frecuentes)

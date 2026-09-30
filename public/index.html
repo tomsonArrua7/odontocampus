@@ -12,11 +12,11 @@
   <!-- Marca: un diente geométrico en blanco sobre el magenta de FOE. Se lee a
        16 px en una pestaña, que es la única prueba que importa para un ícono. -->
   <link rel="icon" href="favicon.ico" sizes="32x32">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260930a">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260930a">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260930b">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260930b">
   <!-- Instalable: "Agregar a pantalla de inicio" la abre sin barra del
        navegador, como una app. -->
-  <link rel="manifest" href="manifest.json?v=20260930a">
+  <link rel="manifest" href="manifest.json?v=20260930b">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="OdontoCampus">
@@ -64,17 +64,17 @@
        LÍNEAS (y en las plantillas de correo del override de Supabase).
        Pasó de verdad: el sitio nuevo quedó cargando el config.js viejo, con la
        clave en PENDIENTE, y las cuentas no aparecían por ningún lado. -->
-  <link rel="stylesheet" href="css/01-tokens.css?v=20260930a">
-  <link rel="stylesheet" href="css/02-base.css?v=20260930a">
-  <link rel="stylesheet" href="css/03-components.css?v=20260930a">
-  <link rel="stylesheet" href="css/04-sections.css?v=20260930a">
-  <link rel="stylesheet" href="css/05-responsive.css?v=20260930a">
-  <link rel="stylesheet" href="css/06-cuentas.css?v=20260930a">
-  <link rel="stylesheet" href="css/08-agenda-juego.css?v=20260930a">
-  <link rel="stylesheet" href="css/07-movimiento.css?v=20260930a">
-  <link rel="stylesheet" href="css/09-app.css?v=20260930a">
-  <link rel="stylesheet" href="css/10-recursos.css?v=20260930a">
-  <link rel="stylesheet" href="css/11-consultorio.css?v=20260930a">
+  <link rel="stylesheet" href="css/01-tokens.css?v=20260930b">
+  <link rel="stylesheet" href="css/02-base.css?v=20260930b">
+  <link rel="stylesheet" href="css/03-components.css?v=20260930b">
+  <link rel="stylesheet" href="css/04-sections.css?v=20260930b">
+  <link rel="stylesheet" href="css/05-responsive.css?v=20260930b">
+  <link rel="stylesheet" href="css/06-cuentas.css?v=20260930b">
+  <link rel="stylesheet" href="css/08-agenda-juego.css?v=20260930b">
+  <link rel="stylesheet" href="css/07-movimiento.css?v=20260930b">
+  <link rel="stylesheet" href="css/09-app.css?v=20260930b">
+  <link rel="stylesheet" href="css/10-recursos.css?v=20260930b">
+  <link rel="stylesheet" href="css/11-consultorio.css?v=20260930b">
 </head>
 <body>
 
@@ -972,9 +972,14 @@
         </div>
 
         <div class="tab-panel" id="panel-cuentas" role="tabpanel" aria-labelledby="tab-cuentas" tabindex="0">
-          <div class="field admin-buscador">
-            <label class="field-label" for="admin-buscar">Buscar por nombre o correo</label>
-            <input type="search" class="form-control" id="admin-buscar" autocomplete="off" placeholder="Por ejemplo: gmail o Pérez">
+          <div class="admin-cuentas-barra">
+            <div class="field admin-buscador">
+              <label class="field-label" for="admin-buscar">Buscar por nombre o correo</label>
+              <input type="search" class="form-control" id="admin-buscar" autocomplete="off" placeholder="Por ejemplo: gmail o Pérez">
+            </div>
+            <button type="button" class="btn btn-secondary" id="admin-exportar" data-action="adminExportarCuentas">
+              <svg class="ic" aria-hidden="true"><use href="#ic-descargar"></use></svg> Descargar Excel
+            </button>
           </div>
           <div id="admin-cuentas"></div>
           <p class="admin-aviso">
@@ -1690,23 +1695,24 @@
 </footer>
 
 <!-- Scripts: configuración y núcleo primero, módulos después, controlador al final -->
-<script src="js/config.js?v=20260930a"></script>
-<script src="js/core.js?v=20260930a"></script>
-<script src="js/api.js?v=20260930a"></script>
-<script src="js/data.js?v=20260930a"></script>
-<script src="js/planes.js?v=20260930a"></script>
-<script src="js/live_sheets.js?v=20260930a"></script>
-<script src="js/calculator.js?v=20260930a"></script>
-<script src="js/carrera.js?v=20260930a"></script>
-<script src="js/agenda.js?v=20260930a"></script>
-<script src="js/recursos.js?v=20260930a"></script>
-<script src="js/biblioteca-datos.js?v=20260930a"></script>
-<script src="js/biblioteca.js?v=20260930a"></script>
-<script src="js/hoy.js?v=20260930a"></script>
-<script src="js/bolsa.js?v=20260930a"></script>
-<script src="js/auth.js?v=20260930a"></script>
-<script src="js/admin.js?v=20260930a"></script>
-<script src="js/chatbot.js?v=20260930a"></script>
-<script src="js/app.js?v=20260930a"></script>
+<script src="js/config.js?v=20260930b"></script>
+<script src="js/core.js?v=20260930b"></script>
+<script src="js/api.js?v=20260930b"></script>
+<script src="js/data.js?v=20260930b"></script>
+<script src="js/planes.js?v=20260930b"></script>
+<script src="js/live_sheets.js?v=20260930b"></script>
+<script src="js/calculator.js?v=20260930b"></script>
+<script src="js/carrera.js?v=20260930b"></script>
+<script src="js/agenda.js?v=20260930b"></script>
+<script src="js/recursos.js?v=20260930b"></script>
+<script src="js/biblioteca-datos.js?v=20260930b"></script>
+<script src="js/biblioteca.js?v=20260930b"></script>
+<script src="js/hoy.js?v=20260930b"></script>
+<script src="js/bolsa.js?v=20260930b"></script>
+<script src="js/auth.js?v=20260930b"></script>
+<script src="js/excel.js?v=20260930b"></script>
+<script src="js/admin.js?v=20260930b"></script>
+<script src="js/chatbot.js?v=20260930b"></script>
+<script src="js/app.js?v=20260930b"></script>
 </body>
 </html>

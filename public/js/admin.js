@@ -36,6 +36,7 @@
     cambiar_planilla: "Cambió la planilla",
     consulta_bot: "Marcó una consulta del bot",
     consulta_bot_borrada: "Borró una consulta del bot",
+    exportar_cuentas: "Descargó el Excel de cuentas",
     aprobar_bolsa: "Aprobó en la bolsa",
     rechazar_bolsa: "Rechazó en la bolsa"
   };
@@ -90,6 +91,7 @@
 
       UI.registerActions({
         adminMasCuentas: function () { self.cargarCuentas(true); },
+        adminExportarCuentas: function (data, boton) { self.exportarCuentas(boton); },
         adminConfirmarCorreo: function (data) { self.confirmarCorreo(data.id, data.email); },
         adminSuspender: function (data) { self.pedirAccion("suspender", data.id, data.email); },
         adminReactivar: function (data) { self.reactivar(data.id, data.email); },
@@ -368,6 +370,43 @@
           ? '<div class="admin-mas"><button type="button" class="btn btn-secondary" data-action="adminMasCuentas">' +
             "Ver " + Math.min(faltan, POR_PAGINA) + " más</button></div>"
           : "");
+    },
+
+    /**
+     * Excel con todas las cuentas: nombre, apellido, correo, WhatsApp y
+     * legajo. La base deja constancia de cada descarga en el registro.
+     */
+    exportarCuentas: function (boton) {
+      if (!global.OdontoExcel) return;
+      if (!global.confirm("Vas a descargar los datos de contacto de todas las cuentas.\n\n" +
+          "Guardalo en un lugar seguro, no lo compartas fuera del equipo y borralo cuando ya no lo necesites. " +
+          "La descarga queda en el registro.")) return;
+
+      var original = boton ? boton.innerHTML : "";
+      if (boton) { boton.disabled = true; boton.innerHTML = UI.icono("cargando", "ic-gira") + " Preparando…"; }
+      var liberar = function () { if (boton) { boton.disabled = false; boton.innerHTML = original; } };
+
+      Api.rpc("admin_exportar_cuentas").then(function (filas) {
+        filas = filas || [];
+        var estado = function (c) {
+          if (c.estado === "suspendido") return "Suspendida";
+          return c.confirmado_at ? "Activa" : "Sin confirmar";
+        };
+        global.OdontoExcel.descargar(
+          "odontocampus-cuentas-" + fecha(new Date()).split("/").reverse().join("-") + ".xlsx",
+          "Cuentas",
+          ["Nombre", "Apellido", "Correo", "WhatsApp", "Legajo", "Saludo", "Alta", "Estado"],
+          filas.map(function (c) {
+            return [c.nombre, c.apellido, c.email, c.whatsapp, c.legajo, c.nombre_visible, fecha(c.creado_at), estado(c)];
+          }),
+          [18, 18, 32, 16, 12, 16, 12, 14]
+        );
+        liberar();
+        UI.toast("Descargado: " + UI.plural(filas.length, "cuenta"), "success");
+      }, function (error) {
+        liberar();
+        UI.toast(error.message, "danger");
+      });
     },
 
     /** Después de cualquier acción: el listado y el resumen se actualizan. */
