@@ -61,114 +61,58 @@ const ODONTO_DATA = {
   // El plan de estudios ya no está acá: vive en js/planes.js, que se genera
   // desde infra/planes/*.json (el mismo origen que la tabla de la base).
 
-  // Modelos de Historias Clínicas para Visualización y Descarga
+  // Historias clínicas: los PDF oficiales de la FOLP, tal como están en
+  // https://www.folp.unlp.edu.ar/hclinica/ (octubre de 2026). Si la
+  // facultad cambia un archivo, se cambia el enlace acá.
   historiasClinicas: [
     {
-      id: "hc-operatoria",
-      titulo: "Historia Clínica - Operatoria Dental I y II",
-      catedra: "Cátedra de Operatoria Dental",
-      anio: "3° y 4° Año",
-      descripcion: "Incluye odontograma inicial y final, índice de placa bacteriana de O'Leary, diagnóstico de caries según ICDAS, plan de tratamiento restaurador y consentimiento.",
-      paginas: 4,
-      formato: "PDF Oficial Imprimible",
-      tags: ["Operatoria", "Odontograma", "ICDAS", "Restauraciones"],
-      secciones: [
-        "1. Anamnesis y Antecedentes Médicos Relevantes",
-        "2. Examen Estomatológico General y Tejidos Blandos",
-        "3. Odontograma con Códigos de Color Normatizados",
-        "4. Índice de Higiene Oral y Placa O'Leary",
-        "5. Diagnóstico de Riesgo Cariogénico",
-        "6. Consentimiento Informado para Tratamientos Restauradores"
+      grupo: "Historia Clínica Única",
+      detalle: "La misma en todas las materias clínicas. Elegí la versión que te convenga imprimir.",
+      documentos: [
+        { titulo: "Historia Clínica Única (blanco y negro)", url: "https://www.folp.unlp.edu.ar/documents/15/Historia_Cl%C3%ADnica_%C3%9Anica_Blanco_y_Negro.pdf" },
+        { titulo: "Historia Clínica Única (color)", url: "https://www.folp.unlp.edu.ar/documents/14/Historia_Cl%C3%ADnica_%C3%9Anica_Color.pdf" }
       ]
     },
     {
-      id: "hc-cirugia",
-      titulo: "Historia Clínica y Ficha Quirúrgica - Cirugía BMF",
-      catedra: "Cátedras de Cirugía Bucomaxilofacial I y II",
-      anio: "4° y 5° Año",
-      descripcion: "Ficha médica especializada con evaluación de riesgo ASA, estudio de hemostasia y coagulación, registro de anestésico administrado, técnica de exodoncia y control postoperatorio.",
-      paginas: 5,
-      formato: "PDF Oficial Imprimible",
-      tags: ["Cirugía", "Exodoncia", "Evaluación ASA", "Anestésicos"],
-      secciones: [
-        "1. Historia Médica Detallada y Alergias a Medicamentos",
-        "2. Evaluación Cardiovascular y Signos Vitales (Tensión/Pulso)",
-        "3. Estudio Radiográfico de Piezas Dentarias y Estructuras Vecinas",
-        "4. Protocolo Quirúrgico (Tipo de incisión, decolado, odontosección, sutura)",
-        "5. Indicaciones y Prescripción Farmacológica Post-quirúrgica",
-        "6. Consentimiento Informado Específico de Cirugía Bucal"
+      grupo: "Anexos por especialidad",
+      detalle: "Se suman a la historia única según la materia que cursás.",
+      documentos: [
+        { titulo: "Patología y Clínica Estomatológica", url: "https://www.folp.unlp.edu.ar/documents/16/PATOLOG%C3%8DA_Y_CL%C3%8DNICA_ESTOMATOL%C3%93GICA.pdf" },
+        { titulo: "Periodoncia A y B", url: "https://www.folp.unlp.edu.ar/documents/18/PERIODONCIA_22A22_Y_22B22.pdf" },
+        { titulo: "Endodoncia A", url: "https://www.folp.unlp.edu.ar/documents/20/ENDODONCIA_22A22.pdf" },
+        { titulo: "Endodoncia B", url: "https://www.folp.unlp.edu.ar/documents/19/ENDODONCIA_B.pdf" },
+        { titulo: "Odontología Integral Niños A y B", url: "https://www.folp.unlp.edu.ar/documents/21/ODONTOLOG%C3%8DA_INTEGRAL_NI%C3%91OS_22A22_Y_22B22.pdf" },
+        { titulo: "Cirugía B", url: "https://www.folp.unlp.edu.ar/documents/22/CIRUGIA_B.pdf" },
+        { titulo: "Prótesis A", url: "https://www.folp.unlp.edu.ar/documents/23/PROTESIS_A.pdf" },
+        { titulo: "Prótesis B", url: "https://www.folp.unlp.edu.ar/documents/24/PROTESIS_B.pdf" }
       ]
     },
     {
-      id: "hc-periodoncia",
-      titulo: "Periodontograma y Ficha Clínica Periodontal",
-      catedra: "Cátedra de Periodoncia",
-      anio: "3° y 4° Año",
-      descripcion: "Plantilla con diagrama para registro de 6 puntos por pieza dentaria: profundidad de sondaje (PS), nivel de inserción clínica (NIC), sangrado al sondaje (SS), movilidad y compromiso de furcación.",
-      paginas: 3,
-      formato: "PDF Oficial Imprimible",
-      tags: ["Periodoncia", "Periodontograma", "Sondaje", "Raspaje"],
-      secciones: [
-        "1. Registro de Profundidad de Sondaje (Mesio, Medio, Disto - V y P/L)",
-        "2. Nivel de Inserción y Margen Gingival",
-        "3. Registro de Movilidad Dentaria (Grados I, II y III)",
-        "4. Diagnóstico Periodontal según Clasificación AAP/EFP",
-        "5. Fase Inicial de Terapia (RAR / TBC / Motivación)",
-        "6. Reevaluación Periodontal a las 4-6 semanas"
+      grupo: "Referencias",
+      detalle: "Cómo completar el periodontograma y el anexo de Patología.",
+      documentos: [
+        { titulo: "Periodontograma: referencias", url: "https://www.folp.unlp.edu.ar/documents/25/PERIODONTOGRAMA_referencias.pdf" },
+        { titulo: "Patología y Clínica Estomatológica: referencias", url: "https://www.folp.unlp.edu.ar/documents/17/PATOLOG%C3%8DA_Y_CL%C3%8DNICA_ESTOMATOL%C3%93GICA_referencias.pdf" }
       ]
     },
     {
-      id: "hc-endodoncia",
-      titulo: "Ficha de Registro Endodóntico y Conductometría",
-      catedra: "Cátedra de Endodoncia",
-      anio: "4° Año",
-      descripcion: "Ficha técnica para pruebas de vitalidad pulpar (frío, calor, percusión, palpación), conductometría electrónica/radiográfica, calibre de lima apical principal y técnica de obturación.",
-      paginas: 3,
-      formato: "PDF Oficial Imprimible",
-      tags: ["Endodoncia", "Conductometría", "Vitalidad", "Obturación"],
-      secciones: [
-        "1. Diagnóstico Pulpar y Periapical",
-        "2. Registro de Pruebas de Sensibilidad Térmica y Eléctrica",
-        "3. Medición de Longitud Real de Trabajo (LRT) por conducto",
-        "4. Referencias Anatómicas Dentarias (Cúspide / Borde Incisal)",
-        "5. Protocolo de Irrigación (Hipoclorito de Sodio / EDTA)",
-        "6. Técnica de Condensación Lateral / Termoplástica"
+      grupo: "Códigos y unificación de criterios",
+      detalle: "Los códigos de prestaciones que se usan en todas las clínicas.",
+      documentos: [
+        { titulo: "Códigos y Unificación de Criterios", url: "https://www.folp.unlp.edu.ar/documents/26/C%C3%B3digos_y_Unificaci%C3%B3n_de_Criterios.pdf" }
       ]
     },
     {
-      id: "hc-odontopediatria",
-      titulo: "Historia Clínica Odontopediátrica y Odontograma Infantil",
-      catedra: "Cátedra de Odontopediatría",
-      anio: "4° y 5° Año",
-      descripcion: "Diseñada para la atención de niños y adolescentes: odontograma para dentición primaria y mixta, escala de comportamiento de Frankl, hábitos de succión/deglución y control de dieta.",
-      paginas: 4,
-      formato: "PDF Oficial Imprimible",
-      tags: ["Odontopediatría", "Dentición Primaria", "Frankl", "Prevención"],
-      secciones: [
-        "1. Datos del Niño y del Tutor Legal Responsable",
-        "2. Antecedentes Perinatales y de Desarrollo Psicomotriz",
-        "3. Registro de Hábitos (Succión digital, mamadera nocturna, respiración bucal)",
-        "4. Odontograma Temporal (Piezas 51 a 85)",
-        "5. Escala de Conducta Frankl y Manejo Psicológico",
-        "6. Consentimiento Informado Pediátrico Firmado por Padre/Tutor"
-      ]
-    },
-    {
-      id: "hc-protesis",
-      titulo: "Ficha Clínica de Prótesis y Registro de Oclusión",
-      catedra: "Cátedras de Prótesis I y II",
-      anio: "4° y 5° Año",
-      descripcion: "Ficha protésica para prótesis parcial removible (Clasificación de Kennedy), prótesis fija o prótesis completa. Registro de dimensión vertical (DVO / DVP) y montaje en articulador semiajustable.",
-      paginas: 4,
-      formato: "PDF Oficial Imprimible",
-      tags: ["Prótesis", "Kennedy", "Oclusión", "Articulador"],
-      secciones: [
-        "1. Clasificación del Reborde Alveolar y Clase de Kennedy",
-        "2. Determinación de Dimensión Vertical Oclusal y Postural",
-        "3. Selección de Color, Forma y Tamaño de Dientes de Stock",
-        "4. Diseño de Esquelético (Apoyos, retenedores, conectores mayores)",
-        "5. Fases de Prueba (Enfilado, prueba de bizcocho, ajuste de oclusión)",
-        "6. Ficha de Envío a Laboratorio Dental"
+      grupo: "Material para descargar de las asignaturas",
+      detalle: "Planillas y formularios que piden algunas cátedras.",
+      documentos: [
+        { titulo: "Fajas de esterilización", url: "https://www.folp.unlp.edu.ar/documents/27/Fajas_de_Esterilizaci%C3%B3n.pdf" },
+        { titulo: "Consentimiento informado bilateral", url: "https://www.folp.unlp.edu.ar/documents/28/Consentimiento_Informado_Bilateral.pdf" },
+        { titulo: "Encuesta (OPS)", url: "https://www.folp.unlp.edu.ar/documents/29/Encuesta_-_OPS.pdf" },
+        { titulo: "Plan de tratamiento (OPS)", url: "https://www.folp.unlp.edu.ar/documents/30/Plan_de_Tratamiento_-_OPS.pdf" },
+        { titulo: "Registro de exposiciones y punciones accidentales", url: "https://www.folp.unlp.edu.ar/documents/31/Registro_de_Exposiciones_y_Punciones_Accidentales.pdf" },
+        { titulo: "Indicaciones posoperatorias (Cirugía B)", url: "https://www.folp.unlp.edu.ar/documents/32/Indicaciones_Posoperatorias_-_CIRUGIA_B.pdf" },
+        { titulo: "Desempeño del alumno en clínica (Odontología Integral Niños)", url: "https://www.folp.unlp.edu.ar/documents/33/Desempe%C3%B1o_del_alumno_en_cl%C3%ADnica_-_ODONTOLOG%C3%8DA_INTEGRAL_NI%C3%91OS.pdf" }
       ]
     }
   ],
@@ -258,8 +202,9 @@ const ODONTO_DATA = {
       elementos: [
         "Espejo bucal N° 5 plano con mango de acero inoxidable",
         "Sonda de exploración curva / doble extremo",
-        "Pinza de algodón para curaciones",
-        "Sonda periodontal milimetrada de Carolina del Norte (UNC-15)"
+        "Pinza para algodón",
+        "Sonda periodontal milimetrada de Carolina del Norte (UNC-15)",
+        "Bandeja metálica perforada o lisa"
       ],
       consejoFOE: "Esterilizar siempre en bolsa con testigo químico y rotular con nombre completo."
     },
@@ -272,8 +217,11 @@ const ODONTO_DATA = {
         "Arco de Young metálico o plástico radiolúcido",
         "Juego de Clamps básicos (N° 200 a 209 para molares y premolares, W8A, 212 para anteriores)",
         "Espátula para resina con recubrimiento de titanio",
-        "Bruñidores de bola y huevo",
-        "Tallador de Hollemback y cleoide-discoide"
+        "Goma dique",
+        "Hilo dental",
+        "Piedra diamantada redonda (color azul-verde)",
+        "Piedra diamantada llama (color amarillo-rojo)",
+        "Piedra diamantada tronco cónica de punta redondeada"
       ],
       consejoFOE: "Conseguí el kit de aislamiento con descuento presentando carnet de socio FOE."
     },
@@ -291,6 +239,95 @@ const ODONTO_DATA = {
         "Tijera quirúrgica para sutura (Spencer / Goldman-Fox)"
       ],
       consejoFOE: "Revisá el filo de los elevadores antes de iniciar el turno clínico para evitar deslizamientos."
+    },
+    {
+      nombre: "Prótesis A",
+      materias: ["Prótesis (Cátedra A)"],
+      elementos: [
+        "Articulador semiajustable",
+        "Articulador con arco facial",
+        "Jabón, toalla, barbijo, botas, anteojos, babero, compresas y guantes descartables",
+        "Caja esterilizada con juego clínico y cubetas Rim Lock lisas",
+        "Solución de hipoclorito de sodio al 10 %",
+        "Spray de alcohol al 70 %",
+        "Cubetas tipo Rim Lock lisas, alginato y dosificador polvo/líquido",
+        "Yeso de impresión, yeso piedra y yeso densita",
+        "Taza de goma, espátula para yeso y espátula para alginato",
+        "Cera utility, cera rosa, cera amarilla, cera Beauty Pink y estañolas de radiografías",
+        "Separador para yeso",
+        "4 dowel pins y clips para retención (clips de oficina)",
+        "Laminillas de Long",
+        "Flameador, lecrón y bisturí",
+        "Alicate universal",
+        "Espátula para cera",
+        "Papel de articular"
+      ]
+    }
+  ],
+
+  /* Preguntas frecuentes (sección Trámites). Las responde FOE en su documento
+     de preguntas frecuentes; cuando cambie algo, se cambia acá.
+     Cada respuesta es una lista de párrafos; un arreglo adentro es una lista
+     con viñetas. */
+  preguntasFrecuentes: [
+    {
+      tema: "Readmisión",
+      preguntas: [
+        { p: "¿Quién tiene que pedir la readmisión?",
+          r: ["Quienes durante el ciclo lectivo no cumplieron con los requisitos para mantener la regularidad."] },
+        { p: "¿Cómo y dónde la presento?",
+          r: ["Descargá la planilla de solicitud de la página de la FOLP (está en la pestaña Readmisión). Imprimila, completala y firmala a mano.",
+              "Escaneala en PDF, tamaño A4, y mandala junto con una copia digital de tu DNI (de los dos lados) a direadmisiones@folp.unlp.edu.ar.",
+              "En el asunto poné: «Readmisión para el Ciclo Lectivo», el año, y tus apellidos y nombres."] },
+        { p: "¿Qué plazo tengo?",
+          r: ["El que disponga la facultad. Lo publicamos apenas salga.",
+              "Si no presentás la documentación en el formato y el plazo pedidos, el trámite se rechaza sin excepción."] },
+        { p: "¿Cuál es el mail de readmisiones?",
+          r: ["direadmisiones@folp.unlp.edu.ar"] }
+      ]
+    },
+    {
+      tema: "Regularidad y vencimientos",
+      preguntas: [
+        { p: "¿Cómo quedo regular?",
+          r: ["Con cualquiera de estas opciones:",
+              ["2 finales aprobados.", "2 promociones.", "2 cursadas aprobadas (materias optativas o electivas).",
+               "Una combinación de las anteriores: por ejemplo, 1 final y 1 promoción, o 1 final y 1 cursada complementaria."]] },
+        { p: "¿Qué hago si se me vence una materia?",
+          r: ["Tenés que rendir el examen de reválida en las mesas correspondientes. Hay mesas todos los meses: son 5 oportunidades en un plazo de un año."] },
+        { p: "¿Cuándo tengo que actualizar una asignatura?",
+          r: ["Cuando perdiste la regularidad del ciclo lectivo y pasaron 5 años o más desde que diste el final: ese examen se actualiza con un examen nuevo."] }
+      ]
+    },
+    {
+      tema: "Clínica",
+      preguntas: [
+        { p: "¿Qué historia clínica uso en SEPOI y POI?",
+          r: ["La historia clínica unificada, la misma de todas las materias. Además completás una planilla de la materia (se imprime en la fotocopiadora) donde anotás las prácticas del día con sus códigos.",
+              "Tu docente a cargo la controla y la firma al terminar: es el registro de tu trabajo en clínica."] },
+        { p: "¿Cuántas prestaciones necesito en SEPOI y POI?",
+          r: ["Para aprobar ambas materias hay un mínimo de prestaciones que asigna tu docente a cargo. Se cuenta la cantidad, no el tipo.",
+              "Las prestaciones de POI suman al total de SEPOI. Por ejemplo: si hiciste 50 en POI y para aprobar SEPOI te piden 120, te faltan 70."] },
+        { p: "¿Cuáles son los horarios de esterilización?",
+          r: ["De lunes a viernes: entrega de 8 a 20 h y retiro de 8 a 21 h.",
+              "Sábados: entrega de 8 a 14 h y retiro de 8 a 17 h.",
+              "La caja o el tambor tiene que tener:",
+              ["Nombre y apellido", "Legajo", "Horario", "Materia", "Día de cursada"]] },
+        { p: "¿Cómo tramito el QR para esterilizar?",
+          r: ["Cada vez que quieras esterilizar o retirar instrumental del área de esterilización tenés que presentar tu QR.",
+              "Cómo sacarlo, en este video: https://youtu.be/NL1ITJ9-rqk"] }
+      ]
+    },
+    {
+      tema: "Alumnado y libreta",
+      preguntas: [
+        { p: "¿Cuál es el horario de alumnado?",
+          r: ["De lunes a viernes, de 8 a 13 h."] },
+        { p: "¿Dónde pido la libreta universitaria?",
+          r: ["En alumnado, de 8 a 12 h. Llevá toda tu documentación presentada de antes y una foto tipo carnet."] },
+        { p: "¿Para qué sirve la libreta universitaria?",
+          r: ["Para volcar las notas de los finales y tu información académica, y para votar en las elecciones estudiantiles."] }
+      ]
     }
   ],
 

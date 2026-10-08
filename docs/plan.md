@@ -233,6 +233,17 @@ la base vieja, Mi carrera no puede guardar (pide tablas que no existen).
 - [ ] Cargar `010_perfil_completo.sql`
 - [ ] `pruebas_rls.sql`: todo en OK (de 00 a 110)
 
+### Cambios del documento «PAGINA WEB.modif» (octubre 2026)
+
+- [x] 💻 Historias clínicas: fuera los modelos propios; ahora los 20 PDF oficiales de la FOLP (folp.unlp.edu.ar/hclinica)
+- [x] 💻 Instrumental: Operatoria sin bruñidores ni tallador, con goma dique, hilo dental y tres piedras diamantadas; Exploración con «pinza para algodón» y bandeja; nueva tarjeta Prótesis A
+- [x] 💻 Guía de preguntas de exámenes (Drive de FOE) en Mesas y en Biblioteca
+- [x] 💻 Preguntas frecuentes: sección propia (Trámites y preguntas), con buscador; el bot sigue apagado
+- [x] 💻 Clases grabadas: Cirugía III a VI (Cátedra A) y Patología III y IV
+- [x] 💻 Readmisión 2027: pasos, planilla de la FOLP, mail y asunto, en Trámites y en el menú
+- [ ] 🙋 La FOLP no tiene publicado el anexo de Cirugía A: sumarlo cuando aparezca
+- [ ] 🙋 Confirmar horario para pedir la libreta (el documento dice 8 a 12 h; alumnado atiende de 8 a 13 h)
+
 ### Exportar cuentas a Excel (septiembre 2026) 🙋 aplicar en el servidor
 
 - [x] 💻 Panel → Cuentas → «Descargar Excel»: nombre, apellido, correo, WhatsApp, legajo, saludo, alta y estado

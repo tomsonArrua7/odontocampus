@@ -21,6 +21,7 @@
     biblioteca: { titulo: "Biblioteca de apuntes", tabs: null },
     recursos:   { titulo: "Recursos", tabs: null },
     carrera:    { titulo: "Mi carrera", tabs: ["plan", "agenda", "juego"] },
+    tramites:   { titulo: "Trámites y preguntas", tabs: ["faq", "readmision"] },
     // No figura en el menú: se llega desde Mi cuenta, y sólo si es admin.
     admin:      { titulo: "Administración", tabs: ["cuentas", "planillas", "bolsa", "bot", "equipo", "registro"] }
   };
@@ -33,6 +34,9 @@
     historias: "cursada/historias",
     instrumental: "cursada/instrumental",
     bolsa: "cursada/bolsa",
+    faq: "tramites/faq",
+    preguntas: "tramites/faq",
+    readmision: "tramites/readmision",
     enlaces: "recursos",
     linktree: "recursos",
     calculadora: "carrera/plan",
@@ -62,6 +66,7 @@
 
       this.initNoticias();
       this.initHistoriasClinicas();
+      this.initPreguntasFrecuentes();
       this.initGuiaInstrumental();
       this.initBuscadorGlobal();
 
@@ -123,8 +128,6 @@
           var fila = boton && boton.closest("li");
           if (fila) fila.remove();
         },
-        verHC: function (data) { app.verVistaPreviaHC(data.id); },
-        imprimirHC: function (data) { app.imprimirHC(data.id); },
         descargarApunte: function (data) { app.descargarApunte(data.titulo); },
         resultadoBusqueda: function (data) { app.ejecutarResultado(Number(data.idx)); },
         limpiarFiltro: function (data) { app.limpiarFiltro(data.campo, data.selects); }
@@ -530,161 +533,130 @@
     },
 
     /* ======================================================================
-       HISTORIAS CLÍNICAS
+       HISTORIAS CLÍNICAS — los PDF oficiales de la FOLP (data.js)
        ====================================================================== */
     initHistoriasClinicas: function () {
       var app = this;
       if (!document.getElementById("historias-grid") || !global.ODONTO_DATA) return;
 
-      this.renderHistoriasClinicas(global.ODONTO_DATA.historiasClinicas);
+      this.renderHistoriasClinicas("");
 
       var input = document.getElementById("hc-search-input");
       if (input) {
-        on(input, "input", UI.debounce(function () {
-          var q = UI.normalizar(input.value);
-          var lista = global.ODONTO_DATA.historiasClinicas.filter(function (hc) {
-            return UI.normalizar(hc.titulo).indexOf(q) !== -1 ||
-                   UI.normalizar(hc.catedra).indexOf(q) !== -1 ||
-                   hc.tags.some(function (t) { return UI.normalizar(t).indexOf(q) !== -1; });
-          });
-          app.renderHistoriasClinicas(lista, input.value);
-        }));
+        on(input, "input", UI.debounce(function () { app.renderHistoriasClinicas(input.value); }));
       }
     },
 
-    renderHistoriasClinicas: function (lista, consulta) {
+    renderHistoriasClinicas: function (consulta) {
       var cont = document.getElementById("historias-grid");
       if (!cont) return;
 
-      this.resumen("historias-summary", lista.length, "modelo", "modelos", consulta);
+      var q = UI.normalizar(consulta || "").trim();
+      var grupos = (global.ODONTO_DATA.historiasClinicas || []).map(function (g) {
+        var docs = g.documentos.filter(function (d) {
+          return !q || UI.normalizar(d.titulo + " " + g.grupo).indexOf(q) !== -1;
+        });
+        return { grupo: g.grupo, detalle: g.detalle, documentos: docs };
+      }).filter(function (g) { return g.documentos.length; });
 
-      if (!lista.length) {
+      var total = grupos.reduce(function (n, g) { return n + g.documentos.length; }, 0);
+      this.resumen("historias-summary", total, "documento", "documentos", consulta);
+
+      if (!total) {
         cont.innerHTML = UI.emptyState({
           icon: "pregunta",
-          title: "No encontramos ese modelo",
-          text: 'Probá con el área de la cátedra: "Operatoria", "Cirugía", "Endodoncia" o "Periodoncia".',
+          title: "No encontramos ese documento",
+          text: 'Probá con la materia: "Endodoncia", "Periodoncia", "Prótesis" o "Cirugía".',
           action: "limpiarFiltro",
-          actionLabel: "Ver todos los modelos"
+          actionLabel: "Ver todos"
         }).replace('data-action="limpiarFiltro"', 'data-action="limpiarFiltro" data-campo="hc-search-input"');
         return;
       }
 
-      cont.innerHTML = lista.map(function (hc) {
+      cont.innerHTML = grupos.map(function (g) {
         return (
-          '<article class="hc-card">' +
-            '<div class="hc-header">' +
-              '<span class="badge-materia-anio">' + esc(hc.anio) + "</span>" +
-              '<span class="hc-pages"><svg class="ic" aria-hidden="true"><use href="#ic-documento"></use></svg> ' + esc(hc.paginas) + " págs</span>" +
-            "</div>" +
-            '<h3 class="hc-title">' + esc(hc.titulo) + "</h3>" +
-            '<p class="hc-catedra"><svg class="ic" aria-hidden="true"><use href="#ic-columnas"></use></svg> ' + esc(hc.catedra) + "</p>" +
-            '<p class="hc-desc">' + esc(hc.descripcion) + "</p>" +
-            '<div class="hc-tags-container">' +
-              hc.tags.map(function (t) { return '<span class="hc-tag">' + esc(t) + "</span>"; }).join("") +
-            "</div>" +
-            '<div class="hc-actions">' +
-              '<button type="button" class="btn btn-secondary btn-sm" data-action="verHC" data-id="' + escAttr(hc.id) + '">' +
-                '<svg class="ic" aria-hidden="true"><use href="#ic-ojo"></use></svg> Ver qué incluye' +
-              "</button>" +
-              '<button type="button" class="btn btn-magenta btn-sm" data-action="imprimirHC" data-id="' + escAttr(hc.id) + '">' +
-                '<svg class="ic" aria-hidden="true"><use href="#ic-imprimir"></use></svg> Imprimir' +
-              "</button>" +
-            "</div>" +
-          "</article>"
+          '<section class="hc-grupo">' +
+            "<h3>" + esc(g.grupo) + "</h3>" +
+            (g.detalle ? '<p class="hc-grupo-detalle">' + esc(g.detalle) + "</p>" : "") +
+            '<ul class="hc-docs">' + g.documentos.map(function (d) {
+              return (
+                "<li>" +
+                  '<a class="recurso" href="' + escAttr(UI.safeUrl(d.url)) + '" target="_blank" rel="noopener noreferrer">' +
+                    '<span class="recurso-icono" aria-hidden="true">' + UI.icono("documento") + "</span>" +
+                    '<span class="recurso-texto"><strong>' + esc(d.titulo) + "</strong><small>PDF · FOLP</small></span>" +
+                    UI.icono("descargar", "recurso-flecha") +
+                    '<span class="visually-hidden"> (se abre en una pestaña nueva)</span>' +
+                  "</a>" +
+                "</li>"
+              );
+            }).join("") + "</ul>" +
+          "</section>"
         );
       }).join("");
     },
 
-    verVistaPreviaHC: function (id) {
-      var hc = (global.ODONTO_DATA.historiasClinicas || []).find(function (item) { return item.id === id; });
-      if (!hc) return;
-
-      this.mostrarModalGenerico(
-        "<div><h2>" + esc(hc.titulo) + '</h2><span class="badge-materia-anio">' + esc(hc.catedra) + "</span></div>",
-        "<p>Estructura que pide la cátedra. La versión imprimible trae todos estos campos en blanco, listos para completar a mano.</p>" +
-        '<ul class="check-list" style="margin:1.25rem 0">' +
-          hc.secciones.map(function (s) {
-            return '<li><svg class="ic" aria-hidden="true"><use href="#ic-tilde"></use></svg><span>' + esc(s) + "</span></li>";
-          }).join("") +
-        "</ul>" +
-        '<div class="callout">' +
-          '<svg class="ic" aria-hidden="true"><use href="#ic-idea"></use></svg>' +
-          "<div><h3>Antes de anestesiar</h3>" +
-          "<p>Presentá la historia firmada por el docente y guardá siempre el consentimiento informado original del paciente.</p></div>" +
-        "</div>" +
-        '<div class="modal-card-footer" style="border:0;background:none;padding-inline:0">' +
-          '<button type="button" class="btn btn-secondary" data-action="cerrarModal">Cerrar</button>' +
-          '<button type="button" class="btn btn-magenta" data-action="imprimirHC" data-id="' + escAttr(hc.id) + '">' +
-            '<svg class="ic" aria-hidden="true"><use href="#ic-imprimir"></use></svg> Abrir versión imprimible' +
-          "</button>" +
-        "</div>"
-      );
+    /* ======================================================================
+       PREGUNTAS FRECUENTES (Trámites) — data.js
+       ====================================================================== */
+    initPreguntasFrecuentes: function () {
+      var app = this;
+      if (!document.getElementById("faq-lista") || !global.ODONTO_DATA) return;
+      this.renderPreguntasFrecuentes("");
+      var input = document.getElementById("faq-buscar");
+      if (input) on(input, "input", UI.debounce(function () { app.renderPreguntasFrecuentes(input.value); }, 160));
     },
 
-    imprimirHC: function (id) {
-      var hc = (global.ODONTO_DATA.historiasClinicas || []).find(function (item) { return item.id === id; });
-      if (!hc) return;
+    /** Texto de una respuesta: los enlaces y el mail se vuelven tocables. */
+    textoConEnlaces: function (texto) {
+      return esc(texto)
+        .replace(/https:\/\/[^\s<]+/g, function (url) {
+          return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + url + "</a>";
+        })
+        .replace(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g, function (mail) {
+          return '<a href="mailto:' + mail + '">' + mail + "</a>";
+        });
+    },
 
-      var ventana = global.open("", "_blank");
-      if (!ventana) {
-        UI.toast("Tu navegador bloqueó la ventana. Habilitá las ventanas emergentes para este sitio.", "warning");
+    renderPreguntasFrecuentes: function (consulta) {
+      var app = this;
+      var cont = document.getElementById("faq-lista");
+      if (!cont) return;
+      var q = UI.normalizar(consulta || "").trim();
+
+      var temas = (global.ODONTO_DATA.preguntasFrecuentes || []).map(function (t) {
+        return {
+          tema: t.tema,
+          preguntas: t.preguntas.filter(function (x) {
+            return !q || UI.normalizar(t.tema + " " + x.p + " " + JSON.stringify(x.r)).indexOf(q) !== -1;
+          })
+        };
+      }).filter(function (t) { return t.preguntas.length; });
+
+      if (!temas.length) {
+        cont.innerHTML = '<p class="recursos-vacio">No encontramos una pregunta así. Escribinos por Instagram a ' +
+          '<a href="https://instagram.com/foe.odontologia/" target="_blank" rel="noopener noreferrer">@foe.odontologia</a>.</p>';
         return;
       }
 
-      var camposPaciente = [
-        [["Paciente", 250], ["DNI", 130], ["Edad", 50]],
-        [["Domicilio", 230], ["Teléfono", 130], ["Fecha", 80]],
-        [["Estudiante / operador", 200], ["Comisión", 60], ["Docente a cargo", 160]]
-      ];
-
-      var html =
-        "<!DOCTYPE html><html lang=\"es\"><head><meta charset=\"UTF-8\">" +
-        "<title>" + esc(hc.titulo) + " — FOE OdontoCampus</title><style>" +
-        "@page{margin:16mm}" +
-        "body{font-family:Arial,Helvetica,sans-serif;margin:0;color:#111;line-height:1.5;font-size:12pt}" +
-        ".header{text-align:center;border-bottom:2px solid #0B192C;padding-bottom:12px;margin-bottom:18px}" +
-        ".logo-text{font-size:15pt;font-weight:bold;color:#C4006B;letter-spacing:1px}" +
-        ".sub{font-size:10pt;color:#444}" +
-        ".hc-title{font-size:14pt;font-weight:bold;color:#0B192C;margin-top:8px}" +
-        ".patient-box{border:1px solid #999;border-radius:4px;padding:10px;margin-bottom:18px}" +
-        ".row{display:flex;justify-content:space-between;gap:12px;margin-bottom:10px;font-size:10.5pt}" +
-        ".field{border-bottom:1px dotted #666;display:inline-block}" +
-        ".section-title{background:#eef2f6;padding:5px 9px;font-size:11pt;font-weight:bold;" +
-          "margin-top:16px;border-left:4px solid #C4006B;break-after:avoid}" +
-        ".write-area{height:64px;border-bottom:1px dashed #aaa;margin-bottom:8px}" +
-        ".signature-area{margin-top:36px;display:flex;justify-content:space-around;text-align:center;font-size:9.5pt}" +
-        ".sig-line{border-top:1px solid #000;width:170px;margin-bottom:4px}" +
-        ".toolbar{background:#eef6ff;padding:10px;text-align:center;margin-bottom:16px;border-radius:4px}" +
-        ".toolbar button{background:#C4006B;color:#fff;border:0;padding:10px 18px;border-radius:4px;" +
-          "font-weight:bold;font-size:11pt;cursor:pointer}" +
-        "@media print{.toolbar{display:none}}" +
-        "</style></head><body>" +
-        '<div class="toolbar"><button type="button" onclick="window.print()">Imprimir o guardar como PDF</button></div>' +
-        '<div class="header">' +
-          '<div class="logo-text">ODONTOCAMPUS · FOE ODONTOLOGÍA UNLP</div>' +
-          '<div class="sub">Facultad de Odontología — Universidad Nacional de La Plata</div>' +
-          '<div class="hc-title">' + esc(hc.titulo.toUpperCase()) + "</div>" +
-          '<div class="sub">Cátedra: ' + esc(hc.catedra) + "</div>" +
-        "</div>" +
-        '<div class="patient-box">' +
-          camposPaciente.map(function (fila) {
-            return '<div class="row">' + fila.map(function (campo) {
-              return "<div><strong>" + esc(campo[0]) + ':</strong> <span class="field" style="width:' + campo[1] + 'px"></span></div>';
-            }).join("") + "</div>";
-          }).join("") +
-        "</div>" +
-        hc.secciones.map(function (sec) {
-          return '<div class="section-title">' + esc(sec) + '</div><div class="write-area"></div>';
-        }).join("") +
-        '<div class="signature-area">' +
-          '<div><div class="sig-line"></div>Firma del estudiante</div>' +
-          '<div><div class="sig-line"></div>Firma del docente</div>' +
-          '<div><div class="sig-line"></div>Firma y consentimiento del paciente</div>' +
-        "</div></body></html>";
-
-      ventana.document.write(html);
-      ventana.document.close();
-      UI.toast('Se abrió la plantilla de "' + hc.titulo + '" en una pestaña nueva', "success");
+      cont.innerHTML = temas.map(function (t) {
+        return (
+          '<section class="faq-tema"><h3>' + esc(t.tema) + "</h3>" +
+            t.preguntas.map(function (x) {
+              return (
+                '<details class="faq-item"' + (q ? " open" : "") + ">" +
+                  "<summary>" + esc(x.p) + "</summary>" +
+                  '<div class="faq-respuesta">' + x.r.map(function (parte) {
+                    if (Array.isArray(parte)) {
+                      return "<ul>" + parte.map(function (li) { return "<li>" + app.textoConEnlaces(li) + "</li>"; }).join("") + "</ul>";
+                    }
+                    return "<p>" + app.textoConEnlaces(parte) + "</p>";
+                  }).join("") + "</div>" +
+                "</details>"
+              );
+            }).join("") +
+          "</section>"
+        );
+      }).join("");
     },
 
     /* ======================================================================
@@ -784,7 +756,7 @@
                 return '<li><svg class="ic" aria-hidden="true"><use href="#ic-diente"></use></svg><span>' + esc(e) + "</span></li>";
               }).join("") +
             "</ul>" +
-            '<p class="guia-tip"><strong>Tip de FOE:</strong> ' + esc(guia.consejoFOE) + "</p>" +
+            (guia.consejoFOE ? '<p class="guia-tip"><strong>Tip de FOE:</strong> ' + esc(guia.consejoFOE) + "</p>" : "") +
           "</article>"
         );
       }).join("");
@@ -855,14 +827,37 @@
       }
 
       if (global.ODONTO_DATA) {
-        (global.ODONTO_DATA.historiasClinicas || []).forEach(function (hc) {
-          if (UI.normalizar(hc.titulo + " " + hc.catedra).indexOf(q) === -1) return;
-          resultados.push({
-            tipo: "Historia clínica · " + hc.catedra,
-            titulo: hc.titulo,
-            icono: "documento",
-            destino: "cursada/historias",
-            despues: function () { app.verVistaPreviaHC(hc.id); }
+        (global.ODONTO_DATA.historiasClinicas || []).forEach(function (g) {
+          g.documentos.forEach(function (d) {
+            if (UI.normalizar(d.titulo + " " + g.grupo).indexOf(q) === -1) return;
+            resultados.push({
+              tipo: "Historia clínica · " + g.grupo,
+              titulo: d.titulo,
+              icono: "documento",
+              destino: "cursada/historias",
+              despues: function () {
+                var input = document.getElementById("hc-search-input");
+                if (input) input.value = d.titulo;
+                app.renderHistoriasClinicas(d.titulo);
+              }
+            });
+          });
+        });
+
+        (global.ODONTO_DATA.preguntasFrecuentes || []).forEach(function (t) {
+          t.preguntas.forEach(function (x) {
+            if (UI.normalizar(x.p + " " + t.tema).indexOf(q) === -1) return;
+            resultados.push({
+              tipo: "Pregunta frecuente · " + t.tema,
+              titulo: x.p,
+              icono: "pregunta",
+              destino: "tramites/faq",
+              despues: function () {
+                var input = document.getElementById("faq-buscar");
+                if (input) input.value = x.p;
+                app.renderPreguntasFrecuentes(x.p);
+              }
+            });
           });
         });
 

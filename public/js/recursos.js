@@ -88,7 +88,8 @@
           ["Farmacología y Terapéutica II", "PL8GG41AwWS6cwlTBqbXE3A3X2_qMYz0D3"],
           ["Patología y Clínica Estomatológica II", "PL8GG41AwWS6d_wGzVd7Nr4_Pt5_bsIvcu"],
           ["Cirugía I (Cátedra A)", "PL8GG41AwWS6fFLSUfRJ7cogSIbI62xKCN"],
-          ["Cirugía II (Cátedra A)", "PL8GG41AwWS6cg9xMVZsShJ0oujRoddys8"]
+          ["Cirugía II (Cátedra A)", "PL8GG41AwWS6cg9xMVZsShJ0oujRoddys8"],
+          ["Patología y Clínica Estomatológica III", "PL8GG41AwWS6eyE3V3x-WrjdoRe-QDydP1"]
         ],
         catedras: [
           { titulo: "Cirugía A", detalle: "@asignaturacirugiaafolp", url: IG + "asignaturacirugiaafolp/", icono: "instagram" },
@@ -99,8 +100,21 @@
           { titulo: "Patología", detalle: "@patologia.folp", url: IG + "patologia.folp/", icono: "instagram" }
         ]
       },
-      4: { clases: [], catedras: [] },
-      5: { clases: [], catedras: [] }
+      4: {
+        clases: [
+          ["Cirugía III (Cátedra A)", "PL8GG41AwWS6eNkLAooNWAvCU7-UG-9Up9"],
+          ["Cirugía IV (Cátedra A)", "PL8GG41AwWS6etmpe2vHw5JLrt4dsqNLd2"],
+          ["Patología y Clínica Estomatológica IV", "PL8GG41AwWS6c4xSSmUAuzuAyUqaRGlbPR"]
+        ],
+        catedras: []
+      },
+      5: {
+        clases: [
+          ["Cirugía V (Cátedra A)", "PL8GG41AwWS6d4S0_G6QioS3YCrO4sAvQ8"],
+          ["Cirugía VI (Cátedra A)", "PL8GG41AwWS6dbEYXC1Qf-6G4sLCt9Eju5"]
+        ],
+        catedras: []
+      }
     }
   };
 

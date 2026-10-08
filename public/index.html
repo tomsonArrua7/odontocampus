@@ -12,11 +12,11 @@
   <!-- Marca: un diente geométrico en blanco sobre el magenta de FOE. Se lee a
        16 px en una pestaña, que es la única prueba que importa para un ícono. -->
   <link rel="icon" href="favicon.ico" sizes="32x32">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260930b">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260930b">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20261008a">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261008a">
   <!-- Instalable: "Agregar a pantalla de inicio" la abre sin barra del
        navegador, como una app. -->
-  <link rel="manifest" href="manifest.json?v=20260930b">
+  <link rel="manifest" href="manifest.json?v=20261008a">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="OdontoCampus">
@@ -64,17 +64,17 @@
        LÍNEAS (y en las plantillas de correo del override de Supabase).
        Pasó de verdad: el sitio nuevo quedó cargando el config.js viejo, con la
        clave en PENDIENTE, y las cuentas no aparecían por ningún lado. -->
-  <link rel="stylesheet" href="css/01-tokens.css?v=20260930b">
-  <link rel="stylesheet" href="css/02-base.css?v=20260930b">
-  <link rel="stylesheet" href="css/03-components.css?v=20260930b">
-  <link rel="stylesheet" href="css/04-sections.css?v=20260930b">
-  <link rel="stylesheet" href="css/05-responsive.css?v=20260930b">
-  <link rel="stylesheet" href="css/06-cuentas.css?v=20260930b">
-  <link rel="stylesheet" href="css/08-agenda-juego.css?v=20260930b">
-  <link rel="stylesheet" href="css/07-movimiento.css?v=20260930b">
-  <link rel="stylesheet" href="css/09-app.css?v=20260930b">
-  <link rel="stylesheet" href="css/10-recursos.css?v=20260930b">
-  <link rel="stylesheet" href="css/11-consultorio.css?v=20260930b">
+  <link rel="stylesheet" href="css/01-tokens.css?v=20261008a">
+  <link rel="stylesheet" href="css/02-base.css?v=20261008a">
+  <link rel="stylesheet" href="css/03-components.css?v=20261008a">
+  <link rel="stylesheet" href="css/04-sections.css?v=20261008a">
+  <link rel="stylesheet" href="css/05-responsive.css?v=20261008a">
+  <link rel="stylesheet" href="css/06-cuentas.css?v=20261008a">
+  <link rel="stylesheet" href="css/08-agenda-juego.css?v=20261008a">
+  <link rel="stylesheet" href="css/07-movimiento.css?v=20261008a">
+  <link rel="stylesheet" href="css/09-app.css?v=20261008a">
+  <link rel="stylesheet" href="css/10-recursos.css?v=20261008a">
+  <link rel="stylesheet" href="css/11-consultorio.css?v=20261008a">
 </head>
 <body>
 
@@ -229,6 +229,8 @@
         <li><a href="#carrera/plan" class="nav-link" data-nav="carrera/plan"><svg class="ic" aria-hidden="true"><use href="#ic-birrete"></use></svg><span>Mi carrera</span></a></li>
         <li><a href="#carrera/agenda" class="nav-link" data-nav="carrera/agenda"><svg class="ic" aria-hidden="true"><use href="#ic-lista"></use></svg><span>Agenda</span></a></li>
         <li><a href="#carrera/juego" class="nav-link" data-nav="carrera/juego"><svg class="ic" aria-hidden="true"><use href="#ic-diente"></use></svg><span>Odontopreguntados</span></a></li>
+        <li><a href="#tramites/faq" class="nav-link" data-nav="tramites/faq"><svg class="ic" aria-hidden="true"><use href="#ic-pregunta"></use></svg><span>Preguntas frecuentes</span></a></li>
+        <li><a href="#tramites/readmision" class="nav-link" data-nav="tramites/readmision"><svg class="ic" aria-hidden="true"><use href="#ic-documento"></use></svg><span>Readmisión 2027</span></a></li>
         <li><a href="#cursada" class="nav-link" data-nav="cursada"><svg class="ic" aria-hidden="true"><use href="#ic-maletin"></use></svg><span>Cursada y clínica</span></a></li>
         <li><a href="#biblioteca" class="nav-link" data-nav="biblioteca"><svg class="ic" aria-hidden="true"><use href="#ic-libro"></use></svg><span>Biblioteca</span></a></li>
         <li><a href="#recursos" class="nav-link" data-nav="recursos"><svg class="ic" aria-hidden="true"><use href="#ic-marcador"></use></svg><span>Recursos</span></a></li>
@@ -287,6 +289,8 @@
         <li><a href="#carrera/plan" class="nav-link" data-nav="carrera/plan">Mi carrera</a></li>
         <li><a href="#carrera/agenda" class="nav-link" data-nav="carrera/agenda">Agenda</a></li>
         <li><a href="#carrera/juego" class="nav-link" data-nav="carrera/juego">Odontopreguntados</a></li>
+        <li><a href="#tramites/faq" class="nav-link" data-nav="tramites/faq">Preguntas frecuentes</a></li>
+        <li><a href="#tramites/readmision" class="nav-link" data-nav="tramites/readmision">Readmisión 2027</a></li>
       </ul>
       </nav>
       <p class="mobile-nav-note">¿Necesitás algo puntual? Usá el buscador: encuentra mesas, materias, apuntes e historias clínicas a la vez.</p>
@@ -401,6 +405,15 @@
           </div>
         </div>
 
+        <!-- Guía de preguntas de exámenes anteriores (Drive de FOE). -->
+        <a class="guia-preguntas en-mesas" href="https://docs.google.com/spreadsheets/d/14vWZ1S5Is4x_noa-ADJbCxeetVUXnZewGhkRHyugz9s/edit?usp=sharing" target="_blank" rel="noopener noreferrer">
+          <span class="guia-preguntas-icono" aria-hidden="true"><svg class="ic"><use href="#ic-pregunta"></use></svg></span>
+          <span class="guia-preguntas-texto"><strong>Guía de preguntas de exámenes</strong>
+            <small>Preguntas recopiladas de exámenes anteriores, en el Drive de FOE</small></span>
+          <svg class="ic guia-preguntas-flecha" aria-hidden="true"><use href="#ic-externo"></use></svg>
+          <span class="visually-hidden"> (se abre en una pestaña nueva)</span>
+        </a>
+
         <div class="filter-bar">
           <div class="filter-group">
             <div class="field">
@@ -508,7 +521,7 @@
       <div class="section-header">
         <div class="section-title-wrap">
           <h2 id="titulo-cursada">Cursada y clínica</h2>
-          <p>Lo que necesitás para atender: papelería oficial, instrumental exigido por cada cátedra y equipamiento de segunda mano entre estudiantes.</p>
+          <p>Lo que necesitás para atender: historias clínicas oficiales de la FOLP, instrumental exigido por cada cátedra y equipamiento de segunda mano entre estudiantes.</p>
         </div>
       </div>
 
@@ -531,15 +544,15 @@
         <div class="filter-bar">
           <div class="filter-group">
             <div class="field search-field">
-              <label class="field-label" for="hc-search-input">Buscar por materia o cátedra</label>
+              <label class="field-label" for="hc-search-input">Buscar por materia o documento</label>
               <svg class="ic" aria-hidden="true"><use href="#ic-buscar"></use></svg>
-              <input type="search" id="hc-search-input" class="form-control" placeholder="Operatoria, Cirugía, Endodoncia…">
+              <input type="search" id="hc-search-input" class="form-control" placeholder="Endodoncia, Prótesis, consentimiento…">
             </div>
           </div>
-          <p class="filter-note"><svg class="ic" aria-hidden="true"><use href="#ic-imprimir"></use></svg> Se abren listas para imprimir o guardar en PDF</p>
+          <p class="filter-note"><svg class="ic" aria-hidden="true"><use href="#ic-imprimir"></use></svg> PDF oficiales de la FOLP, listos para imprimir. <a href="https://www.folp.unlp.edu.ar/hclinica/" target="_blank" rel="noopener noreferrer">Ver la página de la facultad</a></p>
         </div>
         <p class="results-summary" id="historias-summary" role="status" aria-live="polite"></p>
-        <div class="hc-grid" id="historias-grid"></div>
+        <div class="hc-grupos" id="historias-grid"></div>
       </div>
 
       <div class="tab-panel" id="panel-instrumental" role="tabpanel" aria-labelledby="tab-instrumental" tabindex="0" hidden>
@@ -595,6 +608,91 @@
   </section>
 
   <!-- ======================================================================
+       TRÁMITES Y PREGUNTAS — preguntas frecuentes (data.js) y readmisión.
+       Lo de readmisión sale de la publicación de la FOLP y de su planilla:
+       cuando la facultad publique la del año siguiente, se cambian los
+       enlaces y el año.
+       ====================================================================== -->
+  <section id="seccion-tramites" class="app-section" aria-labelledby="titulo-tramites">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2 id="titulo-tramites">Trámites y preguntas</h2>
+          <p>Lo que más nos preguntan en la mesa de FOE, y cómo pedir la readmisión.</p>
+        </div>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Trámites y preguntas">
+        <button type="button" class="tab" role="tab" id="tab-faq" data-tab="faq"
+                aria-controls="panel-faq" aria-selected="true">
+          <svg class="ic" aria-hidden="true"><use href="#ic-pregunta"></use></svg> Preguntas frecuentes
+        </button>
+        <button type="button" class="tab" role="tab" id="tab-readmision" data-tab="readmision"
+                aria-controls="panel-readmision" aria-selected="false" tabindex="-1">
+          <svg class="ic" aria-hidden="true"><use href="#ic-documento"></use></svg> Readmisión 2027
+        </button>
+      </div>
+
+      <div class="tab-panel" id="panel-faq" role="tabpanel" aria-labelledby="tab-faq" tabindex="0">
+        <div class="field recursos-buscador">
+          <label class="field-label" for="faq-buscar">Buscar una pregunta</label>
+          <input type="search" class="form-control" id="faq-buscar" autocomplete="off"
+                 placeholder="Regularidad, esterilización, libreta…">
+        </div>
+        <div class="faq-lista" id="faq-lista"></div>
+      </div>
+
+      <div class="tab-panel" id="panel-readmision" role="tabpanel" aria-labelledby="tab-readmision" tabindex="0" hidden>
+        <div class="readm">
+          <div class="readm-cabecera">
+            <h3>Readmisión para el ciclo lectivo 2027</h3>
+            <p>La tienen que pedir quienes durante el ciclo lectivo no cumplieron con los requisitos para mantener la regularidad.</p>
+            <div class="readm-acciones">
+              <a class="btn btn-magenta" href="https://www.folp.unlp.edu.ar/documents/388/Readmision_2027_planilla_copia.pdf.pdf" target="_blank" rel="noopener noreferrer">
+                <svg class="ic" aria-hidden="true"><use href="#ic-descargar"></use></svg> Descargar la planilla
+              </a>
+              <a class="btn btn-secondary" href="https://www.folp.unlp.edu.ar/alumnos/readmision-2027/" target="_blank" rel="noopener noreferrer">
+                <svg class="ic" aria-hidden="true"><use href="#ic-externo"></use></svg> Ver la publicación de la FOLP
+              </a>
+            </div>
+          </div>
+
+          <ol class="readm-pasos">
+            <li><strong>Descargá la planilla</strong> de solicitud (el botón de arriba).</li>
+            <li><strong>Imprimila, completala y firmala</strong> de puño y letra.</li>
+            <li><strong>Escaneala en PDF, tamaño A4.</strong> Escaneá también tu DNI, de los dos lados.</li>
+            <li><strong>Mandá las dos cosas por mail</strong> a <a href="mailto:direadmisiones@folp.unlp.edu.ar?subject=Readmisi%C3%B3n%20para%20el%20Ciclo%20Lectivo%202027%20-%20Apellidos%20y%20Nombres">direadmisiones@folp.unlp.edu.ar</a>.
+              En el asunto poné: <span class="readm-asunto">Readmisión para el Ciclo Lectivo 2027 — Apellidos y Nombres</span></li>
+          </ol>
+
+          <div class="readm-columnas">
+            <div class="readm-caja">
+              <h4>Qué te pide la planilla</h4>
+              <ul>
+                <li>Apellidos y nombres</li>
+                <li>Número de legajo y DNI</li>
+                <li>Domicilio en La Plata, domicilio real y código postal</li>
+                <li>Teléfono y e-mail</li>
+                <li>Si autorizás que te notifiquen por correo electrónico (Ordenanza 101, art. 20 (4) y 47 bis (12))</li>
+                <li>Firma y aclaración</li>
+              </ul>
+              <p class="readm-nota">Va dirigida a la Secretaría de Asuntos Académicos de la facultad.</p>
+            </div>
+            <div class="readm-caja readm-importante">
+              <h4>Importante</h4>
+              <ul>
+                <li>El plazo lo fija la facultad. Lo publicamos apenas salga.</li>
+                <li>Si la documentación no llega en el formato y el plazo pedidos, <strong>el trámite se rechaza sin excepción.</strong></li>
+                <li>Dudas: <a href="mailto:direadmisiones@folp.unlp.edu.ar">direadmisiones@folp.unlp.edu.ar</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================================
        RECURSOS — lo que estaba en el Linktree de FOE. Lo dibuja
        js/recursos.js, donde también están los enlaces.
        ====================================================================== -->
@@ -638,6 +736,13 @@
                  placeholder="Anatomía, Netter, Periodoncia…">
         </div>
       </div>
+      <a class="guia-preguntas en-biblioteca" href="https://docs.google.com/spreadsheets/d/14vWZ1S5Is4x_noa-ADJbCxeetVUXnZewGhkRHyugz9s/edit?usp=sharing" target="_blank" rel="noopener noreferrer">
+          <span class="guia-preguntas-icono" aria-hidden="true"><svg class="ic"><use href="#ic-pregunta"></use></svg></span>
+          <span class="guia-preguntas-texto"><strong>Guía de preguntas de exámenes</strong>
+            <small>Preguntas recopiladas de exámenes anteriores, en el Drive de FOE</small></span>
+          <svg class="ic guia-preguntas-flecha" aria-hidden="true"><use href="#ic-externo"></use></svg>
+          <span class="visually-hidden"> (se abre en una pestaña nueva)</span>
+        </a>
       <p class="results-summary" id="biblio-resumen" role="status" aria-live="polite"></p>
 
       <div class="biblio-grilla" id="biblio-materias"></div>
@@ -1695,24 +1800,24 @@
 </footer>
 
 <!-- Scripts: configuración y núcleo primero, módulos después, controlador al final -->
-<script src="js/config.js?v=20260930b"></script>
-<script src="js/core.js?v=20260930b"></script>
-<script src="js/api.js?v=20260930b"></script>
-<script src="js/data.js?v=20260930b"></script>
-<script src="js/planes.js?v=20260930b"></script>
-<script src="js/live_sheets.js?v=20260930b"></script>
-<script src="js/calculator.js?v=20260930b"></script>
-<script src="js/carrera.js?v=20260930b"></script>
-<script src="js/agenda.js?v=20260930b"></script>
-<script src="js/recursos.js?v=20260930b"></script>
-<script src="js/biblioteca-datos.js?v=20260930b"></script>
-<script src="js/biblioteca.js?v=20260930b"></script>
-<script src="js/hoy.js?v=20260930b"></script>
-<script src="js/bolsa.js?v=20260930b"></script>
-<script src="js/auth.js?v=20260930b"></script>
-<script src="js/excel.js?v=20260930b"></script>
-<script src="js/admin.js?v=20260930b"></script>
-<script src="js/chatbot.js?v=20260930b"></script>
-<script src="js/app.js?v=20260930b"></script>
+<script src="js/config.js?v=20261008a"></script>
+<script src="js/core.js?v=20261008a"></script>
+<script src="js/api.js?v=20261008a"></script>
+<script src="js/data.js?v=20261008a"></script>
+<script src="js/planes.js?v=20261008a"></script>
+<script src="js/live_sheets.js?v=20261008a"></script>
+<script src="js/calculator.js?v=20261008a"></script>
+<script src="js/carrera.js?v=20261008a"></script>
+<script src="js/agenda.js?v=20261008a"></script>
+<script src="js/recursos.js?v=20261008a"></script>
+<script src="js/biblioteca-datos.js?v=20261008a"></script>
+<script src="js/biblioteca.js?v=20261008a"></script>
+<script src="js/hoy.js?v=20261008a"></script>
+<script src="js/bolsa.js?v=20261008a"></script>
+<script src="js/auth.js?v=20261008a"></script>
+<script src="js/excel.js?v=20261008a"></script>
+<script src="js/admin.js?v=20261008a"></script>
+<script src="js/chatbot.js?v=20261008a"></script>
+<script src="js/app.js?v=20261008a"></script>
 </body>
 </html>
